@@ -72,10 +72,6 @@
                                 <field name="zip" placeholder="ZIP" class="o_address_country"/>
                             </div>
                             <field name="vat" placeholder="e.g. BE0477472701" invisible="1" attrs="{'readonly': [('parent_id','!=',False)]}"/>
-                            <field name="credit_card_id"/>
-                            <field name="categ_id"/>
-                            <field name="categss_id"/>
-                            <field name="post_id"/>
                         </group>
                     </group>
                     <notebook colspan="4">

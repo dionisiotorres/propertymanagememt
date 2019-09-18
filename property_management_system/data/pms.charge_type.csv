@@ -1,8 +1,0 @@
-id,code,name,active
-charge_type_1,BR,Base Rental,TRUE
-charge_type_2,GTO,GTO,TRUE
-charge_type_3,SC,Service Charge,TRUE
-charge_type_4,SD,Security Deposit,TRUE
-charge_type_5,A&D,A&D,TRUE
-charge_type_6,UTIC,UTIC,TRUE
-charge_type_7,Other,Other,TRUE

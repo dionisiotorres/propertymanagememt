@@ -41,10 +41,10 @@ class PmsFormatDetail(models.Model):
                                    ('datetime', 'Datetime')],
                                   string="Type",
                                   default="fix")
-    fix_value = fields.Char("Value")
-    digit_value = fields.Integer("Value")
-    dynamic_value = fields.Char("Value")
-    datetime_value = fields.Char("Value")
+    fix_value = fields.Char("Fixed Value")
+    digit_value = fields.Integer("Digit Value")
+    dynamic_value = fields.Char("Dynamic Value")
+    datetime_value = fields.Char("Date Value")
     value = fields.Char("Value")
 
     @api.onchange("value_type")

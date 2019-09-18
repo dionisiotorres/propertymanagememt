@@ -234,19 +234,19 @@ class PMSDisplayType(models.Model):
         return result
 
 
-class PMSMeterType(models.Model):
-    _name = "pms.meter.type"
-    _description = 'Meter Type'
+# class PMSMeterType(models.Model):
+#     _name = "pms.meter.type"
+#     _description = 'Meter Type'
 
-    name = fields.Char("Meter No")
-    utility_id = fields.Many2one("pms.utility.type", "Utility Type")
-    display_type = fields.Many2one('pms.display.type', 'Display Type')
-    digit = fields.Selection([('3', '3'), ('4', '4'), ('5', '5'), ('6', '6'),
-                              ('7', '7'), ('8', '8'), ('9', '9')],
-                             "Display Digits")
-    charge_type = fields.Selection([('fixed', 'Fixed'),
-                                    ('variable', 'Variable')],
-                                   string="Charge Type")
+#     name = fields.Char("Meter No")
+#     utility_id = fields.Many2one("pms.utility.type", "Utility Type")
+#     display_type = fields.Many2one('pms.display.type', 'Display Type')
+#     digit = fields.Selection([('3', '3'), ('4', '4'), ('5', '5'), ('6', '6'),
+#                               ('7', '7'), ('8', '8'), ('9', '9')],
+#                              "Display Digits")
+#     charge_type = fields.Selection([('fixed', 'Fixed'),
+#                                     ('variable', 'Variable')],
+#                                    string="Charge Type")
 
 
 class PMSTerms(models.Model):
@@ -332,7 +332,7 @@ class Bank(models.Model):
     branch = fields.Char("Branch Name",
                          index=True,
                          help="Sometimes called BIC or Swift.")
-    city_id = fields.Many2one("pms.city", "City Name",ondelete='cascade')
+    city_id = fields.Many2one("pms.city", "City Name", ondelete='cascade')
     township = fields.Many2one("pms.township", "Township")
 
     _sql_constraints = [('name_unique', 'unique(name)',
@@ -357,20 +357,23 @@ class Company(models.Model):
     _order = 'sequence, name'
 
     city_id = fields.Many2one("pms.city",
-                           "City Name",
-                           compute='_compute_address',
-                           inverse='_inverse_city',ondelete='cascade')
+                              "City Name",
+                              compute='_compute_address',
+                              inverse='_inverse_city',
+                              ondelete='cascade')
     township = fields.Many2one("pms.township",
                                "Township Name",
                                compute='_compute_address',
-                               inverse='_inverse_township',ondelete='cascade')
+                               inverse='_inverse_township',
+                               ondelete='cascade')
     company_type = fields.Many2one('pms.company.category', "Company Type")
-    partner_contact_id = fields.Many2many("res.partner",
-                                          "company_partner_contact_rel",
-                                          "company_id",
-                                          "partner_id",
-                                          domain="[('is_company', '!=', True)]",
-                                          store=True)
+    partner_contact_id = fields.Many2many(
+        "res.partner",
+        "company_partner_contact_rel",
+        "company_id",
+        "partner_id",
+        domain="[('is_company', '!=', True)]",
+        store=True)
 
     def _get_company_address_fields(self, partner):
         return {
@@ -404,7 +407,10 @@ class PMSTownship(models.Model):
 
     name = fields.Char("Name", required=True)
     code = fields.Char("Code", required=True)
-    city_id = fields.Many2one("pms.city", "City", ondelete='cascade',required=True)
+    city_id = fields.Many2one("pms.city",
+                              "City",
+                              ondelete='cascade',
+                              required=True)
 
 
 class PMSState(models.Model):

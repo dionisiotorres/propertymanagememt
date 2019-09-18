@@ -5,8 +5,6 @@ access_pms_properties,pms.properties,model_pms_properties,base.group_user,TRUE,T
 access_pms_properties_manager,pms.properties,model_pms_properties,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_floor,pms.floor,model_pms_floor,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_floor_manager,pms.floor,model_pms_floor,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
-access_pms_rule,pms.rule,model_pms_rule,base.group_user,TRUE,TRUE,TRUE,TRUE
-access_pms_rule_manager,pms.rule,model_pms_rule,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_format,pms.format,model_pms_format,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_format_manager,pms.format,model_pms_format,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_format_detail,pms.format.detail,model_pms_format_detail,base.group_user,TRUE,TRUE,TRUE,TRUE

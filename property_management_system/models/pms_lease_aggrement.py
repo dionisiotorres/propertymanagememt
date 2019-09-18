@@ -1,8 +1,9 @@
 from odoo import models, fields, api, tools
 
 
-class PMSLeaseAggrement(models.Model):
-    _name = 'pms.lease_aggrement'
+class PMSLeaseAgreement(models.Model):
+    _name = 'pms.lease_agreement'
+    _description = "Lease Agreement"
 
     name = fields.Char("Shop Name",
                        default="New",
@@ -45,16 +46,16 @@ class PMSLeaseAggrement(models.Model):
                              string="Status",
                              default="NEW")
     active = fields.Boolean(default=True)
-    lease_aggrement_line = fields.One2many("pms.lease_aggrement.line",
-                                           "lease_aggrement_id",
-                                           "Lease Aggrement Items")
+    lease_agreement_line = fields.One2many("pms.lease_agreement.line",
+                                           "lease_agreement_id",
+                                           "Lease Agreement Items")
 
     @api.multi
     def toggle_active(self):
         for la in self:
             if not la.active:
                 la.active = self.active
-        super(PMSLeaseAggrement, self).toggle_active()
+        super(PMSLeaseAgreement, self).toggle_active()
 
     # _sql_constraints = [
     #     ('name_unique', 'unique(name)',
@@ -62,12 +63,12 @@ class PMSLeaseAggrement(models.Model):
     # ]
 
 
-class PMSLeaseAggrementLine(models.Model):
-    _name = 'pms.lease_aggrement.line'
-    _description = "Lease Aggrement Line"
+class PMSLeaseAgreementLine(models.Model):
+    _name = 'pms.lease_agreement.line'
+    _description = "Lease Agreement Line"
 
-    lease_aggrement_id = fields.Many2one("pms.lease_aggrement",
-                                         "Lease Aggrement")
+    lease_agreement_id = fields.Many2one("pms.lease_agreement",
+                                         "Lease Agreement")
 
     unit_no = fields.Many2one("pms.space.unit")
     start_date = fields.Date("Start Date")
@@ -83,6 +84,7 @@ class PMSLeaseAggrementLine(models.Model):
 
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'
+    _description = "Charge Type"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)
@@ -102,6 +104,7 @@ class PMSChargeType(models.Model):
 
 class PMSChargeFormula(models.Model):
     _name = 'pms.charge.formula'
+    _description = "Charge Formula"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)

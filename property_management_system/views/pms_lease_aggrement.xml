@@ -1,8 +1,8 @@
 <odoo>
   <data>
     <record model="ir.ui.view" id="view_lease_aggrement_form">
-      <field name="name">Lease Aggrement Form</field>
-      <field name="model">pms.lease_aggrement</field>
+      <field name="name">Lease Agreement Form</field>
+      <field name="model">pms.lease_agreement</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
@@ -44,7 +44,7 @@
             </group>
             <notebook>
                 <page string="Lease Items" >
-                    <field name="lease_aggrement_line">
+                    <field name="lease_agreement_line">
                     <form>
                       <group>
                         <group>
@@ -74,9 +74,9 @@
         </form>
       </field>
     </record>
-    <record model="ir.ui.view" id="view_lease_aggrement_tree">
-      <field name="name">Lease Aggrement list</field>
-      <field name="model">pms.lease_aggrement</field>
+    <record model="ir.ui.view" id="view_lease_agreement_tree">
+      <field name="name">Lease Agreement list</field>
+      <field name="model">pms.lease_agreement</field>
       <field name="arch" type="xml">
         <tree>
           <field name="property_id"/>
@@ -87,9 +87,9 @@
         </tree>
       </field>
     </record>
-     <record model="ir.ui.view" id="view_lease_aggrement_filter">
-      <field name="name">Lease Aggrement list</field>
-      <field name="model">pms.lease_aggrement</field>
+     <record model="ir.ui.view" id="view_lease_agreement_filter">
+      <field name="name">Lease Agreement list</field>
+      <field name="model">pms.lease_agreement</field>
       <field name="arch" type="xml">
         <search>
           <field name="name"/>
@@ -97,11 +97,11 @@
       </field>
     </record>
      <record id="action_lease_aggrement_all" model="ir.actions.act_window">
-       <field name="name">Lease Aggrements</field>
-       <field name="res_model">pms.lease_aggrement</field>
+       <field name="name">Lease Agreements</field>
+       <field name="res_model">pms.lease_agreement</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
-       <field name="view_id" ref="view_lease_aggrement_tree"/> 
+       <field name="view_id" ref="view_lease_agreement_tree"/> 
     </record>
     <menuitem  id="lease_management_menu_sub" 
       name="Lease Management" 

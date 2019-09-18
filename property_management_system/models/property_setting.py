@@ -4,6 +4,7 @@ from odoo import models, fields, api, tools
 
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'
+    _description = 'Equipment Type'
 
     name = fields.Char("Equipment Type", required=True)
     active = fields.Boolean(default=True)
@@ -14,6 +15,7 @@ class PMSEquipmentType(models.Model):
 
 class PMSEquipment(models.Model):
     _name = 'pms.equipment'
+    _description = "Equipments"
 
     equipment_type_id = fields.Many2one("pms.equipment.type",
                                         string="Equipment Type",
@@ -27,6 +29,7 @@ class PMSEquipment(models.Model):
 
 class PMSPropertyType(models.Model):
     _name = 'pms.property.type'
+    _description = 'Property Type'
 
     name = fields.Char("Property Type", required=True)
     active = fields.Boolean(default=True)
@@ -52,6 +55,7 @@ class PMSPropertyType(models.Model):
 
 class PMSUtilitySourceType(models.Model):
     _name = "pms.utility.source.type"
+    _description = "Utility Source Type"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)
@@ -80,6 +84,7 @@ class PMSUtilitySourceType(models.Model):
 
 class PMSUtilitySupplyType(models.Model):
     _name = "pms.utility.supply.type"
+    _description = "Utility Supply Type"
 
     name = fields.Char("Utility Name", required=True)
     code = fields.Char("Utility Code", required=True)
@@ -216,8 +221,8 @@ class PMSDisplayType(models.Model):
     _name = "pms.display.type"
     _description = 'Display Type'
 
-    name = fields.Char("Display Name")
-    code = fields.Char("Display Code")
+    name = fields.Char("Name")
+    code = fields.Char("Code")
     active = fields.Boolean(default=True)
 
     @api.multi
@@ -327,7 +332,7 @@ class Bank(models.Model):
     branch = fields.Char("Branch Name",
                          index=True,
                          help="Sometimes called BIC or Swift.")
-    city_id = fields.Many2one("pms.city", "City",ondelete='cascade')
+    city_id = fields.Many2one("pms.city", "City Name",ondelete='cascade')
     township = fields.Many2one("pms.township", "Township")
 
     _sql_constraints = [('name_unique', 'unique(name)',
@@ -356,7 +361,7 @@ class Company(models.Model):
                            compute='_compute_address',
                            inverse='_inverse_city',ondelete='cascade')
     township = fields.Many2one("pms.township",
-                               "Township",
+                               "Township Name",
                                compute='_compute_address',
                                inverse='_inverse_township',ondelete='cascade')
     company_type = fields.Many2one('pms.company.category', "Company Type")

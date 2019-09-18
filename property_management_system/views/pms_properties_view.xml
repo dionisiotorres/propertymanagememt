@@ -1,10 +1,10 @@
 <odoo>
   <data>
-  <template id="asset_backend" inherit_id="web.assets_backend"> 
+  <!-- <template id="asset_backend" inherit_id="web.assets_backend"> 
      <xpath expr="." position="inside">
          <link rel="stylesheet" href="/property_management_system/static/src/css/custom.css"/> 
      </xpath>        
-  </template>
+  </template> -->
     <menuitem id="pms_properties_menu_root"
             name="ZPMS"
             web_icon="property_management_system,static/description/icon.png"
@@ -198,8 +198,8 @@
               </group> 
               </page>
               <page name="Terms" string="Terms">
-               <div id="leave-term">Lease Terms</div>
-               <separator/>
+               <!-- <div id="leave-term">Lease Terms</div> -->
+               <!-- <separator/> -->
                <field name="leaseterms_line_id" widget='many2many'>
                   <tree editable="bottom">
                       <field name="name" string="Description"/>

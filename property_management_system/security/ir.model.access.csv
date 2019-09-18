@@ -39,8 +39,8 @@ access_pms_space_unit,pms.space.unit,model_pms_space_unit,base.group_user,TRUE,T
 access_pms_space_unit_manager,pms.space.unit,model_pms_space_unit,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_company_category,pms.company.category,model_pms_company_category,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_company_category_manager,pms.company.category,model_pms_company_category,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
-access_pms_lease_aggrement,pms.lease.aggrement,model_pms_lease_aggrement,base.group_user,TRUE,TRUE,TRUE,TRUE
-access_pms_lease_aggrement_manager,pms.lease.aggrement,model_pms_lease_aggrement,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
+access_pms_lease_agreement,pms.lease.agreement,model_pms_lease_agreement,base.group_user,TRUE,TRUE,TRUE,TRUE
+access_pms_lease_agreement_manager,pms.lease.agreement,model_pms_lease_agreement,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_charge_type,pms.charge.type,model_pms_charge_type,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_charge_type_manager,pms.charge.type,model_pms_charge_type,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_trade_category,pms.trade.category,model_pms_trade_category,base.group_user,TRUE,TRUE,TRUE,TRUE
@@ -63,5 +63,5 @@ access_pms_equipment,pms.equipment,model_pms_equipment,base.group_user,TRUE,TRUE
 access_pms_equipment_manager,pms.equipment,model_pms_equipment,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_facility_lines,pms.facility.lines,model_pms_facility_lines,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_facility_lines_manager,pms.facility.lines,model_pms_facility_lines,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
-access_pms_lease_aggrement_line,pms.lease_aggrement.line,model_pms_lease_aggrement_line,base.group_user,TRUE,TRUE,TRUE,TRUE
-access_pms_lease_aggrement_line_manager,pms.lease_aggrement.line,model_pms_lease_aggrement_line,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
+access_pms_lease_agreement_line,pms.lease_agreement.line,model_pms_lease_agreement_line,base.group_user,TRUE,TRUE,TRUE,TRUE
+access_pms_lease_agreement_line_manager,pms.lease_agreement.line,model_pms_lease_agreement_line,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE

@@ -58,8 +58,9 @@
     </record> 
     <menuitem  id="department_menu_root" 
       name="Department" 
-      parent="pms_menu_config"
+      parent="property_management_menu_sub"
       action="action_department_all"
-      sequence="100"/>
+      groups="base.group_no_one"
+      sequence="200"/>
   </data>
 </odoo>

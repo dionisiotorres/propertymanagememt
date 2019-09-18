@@ -65,3 +65,6 @@ access_pms_facility_lines,pms.facility.lines,model_pms_facility_lines,base.group
 access_pms_facility_lines_manager,pms.facility.lines,model_pms_facility_lines,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
 access_pms_lease_agreement_line,pms.lease_agreement.line,model_pms_lease_agreement_line,base.group_user,TRUE,TRUE,TRUE,TRUE
 access_pms_lease_agreement_line_manager,pms.lease_agreement.line,model_pms_lease_agreement_line,base.group_erp_manager,TRUE,TRUE,TRUE,TRUE
+access_pms_charge_formula,pms.charge.formula,model_pms_charge_formula,base.group_user,1,0,0,0
+access_pms_department,pms.department,model_pms_department,base.group_user,1,0,0,0
+access_pms_space_unit_management,pms.space.unit.management,model_pms_space_unit_management,base.group_user,1,0,0,0

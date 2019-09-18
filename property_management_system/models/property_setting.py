@@ -4,7 +4,7 @@ from odoo import models, fields, api, tools
 
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'
-    _description = 'Equipment Type'
+    _description = 'Equipment Types'
 
     name = fields.Char("Equipment Type", required=True)
     active = fields.Boolean(default=True)
@@ -29,7 +29,7 @@ class PMSEquipment(models.Model):
 
 class PMSPropertyType(models.Model):
     _name = 'pms.property.type'
-    _description = 'Property Type'
+    _description = 'Property Types'
 
     name = fields.Char("Property Type", required=True)
     active = fields.Boolean(default=True)
@@ -55,7 +55,7 @@ class PMSPropertyType(models.Model):
 
 class PMSUtilitySourceType(models.Model):
     _name = "pms.utility.source.type"
-    _description = "Utility Source Type"
+    _description = "Utility Source Types"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)
@@ -84,7 +84,7 @@ class PMSUtilitySourceType(models.Model):
 
 class PMSUtilitySupplyType(models.Model):
     _name = "pms.utility.supply.type"
-    _description = "Utility Supply Type"
+    _description = "Utility Supply Types"
 
     name = fields.Char("Utility Name", required=True)
     code = fields.Char("Utility Code", required=True)
@@ -147,7 +147,7 @@ class PMSFacilities(models.Model):
 
 class PMSFacilitiesline(models.Model):
     _name = 'pms.facility.lines'
-    _description = "Facility Line"
+    _description = "Facility Lines"
 
     facility_id = fields.Many2one("pms.facilities", "Facilities")
     supplier_type_id = fields.Many2one('pms.utility.source.type',
@@ -458,6 +458,7 @@ class PMSDepartment(models.Model):
 
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
+    _description = "Company Categorys"
 
     name = fields.Char("Description", required=True)
     active = fields.Boolean(default=True)

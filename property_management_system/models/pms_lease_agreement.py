@@ -3,7 +3,7 @@ from odoo import models, fields, api, tools
 
 class PMSLeaseAgreement(models.Model):
     _name = 'pms.lease_agreement'
-    _description = "Lease Agreement"
+    _description = "Lease Agreements"
 
     name = fields.Char("Shop Name",
                        default="New",
@@ -84,7 +84,7 @@ class PMSLeaseAgreementLine(models.Model):
 
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'
-    _description = "Charge Type"
+    _description = "Charge Types"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)
@@ -104,7 +104,7 @@ class PMSChargeType(models.Model):
 
 class PMSChargeFormula(models.Model):
     _name = 'pms.charge.formula'
-    _description = "Charge Formula"
+    _description = "Charge Formulas"
 
     name = fields.Char("Description", required=True)
     code = fields.Char("Code", required=True)

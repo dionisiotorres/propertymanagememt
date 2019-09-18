@@ -72,6 +72,7 @@ class Company(models.Model):
 
 class PMSRule(models.TransientModel):
     _name = 'pms.rule'
+    _description = "Rule"
 
     @api.model
     def _get_default_company(self):

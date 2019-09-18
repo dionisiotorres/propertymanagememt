@@ -357,7 +357,7 @@ class Company(models.Model):
     _order = 'sequence, name'
 
     city_id = fields.Many2one("pms.city",
-                           "City",
+                           "City Name",
                            compute='_compute_address',
                            inverse='_inverse_city',ondelete='cascade')
     township = fields.Many2one("pms.township",

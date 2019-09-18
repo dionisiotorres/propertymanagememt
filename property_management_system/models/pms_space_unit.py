@@ -6,7 +6,7 @@ class PMSSpaceUnit(models.Model):
     _description = "Space Units"
     _order = "parent_id"
 
-    name = fields.Char("Space Unit No",
+    name = fields.Char("Unit No",
                        compute='get_unit_no',
                        store=True,
                        readonly=True)
@@ -17,7 +17,7 @@ class PMSSpaceUnit(models.Model):
     floor_code = fields.Char(string="Floor Code",
                              related="floor_id.code",
                              store=False)
-    unit_no = fields.Char("Unit No", store=True, required=True)
+    unit_no = fields.Char("Space Unit No", store=True, required=True)
     parent_id = fields.Many2one("pms.space.unit", "Parent", store=True)
     unittype_id = fields.Many2one("pms.space.type", "Space Type")
     uom = fields.Many2one("pms.uom", "UOM")

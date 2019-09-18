@@ -21,7 +21,7 @@
                 <group> 
                   <field name="property_id"/>
                   <field name="floor_id"/>
-                  <field name="unit_no" requried="1" placeholder="Unit No"/>
+                  <field name="unit_no" requried="1" placeholder="Space Unit No"/>
                   <field name="unittype_id"/>
                   <field name="uom"/>
                 </group>

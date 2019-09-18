@@ -462,6 +462,15 @@ class PMSDepartment(models.Model):
     parent_id = fields.Many2one("pms.department", "Parent Department")
 
 
+class PMSPosition(models.Model):
+    _name = "pms.position"
+    _description = "Positions"
+    _order = "name"
+
+    name = fields.Char("Name", required=True)
+    parent_id = fields.Many2one("pms.department", "Parent Department")
+
+
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
     _description = "Company Categorys"
@@ -481,6 +490,10 @@ class Partner(models.Model):
     _inherit = "res.partner"
 
     city_id = fields.Many2one("pms.city", "City Name", ondelete='cascade')
+    credit_card_id = fields.Many2one("pms.credit_card", "Credit Cards")
+    categ_id = fields.Many2one("pms.category", "Categorys")
+    categss_id = fields.Many2one("pms.category", "Cate")
+    post_id = fields.Many2one("pms.position", "Position")
     company_type = fields.Selection(
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
@@ -519,6 +532,19 @@ class Partner(models.Model):
     def _write_company_type(self):
         for partner in self:
             partner.is_company = partner.company_type == 'company'
+
+
+class PMSCreditCard(models.Model):
+    _name = "pms.credit_card"
+
+    name = fields.Char("Name")
+
+
+class PMSCategory(models.Model):
+    _name = "pms.category"
+    _description = "Categorys"
+
+    name = fields.Char("Description", required=True)
 
     # dis_company_type = fields.Boolean("Disable")
     # department_id = fields.Many2one(

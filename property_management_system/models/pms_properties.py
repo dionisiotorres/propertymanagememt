@@ -99,13 +99,11 @@ class PMSProperties(models.Model):
         'partner_id',
         string='Contacts',
         domain="[('is_company', '!=', True)]")
-    property_management_id = fields.Many2many(
-        'res.partner',
-        'pms_property_managements_rel',
-        'property_id',
-        'partner_id',
-        string='Managements',
-        domain="[('is_company', '=', True)]")
+    property_management_id = fields.Many2many('res.company',
+                                              'pms_property_managements_rel',
+                                              'property_id',
+                                              'partner_id',
+                                              string='Managements')
     leaseterms_line_id = fields.Many2many("pms.leaseterms",
                                           "pms_properties_leaseterms_rel",
                                           "properties_id",

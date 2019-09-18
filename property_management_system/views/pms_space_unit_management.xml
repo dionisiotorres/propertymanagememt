@@ -85,6 +85,7 @@
       name="Space Unit Management" 
       parent="pms_menu_config"
       action="action_space_unit_management_all"
+      groups="base.group_no_one"
       sequence="2"/>
   </data>
 </odoo>

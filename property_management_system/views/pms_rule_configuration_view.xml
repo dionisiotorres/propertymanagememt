@@ -1,0 +1,175 @@
+<odoo>
+  <data>
+    <menuitem id="pms_rule_menu_root"
+            name="Configuration"
+            web_icon="property_management_system,static/description/icon.png"
+            sequence="500"/>
+          <record id="res_rule_view_form" model="ir.ui.view">
+          <field name="name">pms.rule.setting.view.form</field>
+          <field name="model">pms.rule.setting</field>
+          <field name="arch" type="xml">
+            <form string="Settings" class="oe_form_configuration o_base_settings">
+              <div class="o_control_panel">
+                <div class="o_panel">
+                  <div class="title h2 mb0 mt4 text-muted d-none d-md-block">Settings</div>
+                    <div class="o_setting_search">
+                      <!-- <input type="text" class="searchInput" placeholder="Search..."/>
+                        <span class="searchIcon"><i class="fa fa-search" role="img" aria-label="Search" title="Search"/></span> -->
+                    </div>
+                  </div>
+                  <header>
+                    <button string="Save" type="object" name="execute" class="oe_highlight" />
+                    <button string="Discard" type="object" name="cancel" special="cancel" />
+                  </header>
+                </div>
+                <div class="o_setting_container">
+                  <div class="settings_tab"/>
+                  <div class="settings">
+                    <div class="notFound o_hidden">No Record Found</div>
+                    <div>
+                      <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Fixed Code Integration</h4>
+                      <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Property Code</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Property Code format with digit number of generating in property
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="property_code_len" string="Property Digits" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="property_code_len" class="oe_inline" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Floor Code</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Floor Code format with digit number of generating in property
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="floor_code_len" string="Floor Digits" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="floor_code_len" class="oe_inline"/>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Space Unit Defination</h4>
+                      <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Space Unit Format</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Space Unit format with the default
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="space_unit_code_format" string="Space Unit" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="space_unit_code_format" class="oe_inline" />
+                              </div>
+                              <!-- <div class="mt16 row">
+                                <label for="spu_format" string="Format" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="spu_format" class="oe_inline" required="1"/>
+                              </div> -->
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Space Unit Code Length</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Space Unit Code Length in the Configuration using Space Unit Code.
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="space_unit_code_len" string="Space Unit Code Length" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="space_unit_code_len" class="oe_inline" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">POS Format Defination</h4>
+                      <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">POS ID Format</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the POS ID format with the default
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="pos_id_format" string="POS ID Format" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="pos_id_format" class="oe_inline" />
+                              </div>
+                              <!-- <div class="mt16 row">
+                                <label for="pos_format" string="Format" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="pos_format" class="oe_inline" required="1"/>
+                              </div> -->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Set Defaults</h4>
+                      <div class="row mt16 o_settings_container">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Compnay</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Compnay with the default
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="company_id" string="Company" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="company_id" class="oe_inline" required="1"/>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!--<div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_right_pane">
+                            <span class="o_form_label">Timezone</span>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                              Set the Timezone in the Configuration using the time whole Property.
+                            </div>
+                            <div class="content-group">
+                              <div class="mt16 row">
+                                <label for="timezone" string="Timezone" class="col-3 col-lg-3 o_light_label"/>
+                                <field name="timezone" class="oe_inline" required="1"/>
+                              </div>
+                            </div>
+                          </div>
+                        </div>-->
+                      </div> 
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </field>
+          </record>
+          <record id="action_rule_all" model="ir.actions.act_window">
+            <field name="name">Configuration</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pms.rule.setting</field>
+             <field name="view_id" ref="res_rule_view_form"/>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+          </record> 
+    <menuitem  id="rule_menu_root" 
+      name="Configuration" 
+      parent="pms_rule_menu_root"
+      action="action_rule_all"
+      sequence="2"/>
+  </data>
+</odoo>

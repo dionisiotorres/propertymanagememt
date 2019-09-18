@@ -1,0 +1,141 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_facilities_form">
+      <field name="name">Facility Form</field>
+      <field name="model">pms.facilities</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+           <div class="oe_button_box" name="button_box">
+              <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                  <!-- <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/> -->
+              </button>
+            </div>
+            <div class="oe_title">
+            <label for="name" string="Name"/>
+            <h1>
+                <field name="name" placeholder="Name..."/>
+            </h1>
+          </div>
+            <group>
+              <group>
+                <field name="utility_type_id"/>
+                <field name="meter_no"/>
+                <field name="interface_type" widget="radio" options="{'horizontal':true}"/>
+              </group>
+              <group>
+                <!-- <field name="start_date"/> -->
+                <field name="remark"/>
+              </group>
+            </group>
+            <notebook>
+              <page>
+               <field name="facilities_line">
+                <tree editable="bottom" options="{'no_quick_create':True}">
+                  <field name="supplier_type_id"/>
+                  <field name="install_date"/>
+                  <field name="start_reading_value"/>
+                  <field name="digit"/>
+                  <field name="start_date"/>
+                  <field name="end_date"/>
+                  <field name="status"/>
+                </tree>
+               </field>
+              </page>
+            </notebook>
+            
+            <!-- <table style="width:100%;">
+                <tr style="width:100%;padding:10px;background-color:white;">
+                    <th style="width:13%;border:1px solid lightgray;">
+                        <span>
+                            Supplier Type
+                        </span>
+                    </th>
+                    <th style="width:13%;border:1px solid lightgray;">
+                        <span>
+                            Install Date
+                        </span>
+                    </th>
+                    <th style="width:18%;border:1px solid lightgray;">
+                        <span>
+                            Last Reading Value
+                        </span>
+                    </th>
+                    <th style="width:18%;border:1px solid lightgray;">
+                        Digit
+                    </th>
+                    <th style="width:13%;border:1px solid lightgray;">
+                        Start Date
+                    </th>
+                    <th style="width:13%;border:1px solid lightgray;">
+                        End Date
+                    </th>
+                    <th style="width:13%;border:1px solid lightgray;">
+                        Status
+                    </th>
+                </tr>
+                <tr tyle="width:100%;">
+                 <td style="width:13%;border:1px solid lightgray;">
+                        <field name="supplier_type_id" nolabel="1"/>
+                    </td>
+                    <td style="width:13%;border:1px solid lightgray;">
+                        <field name="install_date" nolabel="1"/>
+                    </td>
+                    <td style="width:18%;border:1px solid lightgray;">
+                        <field name="start_reading_value" nolabel="1"/>
+                    </td>
+                    <td style="width:18%;border:1px solid lightgray;">
+                        <field name="digit" nolabel="1"/>
+                    </td>
+                    <td style="width:13%;border:1px solid lightgray;">
+                        <field name="start_date" nolabel="1"/>
+                    </td>
+                    <td style="width:13%;border:1px solid lightgray;">
+                        <field name="end_date" nolabel="1"/>
+                    </td>
+                    <td style="width:13%;text-align:center;border:1px solid lightgray;">
+                        <field name="status" nolabel="1"/>
+                    </td>
+                </tr>
+            </table> -->
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_facilities_tree">
+      <field name="name">Facility list</field>
+      <field name="model">pms.facilities</field>
+      <field name="arch" type="xml">
+        <tree>
+            <field name="utility_type_id"/>
+            <field name="meter_no"/>
+            <field name="interface_type"/>
+            <field name="status"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_facilities_filter">
+      <field name="name">Facility list</field>
+      <field name="model">pms.facilities</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="utility_type_id"/>
+            <field name="interface_type"/>
+            <!-- <field name="start_date"/> -->
+        </search>
+      </field>
+    </record>
+     <record id="action_facilities_all" model="ir.actions.act_window">
+       <field name="name">Facilities</field>
+       <field name="res_model">pms.facilities</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_facilities_tree"/> 
+    </record> 
+    <menuitem  id="facilities_menu_root" 
+      name="Facilities" 
+      parent="property_management_menu"
+      action="action_facilities_all"
+      sequence="70"/>
+  </data>
+</odoo>

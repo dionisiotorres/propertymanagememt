@@ -1,0 +1,304 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_lease_aggrement_form">
+      <field name="name">Lease Aggrement Form</field>
+      <field name="model">pms.lease_aggrement</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+           <div class="oe_button_box" name="button_box">
+              <button type="object" class="oe_stat_button" icon="fa-archive">
+                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+              </button>
+            </div>
+            <div class="oe_title">
+                <!-- <label for="name" string="Description"/> -->
+                <h1>
+                    <field name="name" placeholder="Description"/>
+                </h1>
+            </div>
+            <group>
+              <group>
+                <field name="property_id" />
+                <field name="company_tanent_id"/>
+                <field name="company_vendor_id" />
+                <field name="currency_id" />
+              </group>
+              <group>
+                <field name="start_date" />
+                  <field name="end_date" />
+                  <field name="extend_to" />
+                  <field name="old_end_date" />
+              </group>
+              <group colspan="2">
+                <field name="pos_submission" />
+                <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}"/>                
+                <field name="sale_data_type" widget="radio"   options="{'horizontal':True}"/>
+                <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}"/> 
+              </group>
+              <group>   
+                  <field name="reset_gp_flat" />
+                  <field name="reset_date" />
+                  <field name="remark"/>
+              </group>
+            </group>
+            <notebook>
+                <page string="Lease Items" >
+                    <field name="lease_aggrement_line">
+                    <form>
+                      <group>
+                        <group>
+                          <field name="unit_no"/>   
+                          <field name="pos_id" />
+                          <field name="remark" />
+                        </group>
+                        <group>
+                          <field name="start_date" />
+                          <field name="end_date" />
+                          <field name="extend_to" />
+                        </group>
+                      </group>
+                    </form>
+                      <tree>
+                        <field name="unit_no"/>
+                        <field name="start_date" />
+                        <field name="end_date" />
+                        <field name="extend_to" />
+                        <field name="pos_id" />
+                        <field name="remark" />
+                      </tree>
+                    </field>
+                </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_lease_aggrement_tree">
+      <field name="name">Lease Aggrement list</field>
+      <field name="model">pms.lease_aggrement</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="property_id"/>
+          <field name="name"/>
+          <field name="start_date" />
+          <field name="end_date" />
+          <field name="state"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_lease_aggrement_filter">
+      <field name="name">Lease Aggrement list</field>
+      <field name="model">pms.lease_aggrement</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_lease_aggrement_all" model="ir.actions.act_window">
+       <field name="name">Lease Aggrements</field>
+       <field name="res_model">pms.lease_aggrement</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_lease_aggrement_tree"/> 
+    </record>
+    <menuitem  id="lease_management_menu_sub" 
+      name="Lease Management" 
+      parent="pms_properties_menu_root"
+      sequence="3"/>
+    <menuitem  id="lease_aggrement_menu_subs" 
+      name="Lease" 
+      parent="lease_management_menu_sub" 
+      action="action_lease_aggrement_all"
+      sequence="1"/>
+     <menuitem id="lease_management_menu_config" 
+      name="Lease Management"  
+      parent="pms_menu_config"
+      sequence="3"/>
+     <record model="ir.ui.view" id="view_trade_category_form">
+      <field name="name">Trade Category Form</field>
+      <field name="model">pms.trade_category</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+           <div class="oe_button_box" name="button_box">
+              <button type="object" class="oe_stat_button" icon="fa-archive">
+                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+              </button>
+            </div>
+            <div class="oe_title">
+                <label for="name" string="Description"/>
+                <h1>
+                    <field name="name" placeholder="Description"/>
+                </h1>
+            </div>
+            <group>
+                <group>
+                    <field name="code"/>
+                </group>
+                <group>
+                </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_trade_category_tree">
+      <field name="name">Trade Category list</field>
+      <field name="model">pms.trade_category</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="code"/>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_trade_category_filter">
+      <field name="name">Trade Category list</field>
+      <field name="model">pms.trade_category</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="code"/>
+            <field name="name"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_trade_category_all" model="ir.actions.act_window">
+       <field name="name">Trade Categorys</field>
+       <field name="res_model">pms.trade_category</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_trade_category_tree"/> 
+    </record> 
+    <menuitem  id="trade_category_menu_sub" 
+      name="Trade Category" 
+      parent="lease_management_menu_config" 
+      action="action_trade_category_all"
+      sequence="10"/>
+     <record model="ir.ui.view" id="view_sub_trade_category_form">
+      <field name="name">Sub Trade Category Form</field>
+      <field name="model">pms.sub_trade_category</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+           <div class="oe_button_box" name="button_box">
+              <button type="object" class="oe_stat_button" icon="fa-archive">
+                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+              </button>
+            </div>
+            <div class="oe_title">
+                <label for="name" string="Description"/>
+                <h1>
+                    <field name="name" placeholder="Description"/>
+                </h1>
+            </div>
+            <group>
+                <group>
+                    <field name="code"/>
+                    <field name="trade_id"/>
+                </group>
+                <group>
+                </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_sub_trade_category_tree">
+      <field name="name">Sub Trade Category list</field>
+      <field name="model">pms.sub_trade_category</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="code"/>
+          <field name="name"/>
+          <field name="trade_id"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_sub_trade_category_filter">
+      <field name="name">Sub Trade Category list</field>
+      <field name="model">pms.sub_trade_category</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="code"/>
+            <field name="name"/>
+            <field name="trade_id"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_sub_trade_category_all" model="ir.actions.act_window">
+       <field name="name">Sub Trade Categorys</field>
+       <field name="res_model">pms.sub_trade_category</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_sub_trade_category_tree"/> 
+    </record> 
+    <menuitem  id="sub_trade_category_menu_sub" 
+      name="Sub Trade Category" 
+      parent="lease_management_menu_config" 
+      action="action_sub_trade_category_all"
+      sequence="12"/>
+
+    <record model="ir.ui.view" id="view_charge_type_form">
+      <field name="name">Charge Type Form</field>
+      <field name="model">pms.charge_type</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+           <div class="oe_button_box" name="button_box">
+              <button type="object" class="oe_stat_button" icon="fa-archive">
+                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+              </button>
+            </div>
+            <div class="oe_title">
+                <label for="name" string="Description"/>
+                <h1>
+                    <field name="name" placeholder="Description"/>
+                </h1>
+            </div>
+            <group>
+                <group>
+                    <field name="code"/>
+                </group>
+                <group>
+                </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_charge_type_tree">
+      <field name="name">Charge Type list</field>
+      <field name="model">pms.charge_type</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="code"/>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_charge_type_filter">
+      <field name="name">Charge Type list</field>
+      <field name="model">pms.charge_type</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="code"/>
+            <field name="name"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_charge_type_all" model="ir.actions.act_window">
+       <field name="name">Charge Types</field>
+       <field name="res_model">pms.charge_type</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_charge_type_tree"/> 
+    </record> 
+    <!-- <menuitem  id="charge_type_menu_sub" 
+      name="Charge Type" 
+      parent="lease_management_menu_config" 
+      action="action_charge_type_all"
+      sequence="10"/> -->
+  </data>
+</odoo>

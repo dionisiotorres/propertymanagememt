@@ -7,7 +7,10 @@ class PmsFormat(models.Model):
     _order = "name"
 
     name = fields.Char("Name")
-    # sample = fields.Char("Sample")
+    sample = fields.Char("Sample",
+                         compute='get_sample_format',
+                         store=True,
+                         readonly=True)
     active = fields.Boolean(default=True)
     format_line_id = fields.One2many("pms.format.detail", "format_id",
                                      "Format Line")
@@ -19,6 +22,33 @@ class PmsFormat(models.Model):
             code = record.name
             result.append((record.id, code))
         return result
+
+    @api.model
+    def create(self, values):
+        return super(PmsFormat, self).create(values)
+
+    @api.multi
+    @api.depends('format_line_id')
+    def get_sample_format(self):
+        f_val = []
+        self.sample = ''
+        if self.format_line_id:
+            for fl in self.mapped('format_line_id'):
+                if fl.value_type == 'fix' and fl.fix_value:
+                    f_val.append(fl.fix_value + '/')
+                if fl.value_type == 'digit' and fl.digit_value:
+                    f_val.append(str(fl.digit_value) + '/')
+                if fl.value_type == 'dynamic' and fl.dynamic_value:
+                    f_val.append(fl.dynamic_value + '/')
+                if fl.value_type == 'datetime' and fl.datetime_value:
+                    f_val.append(fl.datetime_value + '/')
+            if f_val:
+                for sm in range(len(f_val)):
+                    if len(f_val) - 1 == sm:
+                        f_val[sm]
+                        self.sample += f_val[sm].split('/')[0]
+                    else:
+                        self.sample += f_val[sm]
 
     @api.multi
     def toggle_active(self):
@@ -40,25 +70,33 @@ class PmsFormatDetail(models.Model):
                                    ('digit', 'Digit'),
                                    ('datetime', 'Datetime')],
                                   string="Type",
-                                  default="fix")
-    fix_value = fields.Char("Fixed Value")
-    digit_value = fields.Integer("Digit Value")
-    dynamic_value = fields.Char("Dynamic Value")
-    datetime_value = fields.Char("Date Value")
-    value = fields.Char("Value", compute="get_value_type")
+                                  default="")
+    fix_value = fields.Char("Fixed Value",
+                            compute="get_value_type",
+                            store=True)
+    digit_value = fields.Integer("Digit Value",
+                                 compute="get_value_type",
+                                 store=True)
+    dynamic_value = fields.Char("Dynamic Value",
+                                compute="get_value_type",
+                                store=True)
+    datetime_value = fields.Char("Date Value",
+                                 compute="get_value_type",
+                                 store=True)
+    value = fields.Char("Value")
 
     @api.one
-    @api.depends("value_type")
+    @api.depends("value")
     def get_value_type(self):
         if self.value_type:
             if self.value_type == 'fix':
-                self.value = self.fix_value
+                self.fix_value = self.value
             if self.value_type == 'dynamic':
-                self.value = self.dynamic_value
+                self.dynamic_value = self.value
             if self.value_type == 'digit':
-                self.value = str(self.digit_value)
+                self.digit_value = self.value
             if self.value_type == 'datetime':
-                self.value = str(self.datetime_value)
+                self.datetime_value = self.value
 
 
 class Company(models.Model):

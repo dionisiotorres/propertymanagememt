@@ -14,29 +14,25 @@
             <div class="oe_title">
               <label for="name" class="oe_edit_only" string="Format Name"/>
               <h1>
-                  <field name="name" placeholder="Name..."/>
+                  <field name="name" placeholder="Format Name"/>
               </h1>
-              <div name="options_active"/>
             </div>
             <group>
               <group>
-              <field name="name" 
+              <field name="sample" 
               readonly="1"
               />
-              <!-- <field name="sample" 
-              readonly="1"
-              /> -->
               </group>
               <group>
               </group>
             </group>
             <notebook>
                 <page string="Add Format Detail" >
-                    <field name="format_line_id" widget='many2many'>
+                    <field name="format_line_id">
                         <tree editable="bottom">
-                            <field name="position_order"/>
-                            <field name="value_type"/> 
-                            <field name="value"/>  
+                          <field name="position_order"/>
+                          <field name="value_type"/> 
+                          <field name="value"/>
                         </tree>
                     </field>
                 </page>
@@ -85,10 +81,11 @@
               <field name="value_type"/>             
               </group>
               <group>
-              <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
+              <field name="value"/>
+              <!-- <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
               <field name="fix_value" attrs="{'invisible':[('value_type','!=','fix')]}"/>
               <field name="digit_value" attrs="{'invisible':[('value_type','!=','digit')]}"/>
-              <field name="datetime_value" attrs="{'invisible':[('value_type','!=','datetime')]}"/>
+              <field name="datetime_value" attrs="{'invisible':[('value_type','!=','datetime')]}"/> -->
               </group>
             </group>            
           </sheet>

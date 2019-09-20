@@ -1,5 +1,18 @@
 from odoo import models, fields, api, tools
 
+# class PMSFacilityLine(models.Model):
+#     _name = 'pms.facilities.lines'
+#     _description = 'Facility Lines'
+
+#     name = fields.Char("Description")
+#     facility_id = fields.Many2one("pms.facilities", "Facilities")
+#     utility_type_id = fields.Many2one('pms.utility.supply.type',
+#                                       "Utility Supply Type")
+#     interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
+#                                        ('mobile', 'Mobile')], "Interface Type")
+#     meter_no = fields.Many2one("pms.equipment", "Meter No")
+#     unit_id = fields.Many2one("pms.space.unit", "Space Units")
+
 
 class PMSSpaceUnit(models.Model):
     _name = 'pms.space.unit'
@@ -29,7 +42,9 @@ class PMSSpaceUnit(models.Model):
                               default="vacant")
     remark = fields.Text("Remark")
 
-    # utility_id = fields.One2many("pms.space.utility", "unit_id", "Facility")
+    facility_line = fields.Many2many("pms.facilities", "pms_unit_facility_rel",
+                                     "unit_id", "facilities_id",
+                                     "Facility Lines")
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 

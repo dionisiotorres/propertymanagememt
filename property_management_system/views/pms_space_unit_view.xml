@@ -33,118 +33,35 @@
                   <!-- <field name="status"/>       -->
                 </group>
               </group>
-
-            <!-- <notebook>
-              <page name="Facilities" string="Facilities">
-                <field name ="utility_id" widget="one2many">
-                  <tree>
-                   <field name="name"/>
-                  <field name="unit_id"/> 
-                  <field name="utility_type"/>
-                   <field name="meter_no"/> 
-                  <field name="interface_type"/>
-                  <field name="remark"/>
-                </tree>
-                <form>
-                  <group>
-                    <group>
-                    <field name="utility_type" options="{'no_quick_create':True,'no_create_edit':True}"/> 
-                      <field name="utility_type" />
-                      <field name="utility_code" invisible="1"/>
-                      <field name="meter_no"/>
-                      <field name="interface_type" widget="radio"/>
-                      <field name="remark"/>
-                    </group>
-                    <group>
-                       <div style="width:100%;">
-                       <group colspan="2">
-                       <field name="start_date"/>
-                       </group>
-                       </div>
-                      <group colspan="2" attrs="{'invisible':[('utility_code','!=','TCA')]}">
-                        <div style="width:100%;">
-                          <div class="check_box_container">
-                            <div attrs="{'invisible':[('utility_code','!=','TCA')]}">
-                              <field name="utt_idd" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_idd" string="IDD" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                            <div attrs="{'invisible':[('utility_code','!=','TCA')]}">
-                              <field name="utt_local" style="display:inline-block;"/>
-                             <div style="display:inline-block;">
-                                <label for="utt_local" string="LOCAL" style="display:inline-block;"/>
-                             </div>
-                            </div>
-                            <div attrs="{'invisible':[('utility_code','!=','TCA')]}">
-                              <field name="utt_mobile" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_mobile" string="MOBILE" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                            <div attrs="{'invisible':[('utility_code','!=','TCA')]}">
-                              <field name="utt_std" style="display:inline-block;" />
-                              <div style="display:inline-block;">
-                                <label for="utt_std" string="STD" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                             <div attrs="{'invisible':[('utility_code','!=','PM')]}">
-                              <field name="utt_gen" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_gen" string="GEN" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                             <div attrs="{'invisible':[('utility_code','!=','PM')]}">
-                              <field name="utt_sub" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_sub" string="SUB" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </group>
-                      <group attrs="{'invisible':[('utility_code','!=','PM')]}">
-                        <div style="width:100%;">
-                          <div class="check_box_container">                            
-                            <div >
-                              <field name="utt_gen" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_gen" string="GEN" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                             <div >
-                              <field name="utt_sub" style="display:inline-block;"/>
-                              <div style="display:inline-block;">
-                                <label for="utt_sub" string="SUB" style="display:inline-block;"/>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </group>
-                    </group>
-                  </group>
-                  <notebook>
-                    <page>
-                      <field name="meter_type_id" style="width:1150px;display:inline-block;">
-                        <tree>
-                          <field name="name" width="80px"/>
-                          <field name="display_type"/>
-                          <field name="charge_type"/>
-                          <field name="i_lmr_date"/>
-                          <field name="s_lmr_value"/>
-                          <field name="uom_id"/>
-                          <field name="digit"/>
-                          <field name="status"/>
-                          <field name="end_date"/>
-                          <field name="e_lmr_value"/>
-                        </tree>
-                      </field>
-                  </page>
-                </notebook>
-                </form>
-              </field> 
-            </page>
-           </notebook> -->
+              <notebook>
+                  <page string="Facilities" >
+                      <field name="facility_line" widget="kanban">               
+                        <kanban>
+                        <field name="id"/>
+                        <field name="utility_type_id"/> 
+                        <field name="interface_type"/>
+                        <field name="meter_no" />
+                        <field name="status"/>
+                        <templates>
+                            <t t-name="kanban-box">
+                                <div t-att-class="' oe_kanban_global_click'">
+                                    <div class="o_kanban_image">
+                                      <img alt="image"  t-att-src='_s + "/property_management_system/static/src/image/cpaild-maint_man.jpg"'/>
+                                    </div>
+                                    <div class="oe_kanban_details">                                     
+                                        <div t-if="record.utility_type_id.raw_value">Utility Supply Type: <field name="utility_type_id"/></div>
+                                        <div t-if="record.interface_type.raw_value">Interface Type:<field name="interface_type"/></div>
+                                        <div t-if="record.meter_no.raw_value">Meter No:<field name="meter_no"/></div>
+                                        <div class="text-success float-right mb4" t-if="record.status.raw_value"><i class="fa fa-circle" role="img" aria-label="status" title="Status"></i></div>
+                                        <div class="text-danger float-right mb4" t-if="!record.status.raw_value"><i class="fa fa-circle" role="img" aria-label="Other" title="Other"></i></div>
+                                    </div>
+                                </div>
+                            </t>
+                          </templates>
+                        </kanban> 
+                  </field>
+              </page>
+              </notebook>
           </sheet>
         </form>
       </field>

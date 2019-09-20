@@ -45,10 +45,11 @@ class PmsFormatDetail(models.Model):
     digit_value = fields.Integer("Digit Value")
     dynamic_value = fields.Char("Dynamic Value")
     datetime_value = fields.Char("Date Value")
-    value = fields.Char("Value")
+    value = fields.Char("Value", compute="get_value_type")
 
-    @api.onchange("value_type")
-    def onchange_value_type(self):
+    @api.one
+    @api.depends("value_type")
+    def get_value_type(self):
         if self.value_type:
             if self.value_type == 'fix':
                 self.value = self.fix_value

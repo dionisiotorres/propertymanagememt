@@ -85,8 +85,8 @@
               <field name="value_type"/>             
               </group>
               <group>
-              <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','fix')]}"/>
-              <field name="fix_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
+              <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
+              <field name="fix_value" attrs="{'invisible':[('value_type','!=','fix')]}"/>
               <field name="digit_value" attrs="{'invisible':[('value_type','!=','digit')]}"/>
               <field name="datetime_value" attrs="{'invisible':[('value_type','!=','datetime')]}"/>
               </group>

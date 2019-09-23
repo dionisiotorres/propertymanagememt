@@ -440,7 +440,7 @@ class PMSCurrency(models.Model):
 
     @api.multi
     def action_status(self):
-        if self.status == True:
+        if self.status is True:
             self.status = False
         else:
             self.status = True
@@ -488,15 +488,9 @@ class Partner(models.Model):
         inverse='_write_company_type',
     )
     type = fields.Selection(
-        [
-            ('contact', 'Contact'),
-            ('invoice', 'Invoice address'),
-            ('other', 'Other address'),
-        ],
+        [('contact', 'Contact'), ('invoice', 'Invoice')],
         string='Address Type',
         default='contact',
-        help=
-        "Used by Sales and Purchase Apps to select the relevant address depending on the context."
     )
     child_ids = fields.One2many('res.partner',
                                 'parent_id',
@@ -525,153 +519,3 @@ class Partner(models.Model):
     #     "pms.department",
     #     "Department",
     #     help="Department is set the partner department.")
-
-
-# class PMSPartner(models.Model):
-#     _name = "pms.partner"
-#     _order = "name"
-
-#     country_id = fields.Many2one("pms.country", "Country Name")
-#
-#     state_id = fields.Many2one("pms.state", "State Name")
-#     name = fields.Char("Name", required=True)
-#     email = fields.Char("Email",
-#                         help='Format email address "Name <email@domain>"')
-#     phone = fields.Char("Phone")
-#     mobile = fields.Char("Mobile")
-#     bank_id = fields.Many2one("pms.bank", "Bank Name")
-#     is_company = fields.Boolean(
-#         string='Is a Company',
-#         default=False,
-#         help="Check if the contact is a company, otherwise it is a person")
-#     parent_id = fields.Many2one("pms.partner", "Parent", index=True)
-#     child_ids = fields.One2many('pms.partner',
-#                                 'parent_id',
-#                                 string='Contacts',
-#                                 domain=[('active', '=', True)])
-#     company_id = fields.Many2one("pms.partner", "Company", index=True)
-#     company_type = fields.Selection(string='Company Type',
-#                                     selection=[('person', 'Individual'),
-#                                                ('company', 'Company')],
-#                                     default="person")
-#     vat = fields.Char(
-#         string='Tax ID',
-#         help=
-#         "The Tax Identification Number. Complete it if the contact is subjected to government taxes. Used in some legal statements."
-#     )
-#     website = fields.Char()
-#     customer = fields.Boolean(
-#         string='Is a Customer',
-#         default=True,
-#         help=
-#         "Check this box if this contact is a customer. It can be selected in sales orders."
-#     )
-#     function = fields.Char(string='Job Position')
-#     # job_id = fields.Many2one("pms.job", string="Job Position")
-#     street = fields.Char()
-#     street2 = fields.Char()
-#     comment = fields.Text()
-#     zip = fields.Char(change_default=True)
-#     active = fields.Boolean(default=True)
-#     address_type = fields.Selection(
-#         [
-#             ('contact', 'Contact'),
-#             ('invoice', 'Invoice address'),
-#             ('other', 'Other address'),
-#         ],
-#         string='Address Type',
-#         default='contact',
-#         help=
-#         "Used by contact,invoice and other address Apps to select the relevant address depending on the context."
-#     )
-#     image = fields.Binary(
-#         "Image",
-#         attachment=True,
-#         help=
-#         "This field holds the image used as avatar for this contact, limited to 1024x1024px",
-#     )
-#     image_medium = fields.Binary("Medium-sized image", attachment=True, help="Medium-sized image of this contact. It is automatically "\
-#         "resized as a 128x128px image, with aspect ratio preserved. "\
-#         "Use this field in form views or some kanban views.")
-#     image_small = fields.Binary("Small-sized image", attachment=True, help="Small-sized image of this contact. It is automatically "\
-#         "resized as a 64x64px image, with aspect ratio preserved. "\
-#         "Use this field anywhere a small image is required.")
-#     color = fields.Integer(string='Color Index', default=0)
-#     company_street = fields.Char("Street",
-#                                  related="company_id.street",
-#                                  store=False)
-#     company_street2 = fields.Char("Street2",
-#                                   related="company_id.street2",
-#                                   store=False)
-#     company_city = fields.Many2one("pms.city",
-#                                    "City",
-#                                    related="company_id.city",
-#                                    store=False)
-#     company_state_id = fields.Many2one("pms.state",
-#                                        "State",
-#                                        related="company_id.state_id",
-#                                        store=False)
-#     company_zip = fields.Char("Zip", related="company_id.zip", store=False)
-#     company_country_id = fields.Many2one("pms.country",
-#                                          "Country",
-#                                          related="company_id.country_id",
-#                                          store=False)
-#     company_country_vat = fields.Char(
-#         string='Tax ID',
-#         related="company_id.vat",
-#         store=False,
-#         help=
-#         "The Tax Identification Number. Complete it if the contact is subjected to government taxes. Used in some legal statements."
-#     )
-#     department_id = fields.Many2one(
-#         "pms.department",
-#         "Department",
-#         help="Department is set the partner department.")
-
-#     @api.onchange('company_type')
-#     def onchange_company_type(self):
-#         for partner in self:
-#             if partner.company_type == 'company':
-#                 partner.customer = False
-#                 partner.is_company = True
-#                 partner.company_id = False
-#             else:
-#                 partner.customer = True
-#                 partner.is_company = False
-#                 partner.parent_id = False
-
-#     # @api.onchange('company_id')
-#     # def onchange_company_id(self):
-#     #     #default address from company of user will calculate in this funcition
-#     #     for company in self:
-#     #         if not company.company_id:
-#     #             company.street = False
-#     #             company.street2 = False
-#     #             company.city = False
-#     #             company.state_id = False
-#     #             company.country_id = False
-#     #         else:
-#     #             company.street = company.company_id.street
-#     #             company.street2 = company.company_id.street2
-#     #             company.city = company.company_id.city
-#     #             company.state_id = company.company_id.state_id
-#     #             company.country_id = company.company_id.country_id
-
-#     @api.model
-#     def create(self, values):
-#         if values['image']:
-#             tools.image_resize_images(values, sizes={'image': (1024, None)})
-#         if values['company_id'] and values['company_type'] == 'person':
-#             company_id = self.env['pms.partner'].browse(values['company_id'])
-#             values['street'] = company_id.street
-#             values['street2'] = company_id.street2
-#             values['city'] = company_id.city.id
-#             values['state_id'] = company_id.state_id.id
-#             values['country_id'] = company_id.country_id.id
-#             values['vat'] = company_id.vat
-#         return super(PMSPartner, self).create(values)
-
-#     @api.multi
-#     def write(self, vals):
-#         tools.image_resize_images(vals, sizes={'image': (1024, None)})
-#         return super(PMSPartner, self).write(vals)

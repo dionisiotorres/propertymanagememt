@@ -110,6 +110,7 @@ class Company(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    @api.one
     def get_company_id(self):
         if not self.company_id:
             self.company_id = self.env.user.company_id

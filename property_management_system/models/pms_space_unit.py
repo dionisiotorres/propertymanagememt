@@ -56,7 +56,20 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
-
+        if self.env.user.company_id.space_unit_code_format:
+            format_ids = self.env['pms.format.detail'].search([
+                ('format_id', '=',
+                 self.env.user.company_id.space_unit_code_format.id)
+            ])
+            for fid in format_ids:
+                if fid.value_type is 'dynamic':
+                    values['name'] += fid.dynamic_value
+                if fid.value_type is 'fix':
+                    values['name'] += fid.fix_value
+                if fid.value_type is 'digit':
+                    values['name'] += fid.digit_value
+                if fid.value_type is 'datetime':
+                    values['name'] += fid.datetime_value
         return super(PMSSpaceUnit, self).create(values)
 
     @api.multi

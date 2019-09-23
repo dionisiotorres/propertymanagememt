@@ -110,6 +110,11 @@ class Company(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    def get_company_id(self):
+        if not self.company_id:
+            self.company_id = self.env.user.company_id
+
+    company_id = fields.Many2one('res.company', default=get_company_id)
     property_code_len = fields.Integer("Property Code Length",
                                        related="company_id.property_code_len",
                                        readonly=False)

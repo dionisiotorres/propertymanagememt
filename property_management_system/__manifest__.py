@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '12.1.0.13',
+    '12.1.0.14',
     'depends': ['base'],
     'data': [
         'security/ir.model.access.csv',

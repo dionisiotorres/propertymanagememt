@@ -91,6 +91,8 @@
                           <div class="mt16 row">
                             <label for="pos_id_format" string="POS ID Format" class="col-3 col-lg-3 o_light_label"/>
                             <field name="pos_id_format" class="oe_inline" />
+                            <field name="company_id"
+                            invisible="1"/>
                           </div>
                           <!-- <div class="mt16 row">
                             <label for="pos_format" string="Format" class="col-3 col-lg-3 o_light_label"/>

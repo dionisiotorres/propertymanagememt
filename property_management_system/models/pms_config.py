@@ -86,7 +86,8 @@ class PmsFormatDetail(models.Model):
     dynamic_value = fields.Selection([('unit code', 'unit code'),
                                       ('property code', 'property code'),
                                       ('pos code', 'pos code'),
-                                      ('floor code', 'floor code')],
+                                      ('floor code', 'floor code'),
+                                      ('floor ref code', 'floor ref code')],
                                      string="Dynamic Value",
                                      store=True)
     datetime_value = fields.Selection([('mmyy', 'MMYY'), ('mmyyyy', 'MMYYYY'),

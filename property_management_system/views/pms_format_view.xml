@@ -29,10 +29,10 @@
             <notebook>
                 <page string="Add Format Detail" >
                     <field name="format_line_id">
-                        <tree editable="bottom">
+                        <tree>
                           <field name="position_order"/>
-                          <field name="value_type"/> 
-                          <field name="value"/>
+                          <field name="value_type" readonly='1'/> 
+                          <field name="value" readonly='1'/>
                         </tree>
                     </field>
                 </page>
@@ -47,7 +47,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <!-- <field name="sample"/> -->
+          <field name="sample"/>
           <field name="active"/>
         </tree>
       </field>
@@ -81,11 +81,11 @@
               <field name="value_type"/>             
               </group>
               <group>
-              <field name="value"/>
-              <!-- <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
+              <field name="value" invisible='1'/>
+              <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
               <field name="fix_value" attrs="{'invisible':[('value_type','!=','fix')]}"/>
               <field name="digit_value" attrs="{'invisible':[('value_type','!=','digit')]}"/>
-              <field name="datetime_value" attrs="{'invisible':[('value_type','!=','datetime')]}"/> -->
+              <field name="datetime_value" attrs="{'invisible':[('value_type','!=','datetime')]}"/>
               </group>
             </group>            
           </sheet>

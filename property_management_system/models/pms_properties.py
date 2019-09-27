@@ -26,7 +26,7 @@ class PMSProperties(models.Model):
 
     def default_get_curency(self):
         currency_id = self.env['res.currency'].search([('name', '=', 'USD')])
-        if currency_id.active == False:
+        if currency_id.active is False:
             currency_id.active = True
         return currency_id if not self.currency_id else self.currency_id
 

@@ -1,18 +1,5 @@
 from odoo import models, fields, api, tools
 
-# class PMSFacilityLine(models.Model):
-#     _name = 'pms.facilities.lines'
-#     _description = 'Facility Lines'
-
-#     name = fields.Char("Description")
-#     facility_id = fields.Many2one("pms.facilities", "Facilities")
-#     utility_type_id = fields.Many2one('pms.utility.supply.type',
-#                                       "Utility Supply Type")
-#     interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
-#                                        ('mobile', 'Mobile')], "Interface Type")
-#     meter_no = fields.Many2one("pms.equipment", "Meter No")
-#     unit_id = fields.Many2one("pms.space.unit", "Space Units")
-
 
 class PMSSpaceUnit(models.Model):
     _name = 'pms.space.unit'
@@ -48,16 +35,16 @@ class PMSSpaceUnit(models.Model):
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 
-    @api.depends('unit_no', 'floor_code')
-    def get_unit_no(self):
-        if not self.floor_id and not self.unit_no:
-            self.name = "New"
-        if self.floor_id and not self.unit_no:
-            self.name = self.floor_id.code
-        if self.unit_no and not self.floor_id:
-            self.name = self.unit_no
-        if self.floor_id and self.unit_no:
-            self.name = self.floor_id.code + "-" + self.unit_no
+    # @api.depends('unit_no', 'floor_code')
+    # def get_unit_no(self):
+    #     if not self.floor_id and not self.unit_no:
+    #         self.name = "New"
+    #     if self.floor_id and not self.unit_no:
+    #         self.name = self.floor_id.code
+    #     if self.unit_no and not self.floor_id:
+    #         self.name = self.unit_no
+    #     if self.floor_id and self.unit_no:
+    #         self.name = self.floor_id.code + "-" + self.unit_no
 
     @api.multi
     def name_get(self):
@@ -69,6 +56,20 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
+        if self.env.user.company_id.space_unit_code_format:
+            format_ids = self.env['pms.format.detail'].search([
+                ('format_id', '=',
+                 self.env.user.company_id.space_unit_code_format.id)
+            ])
+            for fid in format_ids:
+                if fid.value_type is 'dynamic':
+                    values['name'] += fid.dynamic_value
+                if fid.value_type is 'fix':
+                    values['name'] += fid.fix_value
+                if fid.value_type is 'digit':
+                    values['name'] += fid.digit_value
+                if fid.value_type is 'datetime':
+                    values['name'] += fid.datetime_value
         return super(PMSSpaceUnit, self).create(values)
 
     @api.multi

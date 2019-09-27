@@ -110,10 +110,9 @@ class Company(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    @api.one
     def get_company_id(self):
         if not self.company_id:
-            self.company_id = self.env.user.company_id
+            return self.env.user.company_id
 
     company_id = fields.Many2one('res.company', default=get_company_id)
     property_code_len = fields.Integer("Property Code Length",
@@ -139,29 +138,24 @@ class ResConfigSettings(models.TransientModel):
     @api.onchange('property_code_len')
     def onchange_property_code_len(self):
         if self.property_code_len:
-            if self.env.user.company_id == self.company_id:
-                self.company_id.property_code_len = self.property_code_len
+            self.company_id.property_code_len = self.property_code_len
 
     @api.onchange('floor_code_len')
     def onchange_floor_code_len(self):
         if self.floor_code_len:
-            if self.env.user.company_id == self.company_id:
-                self.company_id.floor_code_len = self.floor_code_len
+            self.company_id.floor_code_len = self.floor_code_len
 
     @api.onchange('space_unit_code_len')
     def onchange_space_unit_code_len(self):
         if self.space_unit_code_len:
-            if self.env.user.company_id == self.company_id:
-                self.company_id.space_unit_code_len = self.space_unit_code_len
+            self.company_id.space_unit_code_len = self.space_unit_code_len
 
     @api.onchange('space_unit_code_format')
     def onchange_space_unit_code_format(self):
         if self.space_unit_code_format:
-            if self.env.user.company_id == self.company_id:
-                self.company_id.space_unit_code_format = self.space_unit_code_format
+            self.company_id.space_unit_code_format = self.space_unit_code_format
 
     @api.onchange('pos_id_format')
     def onchange_pos_id_format(self):
         if self.pos_id_format:
-            if self.env.user.company_id == self.company_id:
-                self.company_id.pos_id_format = self.pos_id_format
+            self.company_id.pos_id_format = self.pos_id_format

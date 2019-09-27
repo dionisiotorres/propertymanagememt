@@ -94,14 +94,6 @@ class PMSSpaceUnit(models.Model):
                     self.unit_code += str(val[l])
                 if self.unit_no:
                     self.name += str(self.unit_no)
-        # if not self.floor_id and not self.unit_no:
-        #     self.name = "New"
-        # if self.floor_id and not self.unit_no:
-        #     self.name = self.floor_id.code
-        # if self.unit_no and not self.floor_id:
-        #     self.name = self.unit_no
-        # if self.floor_id and self.unit_no:
-        #     self.name = self.floor_id.code + "-" + self.unit_no
 
     @api.multi
     def name_get(self):

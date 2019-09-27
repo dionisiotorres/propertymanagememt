@@ -15,9 +15,11 @@
                 <label for="name" class="oe_edit_only" readonly="1" string="Unit No"/>
                 <h1  class="mt0">
                   <field name="name" invisible='1'/>
-                  <div attrs="{'invisible': [('name','=',False)]}">
-                      <field name="unit_code" class="oe_inline"/>
-                      <field name="unit_no" class="oe_inline"/>
+                  <div>
+                      <field name="unit_code" readonly="1" class="oe_inline"/>
+                      <field name="unit_no" 
+                      required="1"
+                       class="oe_inline"/>
                   </div>
                 </h1>
               </div>

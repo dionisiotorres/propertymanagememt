@@ -27,7 +27,7 @@ class PMSSpaceUnit(models.Model):
                        compute='get_unit_no',
                        store=True,
                        readonly=True)
-    unit_code = fields.Char("Unit No",
+    unit_code = fields.Char("Unit",
                             compute='get_unit_no',
                             store=True,
                             readonly=True)

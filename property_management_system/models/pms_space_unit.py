@@ -17,7 +17,7 @@ class PMSSpaceUnit(models.Model):
                 val = {
                     'name': 'Floor 1',
                     'code': 'F1',
-                    'floor_ref_code': '01',
+                    'floor_code_ref': '01',
                     'active': True
                 }
                 floor = self.env['pms.floor'].create(val)

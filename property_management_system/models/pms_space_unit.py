@@ -1,4 +1,5 @@
-from odoo import models, fields, api, tools
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PMSSpaceUnit(models.Model):
@@ -6,14 +7,37 @@ class PMSSpaceUnit(models.Model):
     _description = "Space Units"
     _order = "parent_id"
 
+    def get_floor(self):
+        if not self.floor_id:
+            floor_ids = self.env['pms.floor'].search([], order='id asc')
+            if floor_ids:
+                floor_id = floor_ids[0]
+                return floor_id
+            else:
+                val = {
+                    'name': 'Floor 1',
+                    'code': 'F1',
+                    'floor_ref_code': '01',
+                    'active': True
+                }
+                floor = self.env['pms.floor'].create(val)
+                return floor
+
     name = fields.Char("Unit No",
                        compute='get_unit_no',
                        store=True,
                        readonly=True)
+    unit_code = fields.Char("Unit",
+                            compute='get_unit_no',
+                            store=True,
+                            readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",
                                   required=True)
-    floor_id = fields.Many2one("pms.floor", string="Floor", required=True)
+    floor_id = fields.Many2one("pms.floor",
+                               string="Floor",
+                               default=get_floor,
+                               required=True)
     floor_code = fields.Char(string="Floor Code",
                              related="floor_id.code",
                              store=False)
@@ -35,16 +59,49 @@ class PMSSpaceUnit(models.Model):
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 
-    # @api.depends('unit_no', 'floor_code')
-    # def get_unit_no(self):
-    #     if not self.floor_id and not self.unit_no:
-    #         self.name = "New"
-    #     if self.floor_id and not self.unit_no:
-    #         self.name = self.floor_id.code
-    #     if self.unit_no and not self.floor_id:
-    #         self.name = self.unit_no
-    #     if self.floor_id and self.unit_no:
-    #         self.name = self.floor_id.code + "-" + self.unit_no
+    @api.depends('unit_no', 'floor_id', 'property_id')
+    def get_unit_no(self):
+        if self.env.user.company_id.space_unit_code_format:
+            format_ids = self.env['pms.format.detail'].search(
+                [('format_id', '=',
+                  self.env.user.company_id.space_unit_code_format.id)],
+                order='position_order asc')
+            val = []
+            for fid in format_ids:
+                if fid.value_type == 'dynamic':
+                    if self.floor_id.code and fid.dynamic_value == 'floor code':
+                        val.append(self.floor_id.code)
+                    if self.floor_id.floor_code_ref and fid.dynamic_value == 'floor ref code':
+                        val.append(self.floor_id.floor_code_ref)
+                    if self.property_id.code and fid.dynamic_value == 'property code':
+                        val.append(self.property_id.code)
+                if fid.value_type == 'fix':
+                    if self.unit_no or self.floor_id:
+                        val.append(fid.fix_value)
+                if fid.value_type == 'digit':
+                    if self.unit_no and len(self.unit_no) > fid.digit_value:
+                        raise UserError(
+                            _("Please Unit Length less than your format digit."
+                              ))
+                if fid.value_type == 'datetime':
+                    val.append(fid.datetime_value)
+            space = []
+            self.name = ''
+            self.unit_code = ''
+            if len(val) > 0:
+                for l in range(len(val)):
+                    self.name += str(val[l])
+                    self.unit_code += str(val[l])
+                if self.unit_no:
+                    self.name += str(self.unit_no)
+        # if not self.floor_id and not self.unit_no:
+        #     self.name = "New"
+        # if self.floor_id and not self.unit_no:
+        #     self.name = self.floor_id.code
+        # if self.unit_no and not self.floor_id:
+        #     self.name = self.unit_no
+        # if self.floor_id and self.unit_no:
+        #     self.name = self.floor_id.code + "-" + self.unit_no
 
     @api.multi
     def name_get(self):
@@ -56,20 +113,6 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
-        if self.env.user.company_id.space_unit_code_format:
-            format_ids = self.env['pms.format.detail'].search([
-                ('format_id', '=',
-                 self.env.user.company_id.space_unit_code_format.id)
-            ])
-            for fid in format_ids:
-                if fid.value_type is 'dynamic':
-                    values['name'] += fid.dynamic_value
-                if fid.value_type is 'fix':
-                    values['name'] += fid.fix_value
-                if fid.value_type is 'digit':
-                    values['name'] += fid.digit_value
-                if fid.value_type is 'datetime':
-                    values['name'] += fid.datetime_value
         return super(PMSSpaceUnit, self).create(values)
 
     @api.multi

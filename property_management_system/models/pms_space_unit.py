@@ -44,13 +44,14 @@ class PMSSpaceUnit(models.Model):
     unit_no = fields.Char("Space Unit No", store=True, required=True)
     parent_id = fields.Many2one("pms.space.unit", "Parent", store=True)
     unittype_id = fields.Many2one("pms.space.type", "Space Type")
-    uom = fields.Many2one("pms.uom", "UOM")
+    uom = fields.Many2one("uom.uom", "UOM")
     area = fields.Integer("Area")
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
     status = fields.Selection([('vacant', 'Vacant'), ('occupied', 'Occupied')],
                               string="Status",
                               default="vacant")
+    rate = fields.Float("Rate")
     remark = fields.Text("Remark")
 
     facility_line = fields.Many2many("pms.facilities", "pms_unit_facility_rel",

@@ -194,19 +194,16 @@
                 <group></group>
               </group> 
               </page>
-              <page name="Terms" string="Terms">
-               <!-- <div id="leave-term">Lease Terms</div> -->
-               <!-- <separator/> -->
+              <!-- <page name="Terms" string="Terms">
                <field name="leaseterms_line_id" widget='many2many'>
                   <tree editable="bottom">
                       <field name="name" string="Description"/>
                       <field name="lease_term_type" string="Lease Term Type"/> 
                       <field name="min_time_period" string="Min Period"/> 
                       <field name="max_time_period" string="Max Period"/>
-                      <!-- <field name="active"/>   -->
                   </tree>
               </field>
-              </page>
+              </page> -->
             </notebook>
           </sheet>
         </form>

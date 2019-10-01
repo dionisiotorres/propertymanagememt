@@ -23,23 +23,13 @@
                 <field name="company_tanent_id"/>
                 <field name="company_vendor_id" />
                 <field name="currency_id" />
+                <field name="rental_charge_type"/>
               </group>
               <group>
                 <field name="start_date" />
                   <field name="end_date" />
                   <field name="extend_to" />
                   <field name="old_end_date" />
-              </group>
-              <group colspan="2">
-                <field name="pos_submission" />
-                <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}"/>                
-                <field name="sale_data_type" widget="radio"   options="{'horizontal':True}"/>
-                <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}"/> 
-              </group>
-              <group>   
-                  <field name="reset_gp_flat" />
-                  <field name="reset_date" />
-                  <field name="remark"/>
               </group>
             </group>
             <notebook>
@@ -68,6 +58,21 @@
                         <field name="remark" />
                       </tree>
                     </field>
+                </page>
+                <page name="POS Configuration" string="POS Configuration">
+                  <group>
+                    <group colspan="2">
+                      <field name="pos_submission" />
+                      <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}"/>                
+                      <field name="sale_data_type" widget="radio"   options="{'horizontal':True}"/>
+                      <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}"/> 
+                    </group>
+                    <group>   
+                      <field name="reset_gp_flat" />
+                      <field name="reset_date" />
+                      <field name="remark"/>
+                    </group>
+                  </group>
                 </page>
             </notebook>
           </sheet>

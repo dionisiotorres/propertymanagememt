@@ -81,11 +81,11 @@
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_space_unit_management_tree"/> 
     </record> 
-    <menuitem  id="space_unit_management_menu_root" 
+    <!-- <menuitem  id="space_unit_management_menu_root" 
       name="Space Unit Management" 
       parent="pms_menu_config"
       action="action_space_unit_management_all"
       groups="base.group_no_one"
-      sequence="2"/>
+      sequence="2"/> -->
   </data>
 </odoo>

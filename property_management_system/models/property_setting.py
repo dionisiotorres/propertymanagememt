@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, tools
 
+# class PMSRentCharge(models.Model):
+#     _name = 'pms.rent_charge_type'
+#     _description = 'Rent Charge'
+
+#     name = fields.Char("Description")
+#     type = fields.Selection([('base', 'Base'), ('base+gto', 'Base + GTO'),
+#                              ('baseorgto', 'Base or GTO')],
+#                             string="Type")
+#     remark = fields.Text([('Remark')])
+
 
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'

@@ -106,6 +106,8 @@ class Company(models.Model):
     space_unit_code_len = fields.Integer('Space Unit Code Length')
     space_unit_code_format = fields.Many2one('pms.format', 'Space Unit Format')
     pos_id_format = fields.Many2one('pms.format', 'POS ID Format')
+    lease_agre_format_id = fields.Many2one('pms.format',
+                                           'Lease Agreement Format')
 
 
 class ResConfigSettings(models.TransientModel):
@@ -135,6 +137,46 @@ class ResConfigSettings(models.TransientModel):
                                     'POS ID Format',
                                     related="company_id.pos_id_format",
                                     readonly=False)
+    new_lease_term = fields.Many2one(
+        'pms.leaseterms',
+        #  related="company_id.new_lease_term",
+        string="Add New Lease Term",
+        readonly=False)
+    extend_lease_term = fields.Many2one(
+        'pms.leaseterms',
+        # related="company_id.extend_lease_term",
+        string="Extened Lease Term",
+        readonly=False)
+    terminate_lease_term = fields.Many2one(
+        'pms.leaseterms',
+        # related="company_id.terminate_lease_term",
+        string="Terminate Lease Term",
+        readonly=False)
+    lease_agre_format_id = fields.Many2one(
+        'pms.format',
+        'Lease Format',
+        # related="company_id.lease_agre_format_id",
+        readonly=False)
+
+    @api.onchange('new_lease_term')
+    def onchange_new_lease_term(self):
+        if self.new_lease_term:
+            self.company_id.new_lease_term = self.new_lease_term
+
+    @api.onchange('extend_lease_term')
+    def onchange_extend_lease_term(self):
+        if self.extend_lease_term:
+            self.company_id.extend_lease_term = self.extend_lease_term
+
+    @api.onchange('terminate_lease_term')
+    def onchange_terminate_lease_term(self):
+        if self.terminate_lease_term:
+            self.company_id.terminate_lease_term = self.terminate_lease_term
+
+    @api.onchange('lease_agre_format_id')
+    def onchange_lease_agre_format_id(self):
+        if self.lease_agre_format_id:
+            self.company_id.lease_agre_format_id = self.lease_agre_format_id
 
     @api.onchange('property_code_len')
     def onchange_property_code_len(self):
@@ -160,3 +202,22 @@ class ResConfigSettings(models.TransientModel):
     def onchange_pos_id_format(self):
         if self.pos_id_format:
             self.company_id.pos_id_format = self.pos_id_format
+
+
+class PMSLeaseTerms(models.Model):
+    _name = 'pms.leaseterms'
+    _description = "Property LeaseTerms"
+    _order = "name"
+
+    name = fields.Char("Description", required=True)
+    rentschedule_type = fields.Selection([('probation', "Probation"),
+                                          ('calendar', "Calendar")],
+                                         string="Rent Schedule Type")
+    lease_period_type = fields.Selection([('month', "Month"),
+                                          ('year', "Year")],
+                                         string="Lease Period Type")
+    min_time_period = fields.Integer("Min Time Period")
+    max_time_period = fields.Integer("Max Time Period")
+    extend_count = fields.Integer("Extend count")
+    extend_period = fields.Integer("Extend Period(month)")
+    active = fields.Boolean("Active", default=True)

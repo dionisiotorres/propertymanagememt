@@ -14,7 +14,7 @@
     'base',
     'version':
     '12.1.0.24',
-    'depends': ['base'],
+    'depends': ['base', 'uom'],
     'data': [
         'security/ir.model.access.csv',
         'data/pms.charge_type.csv',

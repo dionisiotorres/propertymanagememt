@@ -1,6 +1,6 @@
 <odoo>
   <data>
-    <record model="ir.ui.view" id="view_uom_form">
+    <!-- <record model="ir.ui.view" id="view_uom_form">
       <field name="name">UOM Form</field>
       <field name="model">pms.uom</field>
       <field name="arch" type="xml">
@@ -64,7 +64,7 @@
           <sheet>
            <div class="oe_button_box" name="button_box">
               <button type="object" class="oe_stat_button" icon="fa-archive">
-                  <!-- <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/> -->
+                
               </button>
             </div>
             <div class="oe_title">
@@ -75,7 +75,6 @@
           </div>
             <group>
               <group>
-              <!-- <field name="type_id"/> -->
               </group>
               <group>
               </group>
@@ -90,7 +89,6 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <!-- <field name="type_id"/> -->
         </tree>
       </field>
     </record>
@@ -100,7 +98,6 @@
       <field name="arch" type="xml">
         <search>
           <field name="name"/>
-          <!-- <field name="type_id"/> -->
         </search>
       </field>
     </record>
@@ -120,6 +117,16 @@
       name="Unit of Measure" 
       parent="property_management_menu_sub"
       action="action_uom_all"
+      sequence="3"/> -->
+    <menuitem  id="uom_category_menu_root" 
+      name="UOM Category" 
+      parent="property_management_menu_sub"
+      action="uom.product_uom_categ_form_action"
+      sequence="2"/>
+    <menuitem  id="uom_menu_root" 
+      name="Unit of Measure" 
+      parent="property_management_menu_sub"
+      action="uom.product_uom_form_action"
       sequence="3"/>
   </data>
 </odoo>

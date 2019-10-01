@@ -49,6 +49,10 @@ class PMSLeaseAgreement(models.Model):
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
                                            "Lease Agreement Items")
+    rental_charge_type = fields.Selection([('base', 'Base'),
+                                           ('base+gto', 'Base + GTO'),
+                                           ('baseorgto', 'Base or GTO')],
+                                          string="Rental Charge Type")
 
     @api.multi
     def toggle_active(self):

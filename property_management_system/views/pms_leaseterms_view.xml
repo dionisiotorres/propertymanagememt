@@ -19,11 +19,14 @@
             </div>
             <group>
               <group>
-              <field name="lease_term_type" />
+              <field name="lease_period_type" />
               <field name="min_time_period" />
               <field name="max_time_period" />
               </group>
               <group>
+                <field name="rentschedule_type"/>
+                <field name="extend_count"/>
+                <field name="extend_period"/>
               </group>
             </group>
           </sheet>
@@ -36,10 +39,13 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-            <field name="lease_term_type"/> 
+            <field name="lease_period_type"/> 
             <field name="min_time_period"/> 
             <field name="max_time_period"/>  
-            <field name="max_time_period"/> 
+            <field name="max_time_period"/>
+            <field name="rentschedule_type"/>
+            <field name="extend_count"/>
+            <field name="extend_period"/>
             <field name="active"/>  
         </tree>
       </field>

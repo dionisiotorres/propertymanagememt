@@ -35,7 +35,7 @@ class PMSProperties(models.Model):
         "Property Type",
         required=True,
         help="The properties's type is set the specific type.")
-    uom_id = fields.Many2one("pms.uom",
+    uom_id = fields.Many2one("uom.uom",
                              "UOM",
                              required=True,
                              help="Unit Of Measure is need to set for Area.")
@@ -104,11 +104,11 @@ class PMSProperties(models.Model):
                                               'property_id',
                                               'partner_id',
                                               string='Managements')
-    leaseterms_line_id = fields.Many2many("pms.leaseterms",
-                                          "pms_properties_leaseterms_rel",
-                                          "properties_id",
-                                          "leaseterm_id",
-                                          string="LeaseTerms")
+    # leaseterms_line_id = fields.Many2many("pms.leaseterms",
+    #                                       "pms_properties_leaseterms_rel",
+    #                                       "properties_id",
+    #                                       "leaseterm_id",
+    #                                       string="LeaseTerms")
     image = fields.Binary(
         "Image",
         attachment=True,

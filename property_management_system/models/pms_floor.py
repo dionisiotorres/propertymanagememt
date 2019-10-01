@@ -30,16 +30,3 @@ class PMSFloor(models.Model):
             if not pt.active:
                 pt.active = self.active
         super(PMSFloor, self).toggle_active()
-
-
-class PMSLeaseTerms(models.Model):
-    _name = 'pms.leaseterms'
-    _description = "Property LeaseTerms"
-    _order = "name"
-
-    name = fields.Char("Description", required=True)
-    lease_term_type = fields.Selection([('month', "Month"), ('year', "Year")],
-                                       string="Type")
-    min_time_period = fields.Integer("Min Time Period")
-    max_time_period = fields.Integer("Max Time Period")
-    active = fields.Boolean("Active", default=True)

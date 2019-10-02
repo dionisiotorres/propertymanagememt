@@ -12,30 +12,28 @@
                   <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Property Code</span>
+                        <span class="o_form_label">Maximum Property Code Length</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
                         <div class="text-muted">
-                          Set the Property Code format with digit number of generating in property
+                          Define the maximum property code length
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="property_code_len" string="Property Digits" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="property_code_len" class="oe_inline" />
+                          <div class="mt16">
+                            <field name="property_code_len" class="o_input o_field_widget o_required_modifier" required="1"/>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Floor Code</span>
+                        <span class="o_form_label">Maximum Floor Code Length</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
                         <div class="text-muted">
-                          Set the Floor Code format with digit number of generating in property
+                          Define the maximum floor code length
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="floor_code_len" string="Floor Digits" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="floor_code_len" class="oe_inline"/>
+                          <div class="mt16">
+                            <field name="floor_code_len"/>
                           </div>
                         </div>
                       </div>
@@ -45,34 +43,28 @@
                   <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Space Unit Format</span>
+                        <span class="o_form_label">Space Unit Code Format</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
                         <div class="text-muted">
-                          Set the Space Unit format with the default
+                          Set the space unit code format with the default
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="space_unit_code_format" string="Space Unit" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="space_unit_code_format" class="oe_inline" />
+                          <div class="mt16">
+                            <field name="space_unit_code_format" />
                           </div>
-                          <!-- <div class="mt16 row">
-                            <label for="spu_format" string="Format" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="spu_format" class="oe_inline" required="1"/>
-                          </div> -->
                         </div>
                       </div>
                     </div>
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Space Unit Code Length</span>
+                        <span class="o_form_label">Maximum Space Unit Code Length</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
                         <div class="text-muted">
-                          Set the Space Unit Code Length in the Configuration using Space Unit Code.
+                          Define the maximum space unit code length
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="space_unit_code_len" string="Space Unit Code Length" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="space_unit_code_len" class="oe_inline" />
+                          <div class="mt16">
+                            <field name="space_unit_code_len" />
                           </div>
                         </div>
                       </div>
@@ -85,56 +77,69 @@
                         <span class="o_form_label">POS ID Format</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
                         <div class="text-muted">
-                          Set the POS ID format with the default
+                          Define the POS ID format
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="pos_id_format" string="POS ID Format" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="pos_id_format" class="oe_inline" />
+                          <div class="mt16 ">
+                            <field name="pos_id_format" />
                             <field name="company_id"
                             invisible="1"/>
                           </div>
-                          <!-- <div class="mt16 row">
-                            <label for="pos_format" string="Format" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="pos_format" class="oe_inline" required="1"/>
-                          </div> -->
                         </div>
                       </div>
                     </div>
                   </div>
-                  <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Set Lease Terms</h4>
+                  <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Define Lease Terms</h4>
                   <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
                         <span class="o_form_label">New Lease Term</span>
-                        <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="new_lease_term" string="New Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="new_lease_term" class="oe_inline"/>
-                          </div>
+                        <div class="text-muted">
+                          Define new lease term to apply when create a lease.
                         </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="extend_lease_term" string="Extend Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="extend_lease_term" class="oe_inline"/>
+                          <div class="mt16">
+                            <field name="new_lease_term"  required="1"/>
                           </div>
                         </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                      <div class="o_setting_right_pane">
+                        <span class="o_form_label">Extend Lease Term</span>
+                        <div class="text-muted">
+                          Define extend lease term to apply when create a lease.
+                        </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="terminate_lease_term" string="Terminate Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="terminate_lease_term" class="oe_inline"/>
+                        <div class="mt16">
+                          <field name="extend_lease_term" required="1"/>
                           </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                      <div class="o_setting_right_pane">
+                        <span class="o_form_label">Extend Lease Term</span>
+                        <div class="text-muted">
+                          Define terminate lease term to apply when create a lease.
+                        </div>
+                        <div class="content-group">
+                        <div class="mt16">
+                            <field name="terminate_lease_term" required="1"/>
+                        </div>
                         </div>
                       </div>
                     </div>
                     <div class="col-12 col-lg-6 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Lease Agreement Format</span>
+                        <span class="o_form_label">Lease Agreement No Format</span>
+                        <div class="text-muted">
+                          Define lease agreement no format to apply when create a lease.
+                        </div>
                         <div class="content-group">
-                          <div class="mt16 row">
-                            <label for="lease_agre_format_id" string="Lease Agreement Format" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="lease_agre_format_id" class="oe_inline" />
-                          </div>
+                         <div class="mt16">
+                            <field name="lease_agre_format_id"  />
+                        </div>
                         </div>
                       </div>
                     </div>

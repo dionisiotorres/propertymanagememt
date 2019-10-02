@@ -5,6 +5,17 @@
       <field name="model">pms.lease_agreement</field>
       <field name="arch" type="xml">
         <form>
+          <header>
+            <button name="action_confirm" string="Confirm" type="object" states="BOOKING"/>
+            <button name="action_activate" string="Activate" type="object" states="CONFIRM"/>
+            <button name="action_cancel" states="CONFIRM" type="object" string="Cancel"/>
+            <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
+            <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/> -->
+            <button name="action_extend" states="NEW,EXTENDED" type="object" string="Extend"/>
+            <button name="action_renew" states="NEW,EXTENDED" type="object" string="Renew"/>
+            <button name="action_terminate" states="NEW,EXTENDED" type="object" string="TERMINATE"/>
+            <field name="state" widget="statusbar" statusbar_visible="BOOKING,CONFIRM,NEW,EXTENDED,RENEWED,CANCELLED,TERMINATED,EXPIRED"/>
+          </header>
           <sheet>
            <div class="oe_button_box" name="button_box">
               <button type="object" class="oe_stat_button" icon="fa-archive">
@@ -23,13 +34,13 @@
                 <field name="company_tanent_id"/>
                 <field name="company_vendor_id" />
                 <field name="currency_id" />
-                <field name="rental_charge_type"/>
               </group>
               <group>
                 <field name="start_date" />
                   <field name="end_date" />
-                  <field name="extend_to" />
-                  <field name="old_end_date" />
+                  <field name="extend_to" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED'])]}" />
+                  <!-- <field name="rental_charge_type"/> -->
+                  <!-- <field name="old_end_date" /> -->
               </group>
             </group>
             <notebook>
@@ -40,6 +51,7 @@
                         <group>
                           <field name="unit_no"/>   
                           <field name="pos_id" />
+                          <field name="rental_charge_type"/>
                           <field name="remark" />
                         </group>
                         <group>
@@ -55,6 +67,7 @@
                         <field name="end_date" />
                         <field name="extend_to" />
                         <field name="pos_id" />
+                        <field name="rental_charge_type"/>
                         <field name="remark" />
                       </tree>
                     </field>

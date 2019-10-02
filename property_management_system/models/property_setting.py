@@ -376,7 +376,13 @@ class Company(models.Model):
                                compute='_compute_address',
                                inverse='_inverse_township',
                                ondelete='cascade')
-    company_type = fields.Many2one('pms.company.category', "Company Type")
+    company_type = fields.Many2many('pms.company.category',
+                                    "res_company_type_rel", 'company_id',
+                                    'category_id')
+    is_tanent = fields.Boolean('Is Tanent',
+                               compute="get_tanent",
+                               readonly=False,
+                               store=True)
     partner_contact_id = fields.Many2many(
         "res.partner",
         "company_partner_contact_rel",
@@ -384,6 +390,19 @@ class Company(models.Model):
         "partner_id",
         domain="[('is_company', '!=', True)]",
         store=True)
+    trade_id = fields.Many2one("pms.trade_category", "Trade")
+    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade")
+
+    @api.multi
+    @api.depends('company_type')
+    def get_tanent(self):
+        category = []
+        if self.company_type:
+            for comp in self.company_type:
+                for cat in comp:
+                    category.append(cat.name)
+                if 'Tanent' in category:
+                    self.is_tanent = True
 
     def _get_company_address_fields(self, partner):
         return {

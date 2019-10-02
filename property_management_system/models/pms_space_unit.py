@@ -60,6 +60,7 @@ class PMSSpaceUnit(models.Model):
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 
+    @api.one
     @api.depends('unit_no', 'floor_id', 'property_id')
     def get_unit_no(self):
         if self.env.user.company_id.space_unit_code_format:

@@ -33,6 +33,7 @@
                           <field name="position_order"/>
                           <field name="value_type" readonly='1'/> 
                           <field name="value" readonly='1'/>
+                          <field name="autogenerate" readonly='1'/>
                         </tree>
                     </field>
                 </page>
@@ -78,10 +79,11 @@
             <group>
               <group>
               <field name="position_order"/>
-              <field name="value_type"/>             
+              <field name="value_type"/>         
               </group>
               <group>
               <field name="value" invisible='1'/>
+              <field name="autogenerate" attrs="{'invisible':[('value_type','!=','digit')]}"/>  
               <field name="dynamic_value" attrs="{'invisible':[('value_type','!=','dynamic')]}"/>
               <field name="fix_value" attrs="{'invisible':[('value_type','!=','fix')]}"/>
               <field name="digit_value" attrs="{'invisible':[('value_type','!=','digit')]}"/>

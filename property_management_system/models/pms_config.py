@@ -74,6 +74,7 @@ class PmsFormatDetail(models.Model):
                 self.value = self.datetime_value
 
     name = fields.Char("Name", default="New")
+    autogenerate = fields.Boolean("Auto Generate?")
     format_id = fields.Many2one("pms.format", "Format")
     position_order = fields.Integer("Position Order")
     value_type = fields.Selection([('fix', "Fix"), ('dynamic', 'Dynamic'),
@@ -106,6 +107,14 @@ class Company(models.Model):
     space_unit_code_len = fields.Integer('Space Unit Code Length')
     space_unit_code_format = fields.Many2one('pms.format', 'Space Unit Format')
     pos_id_format = fields.Many2one('pms.format', 'POS ID Format')
+    new_lease_term = fields.Many2one('pms.leaseterms',
+                                     string="Add New Lease Term")
+    extend_lease_term = fields.Many2one('pms.leaseterms',
+                                        string="Extened Lease Term")
+    terminate_lease_term = fields.Many2one(
+        'pms.leaseterms',
+        string="Terminate Lease Term",
+    )
     lease_agre_format_id = fields.Many2one('pms.format',
                                            'Lease Agreement Format')
 
@@ -136,26 +145,28 @@ class ResConfigSettings(models.TransientModel):
     pos_id_format = fields.Many2one('pms.format',
                                     'POS ID Format',
                                     related="company_id.pos_id_format",
-                                    readonly=False)
-    new_lease_term = fields.Many2one(
-        'pms.leaseterms',
-        #  related="company_id.new_lease_term",
-        string="Add New Lease Term",
-        readonly=False)
-    extend_lease_term = fields.Many2one(
-        'pms.leaseterms',
-        # related="company_id.extend_lease_term",
-        string="Extened Lease Term",
-        readonly=False)
+                                    readonly=False,
+                                    required=False)
+    new_lease_term = fields.Many2one('pms.leaseterms',
+                                     string="Add New Lease Term",
+                                     related="company_id.new_lease_term",
+                                     readonly=False,
+                                     required=False)
+    extend_lease_term = fields.Many2one('pms.leaseterms',
+                                        string="Extened Lease Term",
+                                        related="company_id.extend_lease_term",
+                                        readonly=False,
+                                        required=False)
     terminate_lease_term = fields.Many2one(
         'pms.leaseterms',
-        # related="company_id.terminate_lease_term",
         string="Terminate Lease Term",
-        readonly=False)
+        related="company_id.terminate_lease_term",
+        readonly=False,
+        required=False)
     lease_agre_format_id = fields.Many2one(
         'pms.format',
         'Lease Format',
-        # related="company_id.lease_agre_format_id",
+        related="company_id.lease_agre_format_id",
         readonly=False)
 
     @api.onchange('new_lease_term')

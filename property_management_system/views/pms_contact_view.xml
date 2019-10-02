@@ -19,8 +19,7 @@
                         <label for="name" class="oe_edit_only"/>
                         <field name="is_company" invisible="1"/>
                         <field name="commercial_partner_id" invisible="1"/>
-                        <field name="company_type" invisible="1" widget="radio"
-                            options="{'horizontal': true}"/>
+                        <field name="company_type" invisible="1" widget="radio" options="{'horizontal': true}"/>
                         <h1>
                             <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
                         </h1>
@@ -264,7 +263,10 @@
                                     </div>
                                 </group>
                                 <group>
-                                    <field name="company_type"/>
+                                    <field name="company_type" widget="many2many_tags" />
+                                    <field name="is_tanent" invisible="1"/>
+                                    <field name="trade_id" attrs="{'invisible': [('is_tanent','!=', True)]}"/>
+                                    <field name="sub_trade_id" attrs="{'invisible': [('is_tanent','!=',True)]}"/>
                                     <field name="email"/>
                                     <field name="phone"/>
                                     <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>                                    

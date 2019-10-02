@@ -110,19 +110,19 @@
                         <div class="content-group">
                           <div class="mt16 row">
                             <label for="new_lease_term" string="New Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="new_lease_term" class="oe_inline" required="1"/>
+                            <field name="new_lease_term" class="oe_inline"/>
                           </div>
                         </div>
                         <div class="content-group">
                           <div class="mt16 row">
                             <label for="extend_lease_term" string="Extend Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="extend_lease_term" class="oe_inline" required="1"/>
+                            <field name="extend_lease_term" class="oe_inline"/>
                           </div>
                         </div>
                         <div class="content-group">
                           <div class="mt16 row">
                             <label for="terminate_lease_term" string="Terminate Lease Term" class="col-3 col-lg-3 o_light_label"/>
-                            <field name="terminate_lease_term" class="oe_inline" required="1"/>
+                            <field name="terminate_lease_term" class="oe_inline"/>
                           </div>
                         </div>
                       </div>

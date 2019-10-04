@@ -288,40 +288,6 @@ class PMSTerms(models.Model):
         super(PMSTerms, self).toggle_active()
 
 
-class PMSUom(models.Model):
-    _name = "pms.uom"
-    _description = "UOM"
-    _order = "name"
-
-    name = fields.Char("Name", required=True)
-    category_id = fields.Many2one("pms.uom.category",
-                                  "Category",
-                                  required=True)
-    active = fields.Boolean(default=True)
-
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
-
-    @api.multi
-    def toggle_active(self):
-        for pt in self:
-            if not pt.active:
-                pt.active = self.active
-        super(PMSUom, self).toggle_active()
-
-
-class PMSUomCategory(models.Model):
-    _name = "pms.uom.category"
-    _description = "UOM Categroy"
-    _order = "name"
-
-    name = fields.Char("Name", required=True)
-    type_id = fields.Many2one("pms.uom.category", "Type")
-
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
-
-
 class PMSBank(models.Model):
     _name = 'pms.bank'
     _description = "Bank"

@@ -40,9 +40,6 @@ class PMSProperties(models.Model):
                              required=True,
                              help="Unit Of Measure is need to set for Area.")
     bank_id = fields.Many2one('res.bank', "Bank Information")
-    # management_company = fields.Many2one("res.partner",
-    #                                      "Company",
-    #                                      domain="[('is_company', '=', True)]")
     township = fields.Many2one("pms.township",
                                string='Township',
                                ondelete='restrict',

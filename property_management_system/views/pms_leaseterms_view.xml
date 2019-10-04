@@ -24,7 +24,7 @@
               <field name="max_time_period" />
               </group>
               <group>
-                <field name="rentschedule_type"/>
+                <!-- <field name="rentschedule_type"/> -->
                 <field name="extend_count"/>
                 <field name="extend_period"/>
               </group>
@@ -43,7 +43,7 @@
             <field name="min_time_period"/> 
             <field name="max_time_period"/>  
             <field name="max_time_period"/>
-            <field name="rentschedule_type"/>
+            <!-- <field name="rentschedule_type"/> -->
             <field name="extend_count"/>
             <field name="extend_period"/>
             <field name="active"/>  

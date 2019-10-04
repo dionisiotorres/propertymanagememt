@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, tools
 
-# class PMSRentCharge(models.Model):
-#     _name = 'pms.rent_charge_type'
-#     _description = 'Rent Charge'
 
-#     name = fields.Char("Description")
-#     type = fields.Selection([('base', 'Base'), ('base+gto', 'Base + GTO'),
-#                              ('baseorgto', 'Base or GTO')],
-#                             string="Type")
-#     remark = fields.Text([('Remark')])
+class PMSRentCharge(models.Model):
+    _name = 'pms.rent_schedule'
+    _description = 'Rent Schedule'
+
+    property_id = fields.Many2one("pms.properties", "Property ID")
+    lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
+                                              string="Lease Agreement Item")
+    charge_type = fields.Selection([('base', 'Base'),
+                                    ('base+gto', 'Base + GTO'),
+                                    ('baseorgto', 'Base or GTO')],
+                                   string="Charge Type")
+    amount = fields.Float("Amount")
+    start_date = fields.Date("Start Date")
+    end_date = fields.Date("End Date")
 
 
 class PMSEquipmentType(models.Model):

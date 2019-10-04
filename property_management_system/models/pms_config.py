@@ -58,7 +58,7 @@ class PmsFormat(models.Model):
 class PmsFormatDetail(models.Model):
     _name = "pms.format.detail"
     _description = "Property Formats Details"
-    _order = "name"
+    _order = "position_order"
 
     @api.one
     @api.depends('fix_value', 'digit_value', 'dynamic_value', 'datetime_value')
@@ -74,7 +74,7 @@ class PmsFormatDetail(models.Model):
                 self.value = self.datetime_value
 
     name = fields.Char("Name", default="New")
-    autogenerate = fields.Boolean("Auto Generate?")
+    # autogenerate = fields.Boolean("Auto Generate?")
     format_id = fields.Many2one("pms.format", "Format")
     position_order = fields.Integer("Position Order")
     value_type = fields.Selection([('fix', "Fix"), ('dynamic', 'Dynamic'),
@@ -91,8 +91,8 @@ class PmsFormatDetail(models.Model):
                                       ('floor ref code', 'floor ref code')],
                                      string="Dynamic Value",
                                      store=True)
-    datetime_value = fields.Selection([('mmyy', 'MMYY'), ('mmyyyy', 'MMYYYY'),
-                                       ('yy', 'YY'), ('yyyy', 'YYYY')],
+    datetime_value = fields.Selection([('MM', 'MM'), ('MMM', 'MMM'),
+                                       ('YY', 'YY'), ('YYYY', 'YYYY')],
                                       string="Date Value",
                                       store=True)
     value = fields.Char("Value", compute='get_value_type')
@@ -117,6 +117,9 @@ class Company(models.Model):
     )
     lease_agre_format_id = fields.Many2one('pms.format',
                                            'Lease Agreement Format')
+    rentschedule_type = fields.Selection([('probation', "Probation"),
+                                          ('calendar', "Calendar")],
+                                         string="Rent Schedule Type")
 
 
 class ResConfigSettings(models.TransientModel):
@@ -168,6 +171,16 @@ class ResConfigSettings(models.TransientModel):
         'Lease Format',
         related="company_id.lease_agre_format_id",
         readonly=False)
+    rentschedule_type = fields.Selection(
+        [('probation', "Probation"), ('calendar', "Calendar")],
+        string="Rent Schedule",
+        related="company_id.rentschedule_type",
+        readonly=False)
+
+    @api.onchange('rentschedule_type')
+    def onchange_rentschedule_type(self):
+        if self.rentschedule_type:
+            self.company_id.rentschedule_type = self.rentschedule_type
 
     @api.onchange('new_lease_term')
     def onchange_new_lease_term(self):
@@ -221,9 +234,6 @@ class PMSLeaseTerms(models.Model):
     _order = "name"
 
     name = fields.Char("Description", required=True)
-    rentschedule_type = fields.Selection([('probation', "Probation"),
-                                          ('calendar', "Calendar")],
-                                         string="Rent Schedule Type")
     lease_period_type = fields.Selection([('month', "Month"),
                                           ('year', "Year")],
                                          string="Lease Period Type")

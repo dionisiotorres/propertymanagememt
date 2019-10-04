@@ -62,3 +62,5 @@ access_pms_lease_agreement_line_manager,pms.lease_agreement.line,model_pms_lease
 access_pms_charge_formula,pms.charge.formula,model_pms_charge_formula,base.group_user,1,0,0,0
 access_pms_department,pms.department,model_pms_department,base.group_user,1,0,0,0
 access_pms_space_unit_management,pms.space.unit.management,model_pms_space_unit_management,base.group_user,1,0,0,0
+access_pms_rent_schedule,pms.rent_schedule,model_pms_rent_schedule,base.group_user,1,1,1,1
+access_pms_rent_schedule_manager,pms.rent_schedule,model_pms_rent_schedule,base.group_erp_manager,1,1,1,1

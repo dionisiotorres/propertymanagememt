@@ -13,9 +13,10 @@
     'category':
     'base',
     'version':
-    '12.1.0.24',
+    '12.1.0.25',
     'depends': ['base', 'uom'],
     'data': [
+        'data/ir_sequence_data.xml',
         'security/ir.model.access.csv',
         'data/pms.charge_type.csv',
         'data/res.country.state.csv',

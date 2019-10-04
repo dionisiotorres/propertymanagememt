@@ -106,7 +106,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="property_id"/>
-          <field name="name"/>
+          <field name="company_tanent_id"/>
           <field name="start_date" />
           <field name="end_date" />
           <field name="state"/>

@@ -9,7 +9,7 @@ class PMSLeaseAgreement(models.Model):
     _name = 'pms.lease_agreement'
     _description = "Lease Agreements"
 
-    name = fields.Char("Tanent", default="New", compute="compute_tanent")
+    name = fields.Char("Name", default="New", compute="compute_tanent")
     property_id = fields.Many2one("pms.properties")
     company_tanent_id = fields.Many2one("res.company",
                                         "Tanent",

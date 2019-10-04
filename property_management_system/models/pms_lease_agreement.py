@@ -162,6 +162,12 @@ class PMSLeaseAgreement(models.Model):
 
     @api.multi
     def action_extend(self):
+        if not self.company_id.extend_lease_term:
+            raise UserError(
+                _("Please set extend term in the property setting."))
+        else:
+            self.extend_to = self.end_date + relativedelta(
+                months=self.company_id.extend_lease_term.min_time_period)
         return self.write({'state': 'EXTENDED'})
 
     @api.multi
@@ -170,6 +176,12 @@ class PMSLeaseAgreement(models.Model):
 
     @api.multi
     def action_terminate(self):
+        if not self.company_id.extend_lease_term:
+            raise UserError(
+                _("Please set extend term in the property setting."))
+        # else:
+        #     self.extend_to = self.end_date + relativedelta(
+        #         months=self.company_id.extend_lease_term.min_time_period)
         return self.write({'state': 'TERMINATED'})
 
     @api.model

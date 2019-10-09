@@ -365,7 +365,7 @@ class Company(models.Model):
     trade_id = fields.Many2one("pms.trade_category", "Trade")
     sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade")
 
-    @api.multi
+    @api.one
     @api.depends('company_type')
     def get_tanent(self):
         category = []

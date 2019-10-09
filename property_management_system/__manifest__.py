@@ -14,7 +14,7 @@
     'base',
     'version':
     '1.0.27',
-    'depends': ['base', 'uom'],
+    'depends': ['base', 'uom', 'account'],
     'data': [
         'data/ir_sequence_data.xml',
         'security/ir.model.access.csv',
@@ -46,6 +46,7 @@
         'views/pms_utility_type.xml',
         'views/pms_equipment_type.xml',
         'views/pms_equipment_view.xml',
+        'views/account_invoice_view.xml',
     ],
     'installable':
     True,

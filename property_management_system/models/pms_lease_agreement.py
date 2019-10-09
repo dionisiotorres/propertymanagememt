@@ -56,6 +56,11 @@ class PMSLeaseAgreement(models.Model):
                                            "lease_agreement_id",
                                            "Lease Agreement Items")
     lease_no = fields.Char("Lease No", default="New", store=True)
+    old_lease_no = fields.Char("Old Lease No", default="", store=True)
+    extend_count = fields.Float("Extend Count", store=True)
+    is_terminate = fields.Boolean("Is Terminate")
+    terminate_period = fields.Date("Terminate Date")
+    unit_no = fields.Char("Unit", default='', compute="compute_tanent")
     company_id = fields.Many2one(
         'res.company',
         "Company",
@@ -68,16 +73,19 @@ class PMSLeaseAgreement(models.Model):
         if self.company_tanent_id:
             self.name += self.company_tanent_id.name
         if self.lease_agreement_line:
+            self.unit_no = ''
             self.name += '('
             count = 1
             for lag in self.lease_agreement_line:
                 for unit in lag.unit_no:
                     if lag and count < len(self.lease_agreement_line):
                         self.name += str(unit.name) + '|'
+                        self.unit_no += str(unit.name) + '|'
                     elif lag and count == len(self.lease_agreement_line):
                         self.name += str(unit.name) + ')'
+                        self.unit_no += str(unit.name)
                 count += 1
-            return self.name or 'New'
+            # return self.name or 'New'
 
     @api.multi
     @api.onchange('start_date')
@@ -99,9 +107,57 @@ class PMSLeaseAgreement(models.Model):
                 la.active = self.active
         super(PMSLeaseAgreement, self).toggle_active()
 
-    # @api.multi
-    # def action_confirm(self):
-    #     return self.write({'state': 'CONFIRM'})
+    @api.multi
+    def action_view_invoice(self):
+        invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_no)])
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+    
+    @api.multi
+    def action_invoice(self):
+        invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
+        if not invoices:
+            payment_term = self.env['account.payment.term'].search([('name','=','Immediate Payment')])
+            invoice_lines = []
+            for l in self.lease_agreement_line:
+                val = {
+                    'name': l.unit_no.name,
+                }
+                product_tmp_id = self.env['product.template'].create(val)
+                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+                account_id = False
+                if product_id.id:
+                    account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+                taxes = product_id.taxes_id.filtered(lambda r: not self.company_id or r.company_id == self.company_id)
+                value = {
+                    'name': _('Payment'),
+                    'account_id': account_id,
+                    'price_unit': l.rent,
+                    'quantity': l.unit_no.area,
+                    'uom_id': l.unit_no.uom.id,
+                    'product_id': product_id.id,
+                    'sale_line_ids': [(6, 0, [l.id])],
+                    'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+                }
+                inv_line_id = self.env['account.invoice.line'].create(value)
+                invoice_lines.append(inv_line_id.id)
+            invoices = self.env['account.invoice'].create({
+                'lease_no': self.lease_no,
+                'partner_id': self.company_tanent_id.id,
+                'company_id': self.company_id.id,
+                'payment_term_id': payment_term.id,
+                'invoice_line_ids': [(6, 0, invoice_lines)],
+                })
+        if invoices:
+            return self.action_view_invoice()
+        return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
     def action_activate(self):
@@ -115,41 +171,48 @@ class PMSLeaseAgreement(models.Model):
                     end_date = None
                     day = 1
                     while day >= 1:
-                        if not end_date:
-                            end_date = line.start_date
-                        if line.end_date > end_date:
-                            if not start_date:
-                                start_date = line.start_date
-                            if start_date == line.start_date:
-                                date = start_date
-                                end_date = start_date + relativedelta(months=1)
-                                start_date = start_date + relativedelta(
-                                    months=1)
-                                val = {
-                                    'property_id': self.property_id.id,
-                                    'lease_agreement_line_id': line.id,
-                                    'charge_type': line.rental_charge_type,
-                                    'amount': line.rent,
-                                    'start_date': date,
-                                    'end_date': end_date,
-                                }
-                                self.env['pms.rent_schedule'].create(val)
-                                day = 1
+                        if line.start_date and line.end_date:
+                            if not end_date:
+                                end_date = line.start_date
+                            if line.end_date > end_date:
+                                if not start_date:
+                                    start_date = line.start_date
+                                if start_date == line.start_date:
+                                    date = start_date
+                                    end_date = start_date + relativedelta(
+                                        months=1)
+                                    start_date = start_date + relativedelta(
+                                        months=1)
+                                    val = {
+                                        'property_id': self.property_id.id,
+                                        'lease_agreement_line_id': line.id,
+                                        'charge_type': line.rental_charge_type,
+                                        'amount': line.rent,
+                                        'start_date': date,
+                                        'end_date': end_date,
+                                    }
+                                    self.env['pms.rent_schedule'].create(val)
+                                    day = 1
+                                else:
+                                    start_date = end_date
+                                    end_date = start_date + relativedelta(
+                                        months=1)
+                                    day = 1
+                                    val = {
+                                        'property_id': self.property_id.id,
+                                        'lease_agreement_line_id': line.id,
+                                        'charge_type': line.rental_charge_type,
+                                        'amount': line.rent,
+                                        'start_date': start_date,
+                                        'end_date': end_date,
+                                    }
+                                    self.env['pms.rent_schedule'].create(val)
                             else:
-                                start_date = end_date
-                                end_date = start_date + relativedelta(months=1)
-                                day = 1
-                                val = {
-                                    'property_id': self.property_id.id,
-                                    'lease_agreement_line_id': line.id,
-                                    'charge_type': line.rental_charge_type,
-                                    'amount': line.rent,
-                                    'start_date': start_date,
-                                    'end_date': end_date,
-                                }
-                                self.env['pms.rent_schedule'].create(val)
+                                day = 0
                         else:
-                            day = 0
+                            raise UserError(
+                                _("Please set start date and end date for your lease."
+                                  ))
         return self.write({'state': 'NEW'})
 
     @api.multi
@@ -166,23 +229,105 @@ class PMSLeaseAgreement(models.Model):
             raise UserError(
                 _("Please set extend term in the property setting."))
         else:
-            self.extend_to = self.end_date + relativedelta(
-                months=self.company_id.extend_lease_term.min_time_period)
+            self.extend_count += 1
+            if self.extend_count > self.company_id.extend_count:
+                raise UserError(_("Extend Limit is Over."))
+            if self.extend_to:
+                self.extend_to = self.extend_to + relativedelta(
+                    months=self.company_id.extend_lease_term.min_time_period)
+            else:
+                self.extend_to = self.end_date + relativedelta(
+                    months=self.company_id.extend_lease_term.min_time_period)
         return self.write({'state': 'EXTENDED'})
 
     @api.multi
     def action_renew(self):
-        return self.write({'state': 'RENEWED'})
+        line = []
+        if self.lease_agreement_line:
+            for l in self.lease_agreement_line:
+                lease_line_id = self.env['pms.lease_agreement.line'].search([
+                    ('id', '=', l.id)
+                ])
+                for les in lease_line_id:
+                    value = {
+                        'unit_no': les.unit_no.id,
+                        'start_date': les.end_date,
+                        'rent': les.rent,
+                        'company_tanent_id': les.company_tanent_id.id,
+                        'pos_id': les.pos_id,
+                        'remark': les.remark,
+                        'rental_charge_type': les.rental_charge_type,
+                    }
+                    line_id = self.env['pms.lease_agreement.line'].create(
+                        value).id
+                line.append(line_id)
+        val = {
+            'name': self.name,
+            'property_id': self.property_id.id,
+            'company_tanent_id': self.company_tanent_id.id,
+            'start_date': self.end_date,
+            'vendor_type': self.vendor_type,
+            'company_vendor_id': self.company_vendor_id.id,
+            'currency_id': self.currency_id.id,
+            'pos_submission': self.pos_submission,
+            'pos_submission_type': self.pos_submission_type,
+            'sale_data_type': self.sale_data_type,
+            'pos_submission_frequency': self.pos_submission_frequency,
+            'reset_gp_flat': self.reset_gp_flat,
+            'reset_date': self.reset_date,
+            'remark': self.remark,
+            'state': 'BOOKING',
+            'active': self.active,
+            'lease_agreement_line': [(6, 0, line)],
+            'lease_no': self.lease_no,
+            'old_lease_no': self.lease_no,
+            'company_id': self.company_id.id,
+        }
+        new_lease_ids = self.env['pms.lease_agreement'].create(val)
+        self.write({'state': 'RENEWED'})
+        return new_lease_ids.action_view_new_lease()
+
+    @api.multi
+    @api.onchange('is_terminate')
+    def onchange_is_terminate(self):
+        if self.is_terminate == True:
+            if not self.company_id.pre_notice_terminate_term:
+                raise UserError(
+                    _("Please set terminate term in the property setting."))
+            else:
+                self.is_terminate = True
+                self.terminate_period = (datetime.today() + relativedelta(
+                    days=self.company_id.pre_notice_terminate_term)
+                                         ).strftime('%Y-%m-%d')
 
     @api.multi
     def action_terminate(self):
-        if not self.company_id.extend_lease_term:
+        if self.is_terminate == True and self.terminate_period:
+            if self.terminate_period <= datetime.now().date():
+                return self.write({'state': 'TERMINATED'})
+            else:
+                raise UserError(
+                    _("Today date (%s) must be greater than or equal Tarminate date (%s)"
+                      % (datetime.now().date(), self.terminate_period)))
+        else:
             raise UserError(
-                _("Please set extend term in the property setting."))
-        # else:
-        #     self.extend_to = self.end_date + relativedelta(
-        #         months=self.company_id.extend_lease_term.min_time_period)
+                _("Please click is Terminate to set terminate date."))
         return self.write({'state': 'TERMINATED'})
+
+    @api.multi
+    def action_view_new_lease(self):
+        leases = self.env['pms.lease_agreement'].search([('old_lease_no', '=',
+                                                          self.lease_no)])
+        action = self.env.ref(
+            'property_management_system.action_lease_aggrement_all').read()[0]
+        if leases:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_lease_aggrement_form').id,
+                                'form')]
+            action['res_id'] = leases.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
 
     @api.model
     def create(self, values):
@@ -249,7 +394,7 @@ class PMSLeaseAgreementLine(models.Model):
     end_date = fields.Date(string="End Date",
                            related="lease_agreement_id.end_date")
     extend_to = fields.Date("Extend Date")
-    rent = fields.Float(string="Rent", related="unit_no.rate")
+    rent = fields.Float(string="Rent", related="unit_no.rate", store=True)
     company_tanent_id = fields.Many2one(
         'res.company',
         "Shop",
@@ -260,6 +405,8 @@ class PMSLeaseAgreementLine(models.Model):
                                            ('base+gto', 'Base + GTO'),
                                            ('baseorgto', 'Base or GTO')],
                                           string="Rental Charge Type")
+
+    rent_schedule_line = fields.One2many('pms.rent_schedule','lease_agreement_line_id', "Rent Schedules")
 
 
 class PMSChargeType(models.Model):

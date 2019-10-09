@@ -111,15 +111,17 @@ class Company(models.Model):
                                      string="Add New Lease Term")
     extend_lease_term = fields.Many2one('pms.leaseterms',
                                         string="Extened Lease Term")
-    terminate_lease_term = fields.Many2one(
-        'pms.leaseterms',
-        string="Terminate Lease Term",
-    )
+    # terminate_lease_term = fields.Many2one(
+    #     'pms.leaseterms',
+    #     string="Terminate Lease Term",
+    # )
     lease_agre_format_id = fields.Many2one('pms.format',
                                            'Lease Agreement Format')
     rentschedule_type = fields.Selection([('probation', "Probation"),
                                           ('calendar', "Calendar")],
                                          string="Rent Schedule Type")
+    extend_count = fields.Integer("Extend count")
+    pre_notice_terminate_term = fields.Integer("Pre-Terminate Terms(Days)")
 
 
 class ResConfigSettings(models.TransientModel):
@@ -160,12 +162,12 @@ class ResConfigSettings(models.TransientModel):
                                         related="company_id.extend_lease_term",
                                         readonly=False,
                                         required=False)
-    terminate_lease_term = fields.Many2one(
-        'pms.leaseterms',
-        string="Terminate Lease Term",
-        related="company_id.terminate_lease_term",
-        readonly=False,
-        required=False)
+    # terminate_lease_term = fields.Many2one(
+    #     'pms.leaseterms',
+    #     string="Terminate Lease Term",
+    #     related="company_id.terminate_lease_term",
+    #     readonly=False,
+    #     required=False)
     lease_agre_format_id = fields.Many2one(
         'pms.format',
         'Lease Format',
@@ -176,6 +178,23 @@ class ResConfigSettings(models.TransientModel):
         string="Rent Schedule",
         related="company_id.rentschedule_type",
         readonly=False)
+    extend_count = fields.Integer("Extend count",
+                                  related="company_id.extend_count",
+                                  readonly=False)
+    pre_notice_terminate_term = fields.Integer(
+        "Pre-Terminate Terms(Days)",
+        related="company_id.pre_notice_terminate_term",
+        readonly=False)
+
+    @api.onchange('pre_notice_terminate_term')
+    def onchange_pre_notice_terminate_term(self):
+        if self.pre_notice_terminate_term:
+            self.company_id.pre_notice_terminate_term = self.pre_notice_terminate_term
+
+    @api.onchange('extend_count')
+    def onchange_extend_count(self):
+        if self.extend_count:
+            self.company_id.extend_count = self.extend_count
 
     @api.onchange('rentschedule_type')
     def onchange_rentschedule_type(self):
@@ -192,10 +211,10 @@ class ResConfigSettings(models.TransientModel):
         if self.extend_lease_term:
             self.company_id.extend_lease_term = self.extend_lease_term
 
-    @api.onchange('terminate_lease_term')
-    def onchange_terminate_lease_term(self):
-        if self.terminate_lease_term:
-            self.company_id.terminate_lease_term = self.terminate_lease_term
+    # @api.onchange('terminate_lease_term')
+    # def onchange_terminate_lease_term(self):
+    #     if self.terminate_lease_term:
+    #         self.company_id.terminate_lease_term = self.terminate_lease_term
 
     @api.onchange('lease_agre_format_id')
     def onchange_lease_agre_format_id(self):
@@ -239,6 +258,6 @@ class PMSLeaseTerms(models.Model):
                                          string="Lease Period Type")
     min_time_period = fields.Integer("Min Time Period")
     max_time_period = fields.Integer("Max Time Period")
-    extend_count = fields.Integer("Extend count")
-    extend_period = fields.Integer("Extend Period(month)")
+    # extend_count = fields.Integer("Extend count")
+    extend_period = fields.Integer("Notice Period(mon)")
     active = fields.Boolean("Active", default=True)

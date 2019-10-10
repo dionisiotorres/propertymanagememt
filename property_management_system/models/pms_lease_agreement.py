@@ -110,57 +110,57 @@ class PMSLeaseAgreement(models.Model):
                 la.active = self.active
         super(PMSLeaseAgreement, self).toggle_active()
 
-    @api.multi
-    def action_view_invoice(self):
-        invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
-        action = self.env.ref('account.action_invoice_tree1').read()[0]
-        if len(invoices) > 1:
-            action['domain'] = [('id', 'in', invoices.ids)]
-        elif len(invoices) == 1:
-            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
-            action['res_id'] = invoices.ids[0]
-        else:
-            action = {'type': 'ir.actions.act_window_close'}
-        return action
+    # @api.multi
+    # def action_view_invoice(self):
+    #     invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
+    #     action = self.env.ref('account.action_invoice_tree1').read()[0]
+    #     if len(invoices) > 1:
+    #         action['domain'] = [('id', 'in', invoices.ids)]
+    #     elif len(invoices) == 1:
+    #         action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+    #         action['res_id'] = invoices.ids[0]
+    #     else:
+    #         action = {'type': 'ir.actions.act_window_close'}
+    #     return action
 
-    @api.multi
-    def action_invoice(self):
-        invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
-        if not invoices:
-            payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
-            invoice_lines = []
-            for l in self.lease_agreement_line:
-                val = {
-                    'name': l.unit_no.name,
-                }
-                product_tmp_id = self.env['product.template'].create(val)
-                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
-                account_id = False
-                if product_id.id:
-                    account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
-                taxes = product_id.taxes_id.filtered(lambda r: not self.company_id or r.company_id == self.company_id)
-                value = {
-                    'name': _('Payment'),
-                    'account_id': account_id,
-                    'price_unit': l.rent,
-                    'quantity': l.unit_no.area,
-                    'uom_id': l.unit_no.uom.id,
-                    'product_id': product_id.id,
-                    'sale_line_ids': [(6, 0, [l.id])],
-                    'invoice_line_tax_ids': [(6, 0, taxes.ids)],
-                }
-                inv_line_id = self.env['account.invoice.line'].create(value)
-                invoice_lines.append(inv_line_id.id)
-            invoices = self.env['account.invoice'].create({
-                'lease_no': self.lease_no,
-                'partner_id': self.company_tanent_id.id,
-                'company_id': self.company_id.id,
-                'payment_term_id': payment_term.id,
-                'invoice_line_ids': [(6, 0, invoice_lines)],
-                })
-        if invoices:
-            return self.action_view_invoice()
-        return {'type': 'ir.actions.act_window_close'}
+    # @api.multi
+    # def action_invoice(self):
+    #     invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
+    #     if not invoices:
+    #         payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
+    #         invoice_lines = []
+    #         for l in self.lease_agreement_line:
+    #             val = {
+    #                 'name': l.unit_no.name,
+    #             }
+    #             product_tmp_id = self.env['product.template'].create(val)
+    #             product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+    #             account_id = False
+    #             if product_id.id:
+    #                 account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+    #             taxes = product_id.taxes_id.filtered(lambda r: not self.company_id or r.company_id == self.company_id)
+    #             value = {
+    #                 'name': _('Payment'),
+    #                 'account_id': account_id,
+    #                 'price_unit': l.rent,
+    #                 'quantity': l.unit_no.area,
+    #                 'uom_id': l.unit_no.uom.id,
+    #                 'product_id': product_id.id,
+    #                 'sale_line_ids': [(6, 0, [l.id])],
+    #                 'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+    #             }
+    #             inv_line_id = self.env['account.invoice.line'].create(value)
+    #             invoice_lines.append(inv_line_id.id)
+    #         invoices = self.env['account.invoice'].create({
+    #             'lease_no': self.lease_no,
+    #             'partner_id': self.company_tanent_id.id,
+    #             'company_id': self.company_id.id,
+    #             'payment_term_id': payment_term.id,
+    #             'invoice_line_ids': [(6, 0, invoice_lines)],
+    #             })
+    #     if invoices:
+    #         return self.action_view_invoice()
+    #     return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
     def action_activate(self):
@@ -450,12 +450,14 @@ class PMSLeaseAgreementLine(models.Model):
         if self._context.get('end_date') != False:
             return self._context.get('end_date')
 
+    name = fields.Char("Name", compute="compute_name")
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
                                          "Lease Agreement")
+    lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
                                       ('unittype_id.chargeable', '=', True)])
-    start_date = fields.Date(string="Start Date",default=get_start_date,readonly=False,  store=True)
+    start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True)
     end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True)
     extend_to = fields.Date("Extend Date")
     rent = fields.Float(string="Rent", related="unit_no.rate", store=True)
@@ -484,11 +486,76 @@ class PMSLeaseAgreementLine(models.Model):
                              related="lease_agreement_id.state", store=True)
 
     @api.one
+    @api.depends('unit_no', 'lease_no')
+    def compute_name(self):
+        self.name = ''
+        if self.unit_no and self.lease_no:
+            self.name = self.lease_no + '/' + self.unit_no.name
+        elif self.lease_no and not self.unit_no:
+            self.name = self.lease_no
+        elif self.unit_no and not self.lease_no:
+            self.name = self.unit_no.name
+        else:
+            self.name = 'New'
+
+    @api.one
     @api.depends('rent', 'area')
     def get_total_rent(self):
         total = 0
         total = self.area * self.rent
         self.rent_total = total
+    
+    @api.multi
+    def action_view_invoice(self):
+        invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    @api.multi
+    def action_invoice(self):
+        invoices = self.env['account.invoice'].search([('lease_no', '=', self.lease_no)])
+        if not invoices:
+            payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
+            invoice_lines = []
+            for l in self.rent_schedule_line:
+                val = {
+                    'name': l.lease_agreement_line_id.name,
+                }
+                product_tmp_id = self.env['product.template'].create(val)
+                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+                account_id = False
+                if product_id.id:
+                    account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+                taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
+                value = {
+                    'name': _('Payment'),
+                    'account_id': account_id,
+                    'price_unit': self.rent,
+                    'quantity': self.area,
+                    'uom_id': self.unit_no.uom.id,
+                    'product_id': product_id.id,
+                    'sale_line_ids': [(6, 0, [l.id])],
+                    'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+                }
+                inv_line_id = self.env['account.invoice.line'].create(value)
+                invoice_lines.append(inv_line_id.id)
+            invoices = self.env['account.invoice'].create({
+                'lease_no': self.lease_no,
+                'partner_id': self.lease_agreement_id.company_tanent_id.id,
+                'company_id': self.lease_agreement_id.company_id.id,
+                'payment_term_id': payment_term.id,
+                'invoice_line_ids': [(6, 0, invoice_lines)],
+                })
+        if invoices:
+            return self.action_view_invoice()
+        return {'type': 'ir.actions.act_window_close'}
 
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'

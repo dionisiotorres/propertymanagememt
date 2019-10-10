@@ -13,9 +13,10 @@ class PMSRentCharge(models.Model):
                                     ('base+gto', 'Base + GTO'),
                                     ('baseorgto', 'Base or GTO')],
                                    string="Charge Type")
-    amount = fields.Float("Amount")
+    gto_amount = fields.Float("Gto Amount")
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
+    # paid = fields.Boolean("")
 
 
 class PMSEquipmentType(models.Model):

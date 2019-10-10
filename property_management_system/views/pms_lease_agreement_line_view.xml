@@ -1,0 +1,112 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_lease_aggrement_line_form">
+      <field name="name">Lease Agreement Detail</field>
+       <field name="model">pms.lease_agreement.line</field>
+      <field name="arch" type="xml">
+        <form>
+            <header>
+                <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/>
+                <!-- <field name="state" widget="statusbar" statusbar_visible="BOOKING,NEW,EXTENDED,RENEWED,CANCELLED,TERMINATED,EXPIRED"/> -->
+            </header>
+            <sheet>
+            <div class="oe_button_box" name="button_box">
+            <button name="action_view_invoice" type="object"
+                class="oe_stat_button"
+                icon="fa-pencil-square-o"
+                string="Invoice">
+            </button>
+          </div>
+            <div class="oe_title" >
+                <h1>
+                    <field name="name" placeholder="Description"/>
+                </h1>
+            </div>
+                <group>
+                    <group>
+                        <field name="lease_agreement_id" invisible="1"/>
+                        <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>   
+                        <field name="pos_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <!-- <field name="rental_charge_type"/> -->
+                        <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                    </group>
+                    <group>
+                        <!-- <field name="rent"/> -->
+                        <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="state" invisible="1"/>
+                    </group>
+                    </group>
+                    <group name="rent_detail" string="Rent Charge Detail">
+                    <group>
+                        <field name="rental_charge_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="area" />
+                        </group>
+                        <group>                          
+                        <field name="gto_percentage" attrs="{'invisible': [('rental_charge_type','not in', ['base+gto','baseorgto'])]}"/>
+                        <field name="rent"/>
+                        <field name="rent_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <group name="maintenance" string="Maintenance">
+                        <group>
+                        <field name="maintain_charge" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        </group>
+                        <group>                          
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rent Schedule lines" >
+                            <field name="rent_schedule_line" readonly="1">
+                            <tree>
+                            <field name="charge_type"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="gto_amount" />
+                            </tree>
+                            </field> 
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_lease_aggrement_line_tree">
+      <field name="name">Lease Agreement Detail</field>
+      <field name="model">pms.lease_agreement.line</field>
+      <field name="arch" type="xml">
+        <tree>
+            <field name="unit_no"/>
+            <field name="start_date" />
+            <field name="end_date" />
+            <field name="extend_to" />
+            <field name="pos_id" />
+            <field name="rental_charge_type"/>
+            <field name="remark" />
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_lease_aggrement_line_filter">
+      <field name="name">Lease Agreement Detail</field>
+      <field name="model">pms.lease_agreement.line</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="unit_no"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_lease_aggrement_detail_all" model="ir.actions.act_window">
+       <field name="name">Lease Agreement Detail</field>
+       <field name="res_model">pms.lease_agreement.line</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_lease_aggrement_line_tree"/> 
+    </record> 
+    <menuitem  id="lease_agreement_line_menu" 
+      name="Lease Agreement Detail" 
+      parent="lease_management_menu_sub" 
+      action="action_lease_aggrement_detail_all"
+      sequence="2"/>
+  </data>
+</odoo>

@@ -103,11 +103,10 @@
                           <page string="Rent Schedule lines" >
                              <field name="rent_schedule_line" readonly="1">
                               <tree>
-                                <field name="property_id"/>
                                 <field name="charge_type"/>
                                 <field name="start_date"/>
                                 <field name="end_date"/>
-                                <field name="amount"/>
+                                <field name="gto_amount" />
                               </tree>
                              </field> 
                           </page>
@@ -189,6 +188,7 @@
       name="Lease Management"  
       parent="pms_menu_config"
       sequence="3"/>
+     
      <record model="ir.ui.view" id="view_trade_category_form">
       <field name="name">Trade Category Form</field>
       <field name="model">pms.trade_category</field>

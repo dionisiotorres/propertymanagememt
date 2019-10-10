@@ -96,6 +96,8 @@ class PMSSpaceUnit(models.Model):
                     self.unit_code += str(val[l])
                 if self.unit_no:
                     self.name += str(self.unit_no)
+        else:
+            raise UserError(_("Please setup your unit format in ZPMS setting"))
 
     @api.multi
     def name_get(self):

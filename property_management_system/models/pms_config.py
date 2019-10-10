@@ -117,9 +117,11 @@ class Company(models.Model):
     # )
     lease_agre_format_id = fields.Many2one('pms.format',
                                            'Lease Agreement Format')
-    rentschedule_type = fields.Selection([('probation', "Probation"),
-                                          ('calendar', "Calendar")],
-                                         string="Rent Schedule Type")
+    rentschedule_type = fields.Selection(
+        [('probation', "Probation"), ('calendar', "Calendar")],
+        default='probation',
+        string="Rent Schedule Type",
+    )
     extend_count = fields.Integer("Extend count")
     pre_notice_terminate_term = fields.Integer("Pre-Terminate Terms(Days)")
 

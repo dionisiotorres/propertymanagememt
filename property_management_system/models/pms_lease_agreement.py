@@ -471,7 +471,24 @@ class PMSLeaseAgreementLine(models.Model):
                                           string="Rental Charge Type")
 
     rent_schedule_line = fields.One2many('pms.rent_schedule', 'lease_agreement_line_id', "Rent Schedules")
+    rent_total = fields.Float("Amount(per month)", compute="get_total_rent", store=True, readonly=False)
+    area = fields.Integer("Area", related="unit_no.area")
+    gto_percentage = fields.Integer("GTO Percent(%)")
+    maintain_charge = fields.Float("Maintain Charge", store=True, readonly=False)
+    state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
+                              ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
+                              ('CANCELLED', "Cancelled"),
+                              ('TERMINATED', 'Terminated'),
+                              ('EXPIRED', "Expired")],
+                             string="Status",
+                             related="lease_agreement_id.state", store=True)
 
+    @api.one
+    @api.depends('rent', 'area')
+    def get_total_rent(self):
+        total = 0
+        total = self.area * self.rent
+        self.rent_total = total
 
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'

@@ -547,7 +547,7 @@ class PMSLeaseAgreementLine(models.Model):
                 invoice_lines.append(inv_line_id.id)
             invoices = self.env['account.invoice'].create({
                 'lease_no': self.lease_no,
-                'partner_id': self.lease_agreement_id.company_tanent_id.id,
+                'partner_id': self.lease_agreement_id.company_tanent_id.partner_id.id,
                 'company_id': self.lease_agreement_id.company_id.id,
                 'payment_term_id': payment_term.id,
                 'invoice_line_ids': [(6, 0, invoice_lines)],

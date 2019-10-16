@@ -25,7 +25,7 @@ class PMSLeaseAgreement(models.Model):
                                         "Vendor",
                                         domain=[('company_type.name', '=',
                                                  "Vendor")])
-    currency_id = fields.Many2one('res.currency', "Currency")
+    currency_id = fields.Many2one('res.currency', "Currency", related="property_id.currency_id")
     pos_submission = fields.Boolean("Pos Submission")
     pos_submission_type = fields.Selection([('fpt', 'FTP'), ('ws', 'WS SOAP'),
                                             ('rap', 'Restful API'),
@@ -192,8 +192,7 @@ class PMSLeaseAgreement(models.Model):
                                         'charge_type': line.rental_charge_type,
                                         'amount': line.rent,
                                         'start_date': date,
-                                        'end_date': end_date + relativedelta(
-                                        days=1),
+                                        'end_date': end_date + relativedelta(days=1),
                                     }
                                     self.env['pms.rent_schedule'].create(val)
                                     day = 1
@@ -228,7 +227,7 @@ class PMSLeaseAgreement(models.Model):
                     while day >= 1:
                         if line.start_date and line.end_date:
                             s_day = line.start_date.day
-                            last_day = calendar.monthrange(line.start_date.year, line.start_date.month)[1]     
+                            last_day = calendar.monthrange(line.start_date.year, line.start_date.month)[1]
                             if not end_date:
                                 end_date = line.start_date
                             if line.end_date > end_date:

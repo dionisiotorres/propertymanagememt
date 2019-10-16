@@ -1,4 +1,5 @@
 from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 import pytz
 
 _tzs = [
@@ -17,18 +18,21 @@ class PMSProperties(models.Model):
     _description = 'Property Management System'
     _order = "code"
 
-    # def default_get_timezon(self):
-    #     print("hello", self)
-
-    def default_get_country(self):
-        country_id = self.env['res.country'].search([('code', '=', 'US')])
-        return country_id if not self.country_id else self.country_id
-
     def default_get_curency(self):
-        currency_id = self.env['res.currency'].search([('name', '=', 'USD')])
+        currency_id = self.env['res.currency'].search([('name', '=', 'MMK')])
         if currency_id.active is False:
             currency_id.active = True
-        return currency_id if not self.currency_id else self.currency_id
+        return currency_id
+
+    def default_get_country(self):
+        country_id = None
+        if self.currency_id:
+            country_id = self.env['res.country'].search([
+                ('currency_id', '=', self.currency_id.id)
+            ])
+        else:
+            country_id = self.env['res.country'].search([('code', '=', "MM")])
+        return country_id
 
     propertytype_id = fields.Many2one(
         "pms.property.type",
@@ -52,17 +56,17 @@ class PMSProperties(models.Model):
                                string='State',
                                ondelete='restrict',
                                domain="[('country_id', '=?', country_id)]")
-    country_id = fields.Many2one('res.country',
-                                 string='Country',
-                                 default=default_get_country,
-                                 requried=True,
-                                 ondelete='restrict')
     currency_id = fields.Many2one("res.currency",
                                   "Currency",
                                   default=default_get_curency,
-                                  related="country_id.currency_id",
                                   readonly=False,
                                   store=True)
+    country_id = fields.Many2one('res.country',
+                                 string='Country',
+                                 default=default_get_country,
+                                 readonly=False,
+                                 requried=True,
+                                 ondelete='restrict')
     name = fields.Char("Name", required=True, size=250)
     code = fields.Char("Code", size=250, required=True)
     gross_floor_area = fields.Float('GFA',
@@ -127,6 +131,20 @@ class PMSProperties(models.Model):
                          'Your code is exiting in the database.')]
 
     @api.multi
+    @api.onchange('currency_id')
+    def onchange_currency_id(self):
+        country_id = None
+        if self.currency_id:
+            country_ids = self.env['res.country'].search([
+                ('currency_id', '=', self.currency_id.id)
+            ])
+            if len(country_ids) > 1:
+                country_id = country_ids[0]
+            else:
+                country_id = country_ids
+        self.country_id = country_id
+
+    @api.multi
     def name_get(self):
         result = []
         for record in self:
@@ -136,11 +154,20 @@ class PMSProperties(models.Model):
 
     @api.model
     def create(self, values):
+        if values['property_management_id'][0][2] == []:
+            raise UserError(
+                _("Please set your management company for setting management rules."
+                  ))
         if values['image']:
             tools.image_resize_images(values, sizes={'image': (1024, None)})
         return super(PMSProperties, self).create(values)
 
     @api.multi
     def write(self, vals):
+        if 'property_management_id' in vals:
+            if vals['property_management_id'][0][2] == []:
+                raise UserError(
+                    _("Please set your management company for setting management rules."
+                      ))
         tools.image_resize_images(vals, sizes={'image': (1024, None)})
         return super(PMSProperties, self).write(vals)

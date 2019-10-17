@@ -18,12 +18,14 @@ class PMSProperties(models.Model):
     _description = 'Property Management System'
     _order = "code"
 
+    @api.model
     def default_get_curency(self):
         currency_id = self.env['res.currency'].search([('name', '=', 'MMK')])
         if currency_id.active is False:
             currency_id.active = True
         return currency_id
 
+    @api.model
     def default_get_country(self):
         country_id = None
         if self.currency_id:

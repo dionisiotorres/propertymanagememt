@@ -65,6 +65,20 @@
                 <page string="Lease Items">
                     <field name="lease_agreement_line" attrs="{'readonly': [('state','in', ['TERMINATED'])]}" context="{'start_date': start_date,'end_date':end_date}">
                     <form>
+                      <header>
+                        <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
+                        <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
+                      </header>
+                      <sheet>
+                      <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
+                        <button name="action_view_invoice" type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            string="Invoice">
+                            <field name="invoice_count"/>
+                        </button>
+                      </div>
                       <group>
                         <group>
                           <field name="lease_agreement_id" invisible="1"/>
@@ -111,6 +125,7 @@
                              </field> 
                           </page>
                       </notebook>
+                      </sheet>
                     </form>
                       <tree>
                         <field name="unit_no"/>

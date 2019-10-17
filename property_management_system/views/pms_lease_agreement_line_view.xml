@@ -6,15 +6,17 @@
       <field name="arch" type="xml">
         <form>
             <header>
-                <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/>
-                <!-- <field name="state" widget="statusbar" statusbar_visible="BOOKING,NEW,EXTENDED,RENEWED,CANCELLED,TERMINATED,EXPIRED"/> -->
+                <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
+                <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/>
+                <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
             </header>
             <sheet>
-            <div class="oe_button_box" name="button_box">
+            <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
             <button name="action_view_invoice" type="object"
                 class="oe_stat_button"
                 icon="fa-pencil-square-o"
                 string="Invoice">
+                <field name="invoice_count"/>
             </button>
           </div>
             <div class="oe_title" >

@@ -488,6 +488,8 @@ class PMSLeaseAgreementLine(models.Model):
                              string="Status",
                              related="lease_agreement_id.state", store=True)
 
+    invoice_count = fields.Integer(default=0)
+
     @api.one
     @api.depends('unit_no', 'lease_no')
     def compute_name(self):
@@ -556,6 +558,7 @@ class PMSLeaseAgreementLine(models.Model):
                 'payment_term_id': payment_term.id,
                 'invoice_line_ids': [(6, 0, invoice_lines)],
                 })
+            self.invoice_count += 1
         if invoices:
             return self.action_view_invoice()
         return {'type': 'ir.actions.act_window_close'}

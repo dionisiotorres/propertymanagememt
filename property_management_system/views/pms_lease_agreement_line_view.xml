@@ -81,9 +81,9 @@
             <field name="start_date" />
             <field name="end_date" />
             <field name="extend_to" />
-            <field name="pos_id" />
             <field name="rental_charge_type"/>
-            <field name="remark" />
+            <field name="rent"/>
+            <field name="rent_total"/>
         </tree>
       </field>
     </record>

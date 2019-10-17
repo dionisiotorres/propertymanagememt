@@ -23,10 +23,10 @@ class PMSProperties(models.Model):
                                                            ])
         usd_currency_id = self.env['res.currency'].search([('name', '=', 'USD')
                                                            ])
-        if currency_id.active != False:
-            return mmk_currency_id
-        else:
+        if mmk_currency_id.active is False:
             return usd_currency_id
+        else:
+            return mmk_currency_id
 
     def default_get_country(self):
         country_id = None

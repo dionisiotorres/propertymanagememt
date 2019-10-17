@@ -489,11 +489,11 @@ class Partner(models.Model):
         compute='_compute_company_type',
         inverse='_write_company_type',
     )
-    type = fields.Selection(
-        [('contact', 'Contact'), ('invoice', 'Invoice')],
-        string='Address Type',
-        default='contact',
-    )
+    # type = fields.Selection(
+    #     [('contact', 'Contact'), ('invoice', 'Invoice')],
+    #     string='Address Type',
+    #     default='contact',
+    # )
     child_ids = fields.One2many('res.partner',
                                 'parent_id',
                                 string='Contacts',

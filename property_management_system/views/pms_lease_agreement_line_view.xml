@@ -82,6 +82,7 @@
             <field name="end_date" />
             <field name="extend_to" />
             <field name="rental_charge_type"/>
+            <field name="maintain_charge" />
             <field name="rent"/>
             <field name="rent_total"/>
         </tree>

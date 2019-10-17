@@ -14,7 +14,7 @@
     'base',
     'version':
     '1.0.36',
-    'depends': ['base', 'uom', 'account'],
+    'depends': ['base', 'uom', 'account', 'mail'],
     'data': [
         'data/ir_sequence_data.xml',
         'security/ir.model.access.csv',

@@ -13,10 +13,11 @@
     'category':
     'base',
     'version':
-    '1.0.45',
+    '1.0.46',
     'depends': ['base', 'uom', 'account', 'mail'],
     'data': [
         'data/ir_sequence_data.xml',
+        'wizard/pms_invoice_wizard_view.xml',
         'security/ir.model.access.csv',
         'data/pms.charge_type.csv',
         'data/res.country.state.csv',
@@ -48,7 +49,6 @@
         'views/pms_equipment_view.xml',
         'views/pms_lease_agreement_line_view.xml',
         'views/account_invoice_view.xml',
-        'wizard/pms_invoice_wizard_view.xml',
     ],
     'installable':
     True,

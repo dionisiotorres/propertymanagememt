@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.35',
+    '1.0.36',
     'depends': ['base', 'uom', 'account'],
     'data': [
         'data/ir_sequence_data.xml',

@@ -21,7 +21,7 @@ class PMSProperties(models.Model):
     @api.model
     def default_get_curency(self):
         currency_id = self.env['res.currency'].search([('name', '=', 'MMK')])
-        if currency_id.active is False:
+        if currency_id.active == False:
             currency_id.active = True
         return currency_id
 

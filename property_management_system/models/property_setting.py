@@ -482,7 +482,7 @@ class PMSCompanyCategory(models.Model):
 class Partner(models.Model):
     _inherit = "res.partner"
 
-    city_id = fields.Many2one("pms.city", "City Name", ondelete='cascade')
+    city_id = fields.Many2one("pms.city", "City Name")
     company_type = fields.Selection(
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
@@ -500,7 +500,7 @@ class Partner(models.Model):
                                 domain=[('is_company', '!=', True)])
     compnay_channel_type = fields.Many2many('pms.company.category',
                                             string="Type")
-    township = fields.Many2one('pms.township', "Township", ondelete='cascade')
+    township = fields.Many2one('pms.township', "Township")
 
     @api.depends('is_company')
     def _compute_company_type(self):

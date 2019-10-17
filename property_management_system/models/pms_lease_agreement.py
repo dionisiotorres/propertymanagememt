@@ -184,7 +184,9 @@ class PMSLeaseAgreement(models.Model):
                                     date = start_date
                                     end_date = start_date + relativedelta(
                                         months=1)
-                                    start_date = start_date + relativedelta(
+                                    end_date = end_date - relativedelta(
+                                        days=1)
+                                    start_date = date + relativedelta(
                                         months=1)
                                     val = {
                                         'property_id': self.property_id.id,
@@ -192,14 +194,16 @@ class PMSLeaseAgreement(models.Model):
                                         'charge_type': line.rental_charge_type,
                                         'amount': line.rent,
                                         'start_date': date,
-                                        'end_date': end_date + relativedelta(days=1),
+                                        'end_date': end_date,
                                     }
                                     self.env['pms.rent_schedule'].create(val)
                                     day = 1
                                 else:
-                                    start_date = end_date
+                                    start_date = end_date + relativedelta(days=1)
                                     end_date = start_date + relativedelta(
                                         months=1)
+                                    end_date = end_date - relativedelta(days=1)
+                                    end_date
                                     day = 1
                                     val = {
                                         'property_id': self.property_id.id,

@@ -60,4 +60,18 @@ class PMSInvoicewizard(models.TransientModel):
     def create_lease_invoice(self):
         lease_invoices = self.env['pms.lease_agreement.line'].browse(
             self._context.get('active_id', []))
-        lease_invoices.action_invoice()
+        vals = []
+        vals.append([self.inv_month, self.inv_year, self.inv_quorter])
+        invoices = lease_invoices.action_invoice(self.inv_create_type, vals)
+        if invoices:
+            action = self.env.ref('account.action_invoice_tree1').read()[0]
+            if len(invoices) > 1:
+                action['domain'] = [('id', 'in', invoices.ids)]
+            elif len(invoices) == 1:
+                action['views'] = [(self.env.ref('account.invoice_form').id,
+                                    'form')]
+                action['res_id'] = invoices.ids[0]
+            else:
+                action = {'type': 'ir.actions.act_window_close'}
+            return action
+        return {'type': 'ir.actions.act_window_close'}

@@ -5,3 +5,4 @@ class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     lease_no = fields.Char("Lease No")
+    inv_month = fields.Char("Invoice Month", readonly=True, store=True)

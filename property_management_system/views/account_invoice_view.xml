@@ -7,7 +7,30 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <field name="payment_term_id" position="after">
-                    <field name="lease_no"/>
+                    <field name="lease_no" string="Lease Detail"/>
+                </field>
+                <field name="date_due" position="after">
+                    <field name="inv_month" string="Month"/>
+                </field>
+                <field name="company_id" position="attributes">
+                    <attribute name="string">Mall</attribute>
+                </field>
+            </field>
+        </record>
+         <record id="invoice_tree_extension" model="ir.ui.view">
+            <field name="name">account.invoice.tree</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="company_id" position="attributes">
+                    <attribute name="string">Mall</attribute>
+                </field>
+                <field name="origin" position="after">
+                    <field name="lease_no" string="Lease Detail"/>
+                    <field name="inv_month" string="Month"/>
+                </field>
+                <field name="origin" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </field>
             </field>
         </record>

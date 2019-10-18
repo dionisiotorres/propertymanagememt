@@ -6,7 +6,7 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button name="action_activate" string="Activate" type="object" states="BOOKING,EXTENDED"/>
+            <button name="action_activate" string="Activate" type="object" states="BOOKING"/>
             <button name="action_cancel" states="BOOKING" type="object" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
             <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/> -->
@@ -62,7 +62,7 @@
               </group>
             </group>
             <notebook>
-                <page string="Lease Items">
+                <page string="Lease Units">
                     <field name="lease_agreement_line" attrs="{'readonly': [('state','in', ['TERMINATED'])]}" context="{'start_date': start_date,'end_date':end_date}">
                     <form>
                       <header>

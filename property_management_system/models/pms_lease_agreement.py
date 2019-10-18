@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 class PMSLeaseAgreement(models.Model):
     _name = 'pms.lease_agreement'
     _description = "Lease Agreements"
-    _order = "id desc,name"
+    _order = "property_id, company_tanent_id, state, start_date"
 
     name = fields.Char("Name", default="New", compute="compute_tanent")
     property_id = fields.Many2one("pms.properties")
@@ -253,15 +253,26 @@ class PMSLeaseAgreement(models.Model):
     @api.multi
     def action_renew(self):
         line = []
+        end_date = None
         if self.lease_agreement_line:
             for l in self.lease_agreement_line:
                 lease_line_id = self.env['pms.lease_agreement.line'].search([
                     ('id', '=', l.id)
                 ])
                 for les in lease_line_id:
+                    if self.property_id.property_management_id:
+                        for company in self.property_id.property_management_id:
+                            if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
+                                end_date = self.start_date + relativedelta(
+                                    months=company.new_lease_term.min_time_period) - relativedelta(days=1)
+                            elif company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
+                                end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
+                    else:
+                        raise UserError(_("Pease set management company with your mall."))
                     value = {
                         'unit_no': les.unit_no.id,
                         'start_date': les.end_date,
+                        'end_date': end_date,
                         'rent': les.rent,
                         'company_tanent_id': les.company_tanent_id.id,
                         'pos_id': les.pos_id,
@@ -276,6 +287,7 @@ class PMSLeaseAgreement(models.Model):
             'property_id': self.property_id.id,
             'company_tanent_id': self.company_tanent_id.id,
             'start_date': self.end_date,
+            'end_date': end_date,
             'vendor_type': self.vendor_type,
             'company_vendor_id': self.company_vendor_id.id,
             'currency_id': self.currency_id.id,

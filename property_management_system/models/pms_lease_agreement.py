@@ -117,7 +117,7 @@ class PMSLeaseAgreement(models.Model):
             for line in self.lease_agreement_line:
                 for unit in line.unit_no:
                     unit.write({'status': 'occupied'})
-                if self.company_id.rentschedule_type == 'probation':
+                if self.company_id.rentschedule_type == 'prorated':
                     date = None
                     start_date = None
                     end_date = None

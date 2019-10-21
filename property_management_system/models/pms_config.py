@@ -119,7 +119,7 @@ class Company(models.Model):
                                            'Lease Agreement Format')
     rentschedule_type = fields.Selection(
         [('prorated', "Prorated"), ('calendar', "Calendar")],
-        default='probation',
+        default='prorated',
         string="Rent Schedule Type",
     )
     extend_count = fields.Integer("Extend count")

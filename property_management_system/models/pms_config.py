@@ -118,8 +118,8 @@ class Company(models.Model):
     lease_agre_format_id = fields.Many2one('pms.format',
                                            'Lease Agreement Format')
     rentschedule_type = fields.Selection(
-        [('prorated', "Prorated"), ('calendar', "Calendar")],
-        default='prorated',
+        [('probation', "Prorated"), ('calendar', "Calendar")],
+        default='probation',
         string="Rent Schedule Type",
     )
     extend_count = fields.Integer("Extend count")
@@ -176,7 +176,7 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.lease_agre_format_id",
         readonly=False)
     rentschedule_type = fields.Selection(
-        [('prorated', "Prorated"), ('calendar', "Calendar")],
+        [('probation', "Prorated"), ('calendar', "Calendar")],
         string="Rent Schedule",
         related="company_id.rentschedule_type",
         readonly=False)

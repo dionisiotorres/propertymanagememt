@@ -15,7 +15,10 @@
                           <field name="email" widget="email" placeholder="email" context="{'gravatar_image': True}" attrs="{'required': [('user_ids','!=', [])]}"/>
                           <field name="mobile" widget="phone" placeholder="mobile"/>
                           <field name="phone" widget="phone" placeholder="phone"/>
-                          <field name="compnay_channel_type" widget="many2many_tags" attrs="{'invisible': [('is_company','!=', True)]}" placeholder="Type"/>
+                          <field name="company_channel_type" widget="many2many_tags" attrs="{'invisible': [('is_company','!=', True)]}" placeholder="Type"/>
+                          <field name="is_tanent" invisible="1"/>
+                        <field name="trade_id" attrs="{'invisible': [('is_tanent','!=', True)]}"/>
+                        <field name="sub_trade_id" attrs="{'invisible': [('is_tanent','!=',True)]}"/>
                           <field name="user_ids" invisible="1"/>
                           <field name="website" widget="url" invisible="1" placeholder="e.g. www.odoo.com"/>
                           <field name="parent_id" invisible="1"
@@ -148,7 +151,7 @@
                                 </form>
                             </field>
                         </page>
-                        <page name='internal_notes' string="Internal Notes">
+                        <page name='internal_notes'  attrs="{'invisible': [('is_company', '=', True)]}" string="Internal Notes">
                             <field name="comment" placeholder="Internal note..."/>
                         </page>
                         <page name='sales_purchases' invisible="1" string="Sales &amp; Purchases">

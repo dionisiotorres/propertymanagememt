@@ -44,7 +44,10 @@ class PMSSpaceUnit(models.Model):
     unit_no = fields.Char("Space Unit No", store=True, required=True)
     parent_id = fields.Many2one("pms.space.unit", "Parent", store=True)
     unittype_id = fields.Many2one("pms.space.type", "Space Type")
-    uom = fields.Many2one("uom.uom", "UOM")
+    uom = fields.Many2one("uom.uom",
+                          "UOM",
+                          related="property_id.uom_id",
+                          store=True)
     area = fields.Integer("Area")
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")

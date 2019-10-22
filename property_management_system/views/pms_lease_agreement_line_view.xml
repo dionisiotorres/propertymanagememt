@@ -6,8 +6,7 @@
       <field name="arch" type="xml">
         <form>
             <header>
-                <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
-                <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/>
+                <button name="%(action_invoice_wiz)d" states="NEW,EXTENDED" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
                 <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
             </header>
             <sheet>
@@ -37,7 +36,6 @@
                         <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                        <field name="state" invisible="1"/>
                     </group>
                     </group>
                     <group name="rent_detail" string="Rent Charge Detail">
@@ -61,12 +59,12 @@
                     <notebook>
                         <page string="Rent Schedule lines" >
                             <field name="rent_schedule_line" readonly="1">
-                            <tree>
-                            <field name="charge_type"/>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
-                            <field name="gto_amount" />
-                            </tree>
+                              <tree>
+                                <field name="charge_type"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="gto_amount" />
+                              </tree>
                             </field> 
                         </page>
                     </notebook>
@@ -87,6 +85,7 @@
             <field name="maintain_charge" />
             <field name="rent"/>
             <field name="rent_total"/>
+            <field name="state"/>
         </tree>
       </field>
     </record>

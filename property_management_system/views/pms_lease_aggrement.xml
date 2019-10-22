@@ -92,7 +92,6 @@
                           <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                           <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                           <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                          <field name="state" invisible="1"/>
                         </group>
                       </group>
                       <group name="rent_detail" string="Rent Charge Detail">

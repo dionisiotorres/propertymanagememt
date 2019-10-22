@@ -352,30 +352,6 @@ class Company(models.Model):
     company_type = fields.Many2many('pms.company.category',
                                     "res_company_type_rel", 'company_id',
                                     'category_id')
-    is_tanent = fields.Boolean('Is Tanent',
-                               compute="get_tanent",
-                               readonly=False,
-                               store=True)
-    partner_contact_id = fields.Many2many(
-        "res.partner",
-        "company_partner_contact_rel",
-        "company_id",
-        "partner_id",
-        domain="[('is_company', '!=', True)]",
-        store=True)
-    trade_id = fields.Many2one("pms.trade_category", "Trade")
-    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade")
-
-    @api.one
-    @api.depends('company_type')
-    def get_tanent(self):
-        category = []
-        if self.company_type:
-            for comp in self.company_type:
-                for cat in comp:
-                    category.append(cat.name)
-                if 'Tanent' in category:
-                    self.is_tanent = True
 
     def _get_company_address_fields(self, partner):
         return {
@@ -498,9 +474,33 @@ class Partner(models.Model):
                                 'parent_id',
                                 string='Contacts',
                                 domain=[('is_company', '!=', True)])
-    compnay_channel_type = fields.Many2many('pms.company.category',
+    company_channel_type = fields.Many2many('pms.company.category',
                                             string="Type")
     township = fields.Many2one('pms.township', "Township")
+    is_tanent = fields.Boolean('Is Tanent',
+                               compute="get_tanent",
+                               readonly=False,
+                               store=True)
+    # partner_contact_id = fields.Many2many(
+    #     "res.partner",
+    #     "company_partner_contact_rel",
+    #     "company_id",
+    #     "partner_id",
+    #     domain="[('is_company', '!=', True)]",
+    #     store=True)
+    trade_id = fields.Many2one("pms.trade_category", "Trade")
+    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade")
+
+    @api.one
+    @api.depends('company_channel_type')
+    def get_tanent(self):
+        category = []
+        if self.company_channel_type:
+            for comp in self.company_channel_type:
+                for cat in comp:
+                    category.append(cat.name)
+                if 'Tenant' in category:
+                    self.is_tanent = True
 
     @api.depends('is_company')
     def _compute_company_type(self):

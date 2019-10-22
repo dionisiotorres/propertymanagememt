@@ -14,17 +14,17 @@ class PMSLeaseAgreement(models.Model):
 
     name = fields.Char("Name", default="New", compute="compute_tanent")
     property_id = fields.Many2one("pms.properties")
-    company_tanent_id = fields.Many2one("res.company",
+    company_tanent_id = fields.Many2one("res.partner",
                                         "Tenant",
-                                        domain=[('company_type.name', '=',
+                                        domain=[('company_channel_type.name', '=',
                                                  "Tenant")])
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
     extend_to = fields.Date("Extend Date")
     vendor_type = fields.Char("Vendor Type")
-    company_vendor_id = fields.Many2one('res.company',
+    company_vendor_id = fields.Many2one('res.partner',
                                         "Vendor",
-                                        domain=[('company_type.name', '=',
+                                        domain=[('company_channel_type.name', '=',
                                                  "Vendor")])
     currency_id = fields.Many2one('res.currency', "Currency", related="property_id.currency_id")
     pos_submission = fields.Boolean("Pos Submission")
@@ -94,15 +94,19 @@ class PMSLeaseAgreement(models.Model):
     @api.onchange('start_date')
     def onchange_start_date(self):
         if self.start_date and self.property_id:
-            if self.property_id.property_management_id:
-                for company in self.property_id.property_management_id:
-                    if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
-                        self.end_date = self.start_date + relativedelta(
-                            months=company.new_lease_term.min_time_period) - relativedelta(days=1)
-                    elif company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
-                        self.end_date=self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
-            else:
+            if not self.property_id.property_management_id:
                 raise UserError(_("Pease set management company with your mall."))
+            else:
+                self.end_date = company = None
+                company = self.property_id.property_management_id
+                if not company.new_lease_term:
+                    raise UserError(_("Please set new lease term in Setting."))
+                if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
+                    self.end_date = self.start_date + relativedelta(
+                        months=company.new_lease_term.min_time_period) - relativedelta(days=1)
+                if company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
+                    self.end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
+                
 
     @api.multi
     def toggle_active(self):
@@ -263,10 +267,10 @@ class PMSLeaseAgreement(models.Model):
                     if self.property_id.property_management_id:
                         for company in self.property_id.property_management_id:
                             if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
-                                end_date = self.start_date + relativedelta(
+                                end_date = les.end_date + relativedelta(
                                     months=company.new_lease_term.min_time_period) - relativedelta(days=1)
                             elif company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
-                                end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
+                                end_date = les.end_date +relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
                     else:
                         raise UserError(_("Pease set management company with your mall."))
                     value = {
@@ -405,7 +409,7 @@ class PMSLeaseAgreement(models.Model):
 class PMSLeaseAgreementLine(models.Model):
     _name = 'pms.lease_agreement.line'
     _description = "Lease Agreement Line"
-    _order = "id desc,name"
+    _order = "id,name"
 
     def get_start_date(self):
         if self._context.get('start_date') != False:
@@ -447,8 +451,7 @@ class PMSLeaseAgreementLine(models.Model):
                               ('CANCELLED', "Cancelled"),
                               ('TERMINATED', 'Terminated'),
                               ('EXPIRED', "Expired")],
-                             string="Status",
-                             related="lease_agreement_id.state", store=True)
+                             related="lease_agreement_id.state", string='Status', readonly=True, copy=False, store=True, default='BOOKING')
 
     invoice_count = fields.Integer(default=0)
 

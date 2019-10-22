@@ -6,3 +6,4 @@ class AccountInvoice(models.Model):
 
     lease_no = fields.Char("Lease No")
     inv_month = fields.Char("Invoice Month", readonly=True, store=True)
+    property_id = fields.Many2one('pms.properties', "Properties")

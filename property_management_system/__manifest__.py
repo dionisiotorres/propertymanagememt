@@ -13,8 +13,8 @@
     'category':
     'base',
     'version':
-    '1.0.51',
-    'depends': ['base', 'uom', 'account', 'mail'],
+    '1.0.52',
+    'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
         'data/ir_sequence_data.xml',
         'wizard/pms_invoice_wizard_view.xml',
@@ -39,7 +39,7 @@
         'views/pms_township_view.xml',
         'views/pms_country_view.xml',
         'views/pms_currency_view.xml',
-        'views/pms_contact_view.xml',
+        'views/pms_contacts_view.xml',
         'views/pms_department_view.xml',
         'views/pms_company_type.xml',
         'views/pms_space_type.xml',

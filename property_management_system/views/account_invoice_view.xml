@@ -7,13 +7,11 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <field name="payment_term_id" position="after">
+                <field name="property_id"/>
                     <field name="lease_no" string="Lease Detail"/>
                 </field>
                 <field name="date_due" position="after">
                     <field name="inv_month" string="Month"/>
-                </field>
-                <field name="company_id" position="attributes">
-                    <attribute name="string">Mall</attribute>
                 </field>
             </field>
         </record>
@@ -22,10 +20,11 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_tree"/>
             <field name="arch" type="xml">
-                <field name="company_id" position="attributes">
+                <!-- <field name="company_id" position="attributes">
                     <attribute name="string">Mall</attribute>
-                </field>
-                <field name="origin" position="after">
+                </field> -->
+                <field name="company_id" position="before">
+                    <field name="property_id" string="Mall"/>
                     <field name="lease_no" string="Lease Detail"/>
                     <field name="inv_month" string="Month"/>
                 </field>

@@ -532,6 +532,7 @@ class PMSLeaseAgreementLine(models.Model):
                 'lease_no': self.name,
                 'inv_month': calendar.month_name[vals[0][0]] + ' - ' + str(vals[0][1]),
                 'partner_id': self.lease_agreement_id.company_tanent_id.partner_id.id,
+                'property_id': self.lease_agreement_id.property_id.id,
                 'company_id': self.lease_agreement_id.company_id.id,
                 'payment_term_id': payment_term.id,
                 'invoice_line_ids': [(6, 0, invoice_lines)],

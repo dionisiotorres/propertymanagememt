@@ -30,7 +30,7 @@ class PMSProperties(models.Model):
             uom_id = self.env['uom.uom'].create({
                 'name':
                 'sqft',
-                'cateogry_id':
+                'category_id':
                 uom_category_id.id
             })
         return uom_id

@@ -534,7 +534,7 @@ class PMSLeaseAgreementLine(models.Model):
             inv_ids = self.env['account.invoice'].create({
                 'lease_no': self.name,
                 'inv_month': calendar.month_name[vals[0][0]] + ' - ' + str(vals[0][1]),
-                'partner_id': self.lease_agreement_id.company_tanent_id.partner_id.id,
+                'partner_id': self.lease_agreement_id.company_tanent_id.id,
                 'property_id': self.lease_agreement_id.property_id.id,
                 'company_id': self.lease_agreement_id.company_id.id,
                 'payment_term_id': payment_term.id,

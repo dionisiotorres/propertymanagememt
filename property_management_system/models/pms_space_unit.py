@@ -66,41 +66,65 @@ class PMSSpaceUnit(models.Model):
     @api.one
     @api.depends('unit_no', 'floor_id', 'property_id')
     def get_unit_no(self):
-        if self.env.user.company_id.space_unit_code_format:
-            format_ids = self.env['pms.format.detail'].search(
-                [('format_id', '=',
-                  self.env.user.company_id.space_unit_code_format.id)],
-                order='position_order asc')
-            val = []
-            for fid in format_ids:
-                if fid.value_type == 'dynamic':
-                    if self.floor_id.code and fid.dynamic_value == 'floor code':
-                        val.append(self.floor_id.code)
-                    if self.floor_id.floor_code_ref and fid.dynamic_value == 'floor ref code':
-                        val.append(self.floor_id.floor_code_ref)
-                    if self.property_id.code and fid.dynamic_value == 'property code':
-                        val.append(self.property_id.code)
-                if fid.value_type == 'fix':
-                    if self.unit_no or self.floor_id:
-                        val.append(fid.fix_value)
-                if fid.value_type == 'digit':
-                    if self.unit_no and len(self.unit_no) > fid.digit_value:
-                        raise UserError(
-                            _("Please Unit Length less than your format digit."
-                              ))
-                if fid.value_type == 'datetime':
-                    val.append(fid.datetime_value)
-            space = []
-            self.name = ''
-            self.unit_code = ''
-            if len(val) > 0:
-                for l in range(len(val)):
-                    self.name += str(val[l])
-                    self.unit_code += str(val[l])
-                if self.unit_no:
-                    self.name += str(self.unit_no)
-        else:
-            raise UserError(_("Please setup your unit format in ZPMS setting"))
+        if self.floor_id:
+            self.unit_code = self.floor_id.floor_code_ref + '-'
+        if self.property_id:
+            if self.property_id.unit_format:
+                format_ids = self.env['pms.format.detail'].search(
+                    [('format_id', '=', self.property_id.unit_format.id)],
+                    order='position_order asc')
+                val = []
+                for fid in format_ids:
+                    if fid.value_type == 'dynamic':
+                        if self.floor_id.code and fid.dynamic_value == 'floor code':
+                            val.append(self.floor_id.code)
+                        if self.floor_id.floor_code_ref and fid.dynamic_value == 'floor ref code':
+                            val.append(self.floor_id.floor_code_ref)
+                        if self.property_id.code and fid.dynamic_value == 'property code':
+                            val.append(self.property_id.code)
+                    if fid.value_type == 'fix':
+                        if self.unit_no or self.floor_id:
+                            val.append(fid.fix_value)
+                    if fid.value_type == 'digit':
+                        if self.unit_no and len(
+                                self.unit_no) > fid.digit_value:
+                            raise UserError(
+                                _("Please Unit Length less than your format digit."
+                                  ))
+                    if fid.value_type == 'datetime':
+                        val.append(fid.datetime_value)
+                space = []
+                self.name = ''
+                self.unit_code = ''
+                if len(val) > 0:
+                    for l in range(len(val)):
+                        self.name += str(val[l])
+                        self.unit_code += str(val[l])
+                    if self.unit_no:
+                        self.name += str(self.unit_no)
+
+            else:
+                raise UserError(_("Please setup your unit format in Property"))
+        length = 0
+        if self.name:
+            length = len(self.name)
+        if self.property_id.unit_code_len:
+            if length > self.property_id.unit_code_len:
+                raise UserError(
+                    _("Please set your code length less than %s." %
+                      (self.property_id.unit_code_len)))
+
+    # @api.multi
+    # @api.onchange('name')
+    # def onchange_name(self):
+    #     length = 0
+    #     if self.name:
+    #         length = len(self.name)
+    #     if self.env.user.company_id.space_unit_code_len:
+    #         if length > self.env.user.company_id.space_unit_code_len:
+    #             raise UserError(
+    #                 _("Please set your code length less than %s." %
+    #                   (self.env.user.company_id.space_unit_code_len)))
 
     @api.multi
     def name_get(self):

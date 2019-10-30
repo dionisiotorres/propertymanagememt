@@ -13,10 +13,12 @@
     'category':
     'base',
     'version':
-    '1.0.56',
+    '1.0.57',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
         'data/ir_sequence_data.xml',
+        'data/pms_lease_schedular_data.xml',
+        'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
         'security/ir.model.access.csv',
         'data/pms.charge_type.csv',

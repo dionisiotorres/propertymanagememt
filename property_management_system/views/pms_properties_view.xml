@@ -194,16 +194,29 @@
                 <group></group>
               </group> 
               </page>
-              <!-- <page name="Terms" string="Terms">
-               <field name="leaseterms_line_id" widget='many2many'>
-                  <tree editable="bottom">
-                      <field name="name" string="Description"/>
-                      <field name="lease_term_type" string="Lease Term Type"/> 
-                      <field name="min_time_period" string="Min Period"/> 
-                      <field name="max_time_period" string="Max Period"/>
-                  </tree>
-              </field>
-              </page> -->
+              <page name="Configuration" string="Configuration">
+                <group>
+                  <group string="Fixed Code Integration">
+                    <field name="property_code_len"/>
+                    <field name="unit_code_len"/>
+                    <field name="floor_code_len"/>
+                  </group>
+                  <group string="Define Lease Terms">
+                    <field name="new_lease_term" widget="selection"/>
+                    <field name="extend_lease_term" widget="selection"/>
+                    <field name="terminate_days"/>
+                    <field name="extend_count"/>
+                  </group>
+                  <group string="Format Defination">
+                    <field name="pos_id_format" widget="selection"/>
+                    <field name="unit_format" widget="selection"/>
+                    <field name="lease_format" widget="selection"/>
+                  </group>
+                  <group string="Define Rent Schedule Type">
+                    <field name="rentschedule_type"/>
+                  </group>
+                </group>
+              </page>
             </notebook>
           </sheet>
         </form>

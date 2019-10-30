@@ -26,7 +26,7 @@
               <group>
                 <!-- <field name="rentschedule_type"/> -->
                 <!-- <field name="extend_count"/> -->
-                <field name="extend_period"/>
+                <field name="notify_period"/>
               </group>
             </group>
           </sheet>
@@ -45,7 +45,7 @@
             <field name="max_time_period"/>
             <!-- <field name="rentschedule_type"/> -->
             <!-- <field name="extend_count"/> -->
-            <field name="extend_period"/>
+            <field name="notify_period"/>
             <field name="active"/>  
         </tree>
       </field>

@@ -7,12 +7,18 @@
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
                 <field name="payment_term_id" position="after">
-                <field name="property_id"/>
+                <field name="property_id" string="Mall"/>
                     <field name="lease_no" string="Lease Detail"/>
                 </field>
                 <field name="date_due" position="after">
                     <field name="inv_month" string="Month"/>
                 </field>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
+                    <attribute name="string">Unit</attribute>
+                </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="attributes">
+                    <attribute name="string">Area</attribute>
+                </xpath>
             </field>
         </record>
          <record id="invoice_tree_extension" model="ir.ui.view">

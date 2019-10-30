@@ -1,1 +1,1 @@
-from . import pms_invoice_wizard
+from . import pms_invoice_wizard, pms_extend_wizard

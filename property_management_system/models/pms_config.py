@@ -6,7 +6,7 @@ class PmsFormat(models.Model):
     _description = "Property Formats"
     _order = "name"
 
-    name = fields.Char("Name")
+    name = fields.Char("Name", required=True)
     sample = fields.Char("Sample",
                          compute='get_sample_format',
                          store=True,
@@ -261,5 +261,5 @@ class PMSLeaseTerms(models.Model):
     min_time_period = fields.Integer("Min Time Period")
     max_time_period = fields.Integer("Max Time Period")
     # extend_count = fields.Integer("Extend count")
-    extend_period = fields.Integer("Notice Period(mon)")
+    notify_period = fields.Integer("Notice Period(mon)")
     active = fields.Boolean("Active", default=True)

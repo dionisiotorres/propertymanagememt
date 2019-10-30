@@ -145,10 +145,50 @@ class PMSProperties(models.Model):
         "resized as a 64x64px image, with aspect ratio preserved. "\
         "Use this field anywhere a small image is required.")
 
+    property_code_len = fields.Integer(
+        "Property Code Length",
+        default=lambda self: self.env.user.company_id.property_code_len)
+    unit_code_len = fields.Integer(
+        "Unit Code Length",
+        default=lambda self: self.env.user.company_id.space_unit_code_len)
+    floor_code_len = fields.Integer(
+        "Floor Code Length",
+        default=lambda self: self.env.user.company_id.floor_code_len)
+    unit_format = fields.Many2one("pms.format",
+                                  "Unit Format",
+                                  default=lambda self: self.env.user.company_id
+                                  .space_unit_code_format.id)
+    lease_format = fields.Many2one(
+        "pms.format",
+        "Lease Format",
+        default=lambda self: self.env.user.company_id.lease_agre_format_id.id)
+    pos_id_format = fields.Many2one(
+        "pms.format",
+        "POS ID  Format",
+        default=lambda self: self.env.user.company_id.pos_id_format.id)
+    new_lease_term = fields.Many2one(
+        "pms.leaseterms",
+        "New Lease Term",
+        default=lambda self: self.env.user.company_id.new_lease_term.id)
+    extend_lease_term = fields.Many2one(
+        "pms.leaseterms",
+        "Extend Lease Term",
+        default=lambda self: self.env.user.company_id.extend_lease_term.id)
+    terminate_days = fields.Integer("Terminate Days",
+                                    default=lambda self: self.env.user.
+                                    company_id.pre_notice_terminate_term)
+    extend_count = fields.Integer(
+        "Extend Count",
+        default=lambda self: self.env.user.company_id.extend_count)
+    rentschedule_type = fields.Selection(
+        [('prorated', "Prorated"), ('calendar', "Calendar")],
+        default=lambda self: self.env.user.company_id.rentschedule_type,
+        string="Rent Schedule Type",
+    )
+
     # company_id = fields.Many2many('res.partner')
 
     # next_pos_id = fields.Char("Next Pos ID")
-    # pos_id_format = fields.Char("POS ID Format", size=250)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -165,6 +205,18 @@ class PMSProperties(models.Model):
             else:
                 country_id = country_ids
         self.country_id = country_id
+
+    @api.multi
+    @api.onchange('code')
+    def onchange_code(self):
+        length = 0
+        if self.code:
+            length = len(self.code)
+        if self.property_code_len:
+            if length > self.property_code_len:
+                raise UserError(
+                    _("Please set your code length less than %s." %
+                      (self.property_code_len)))
 
     @api.multi
     def name_get(self):

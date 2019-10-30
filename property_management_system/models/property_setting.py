@@ -16,6 +16,8 @@ class PMSRentCharge(models.Model):
     gto_amount = fields.Float("Gto Amount")
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
+    extend_count = fields.Integer("Extend Times", store=True)
+    extend_to = fields.Date('Extend To')
     # paid = fields.Boolean("")
 
 

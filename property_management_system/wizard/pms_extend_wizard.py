@@ -53,7 +53,7 @@ class PMSLeaseExtendWizard(models.TransientModel):
     lease_no = fields.Many2one("pms.lease_agreement",
                                default=get_lease_agreement_id,
                                store=True)
-    lease = fields.Char("Lease No", related="lease_no.lease_no", store=True)
+    lease = fields.Char("Lease", related="lease_no.lease_no", store=True)
     extend_start_date = fields.Date('Extend Start Date',
                                     default=get_start_date)
     extend_end_date = fields.Date('Extend End Date', default=get_end_date)

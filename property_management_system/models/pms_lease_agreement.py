@@ -20,7 +20,7 @@ class PMSLeaseAgreement(models.Model):
                                                  "Tenant")])
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
-    extend_to = fields.Date("Extend Date")
+    extend_to = fields.Date("Extend End")
     vendor_type = fields.Char("Vendor Type")
     company_vendor_id = fields.Many2one('res.partner',
                                         "Vendor",
@@ -662,7 +662,7 @@ class PMSLeaseAgreementLine(models.Model):
                                       ('unittype_id.chargeable', '=', True)])
     start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True)
     end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True)
-    extend_to = fields.Date("Extend Date")
+    extend_to = fields.Date("Extend End")
     rent = fields.Float(string="Rent", related="unit_no.rate", store=True)
     company_tanent_id = fields.Many2one(
         'res.company',
@@ -688,7 +688,7 @@ class PMSLeaseAgreementLine(models.Model):
                              related="lease_agreement_id.state", string='Status', readonly=True, copy=False, store=True, default='BOOKING')
 
     invoice_count = fields.Integer(default=0)
-    extend_start = fields.Date("Extend Date", store=True)
+    extend_start = fields.Date("Extend Start", store=True)
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True)
 
     @api.one

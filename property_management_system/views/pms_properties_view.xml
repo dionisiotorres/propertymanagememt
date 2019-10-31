@@ -8,7 +8,8 @@
     <menuitem id="pms_properties_menu_root"
             name="ZPMS"
             web_icon="property_management_system,static/description/icon.png"
-            sequence="200"/>
+            sequence="200"
+            groups="group_property_user,group_property_manager"/>
     <record model="ir.ui.view" id="view_pms_properties_form">
       <field name="name">Properites Form</field>
       <field name="model">pms.properties</field>
@@ -300,7 +301,7 @@
      <menuitem  id="property_management_menu" 
       name="Property Management" 
       parent="pms_properties_menu_root"
-      sequence="1"/>
+      sequence="1" groups="group_property_user,group_property_manager"/>
     <menuitem  id="properties_menu_sub" 
       name="Property" 
       parent="property_management_menu" 

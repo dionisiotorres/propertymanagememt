@@ -656,6 +656,7 @@ class PMSLeaseAgreementLine(models.Model):
     name = fields.Char("Name", compute="compute_name")
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
                                          "Lease Agreement")
+    property_id = fields.Many2one("pms.properties", related="lease_agreement_id.property_id", store=True)
     lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
@@ -744,7 +745,9 @@ class PMSLeaseAgreementLine(models.Model):
                         prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
                         prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
                         if not prod_ids:
-                            val = {'name': product_name}
+                            val = {'name': product_name,
+                                'sale_ok': False,
+                                'is_unit': True}
                             product_tmp_id = self.env['product.template'].create(val)
                             product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
                             if not product_tmp_ids:

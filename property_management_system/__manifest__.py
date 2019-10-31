@@ -16,11 +16,12 @@
     '1.0.58',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
+        'security/property_security.xml',
+        'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
         'data/pms_lease_schedular_data.xml',
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
-        'security/ir.model.access.csv',
         'data/pms.charge_type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',

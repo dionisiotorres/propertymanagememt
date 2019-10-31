@@ -122,11 +122,13 @@
       name="UOM Category" 
       parent="property_management_menu_sub"
       action="uom.product_uom_categ_form_action"
-      sequence="2"/>
+      sequence="2"
+      groups="group_property_user,group_property_manager" />
     <menuitem  id="uom_menu_root" 
       name="Unit of Measure" 
       parent="property_management_menu_sub"
       action="uom.product_uom_form_action"
-      sequence="3"/>
+      sequence="3"
+      groups="group_property_user,group_property_manager"/>
   </data>
 </odoo>

@@ -26,6 +26,7 @@
                 <group>
                     <group>
                         <field name="lease_agreement_id" invisible="1"/>
+                        <field name="property_id"/>
                         <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>   
                         <field name="pos_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <!-- <field name="rental_charge_type"/> -->
@@ -79,6 +80,7 @@
       <field name="model">pms.lease_agreement.line</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="property_id"/>
           <field name="lease_no"/>
           <field name="unit_no"/>
           <field name="start_date" />

@@ -1,0 +1,13 @@
+<odoo>
+    <data noupdate="1">
+        <!--Group for property manager -->
+        <record id="group_property_manager" model="res.groups">
+            <field name="name">Property Management/ Manager</field>
+        </record>
+
+        <!--Group for property user -->
+        <record id="group_property_user" model="res.groups">
+            <field name="name">Property Management/ User</field>
+        </record>
+    </data>
+</odoo>

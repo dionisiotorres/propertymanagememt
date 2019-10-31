@@ -365,20 +365,24 @@
               </p>
             </field>
         </record>
+        
         <menuitem  id="crm_menu_root" 
         name="CRM" 
         parent="pms_properties_menu_root"
-        sequence="2"/>
+        sequence="2"
+        groups="group_property_user,group_property_manager"/>
         <menuitem  id="contact_menu_root" 
         name="Contacts" 
         parent="crm_menu_root"
         action="base.action_partner_form"
-        sequence="1"/>
+        sequence="1"
+        groups="group_property_user,group_property_manager"/>
         <menuitem  id="contact_company_menu_root" 
         name="Company" 
         parent="crm_menu_root"
         action="base.action_res_company_form"
-        sequence="2"/>
+        sequence="2"
+        groups="group_property_user,group_property_manager"/>
 
         <!-- <menuitem name="Contacts"
             id="menu_contacts"
@@ -393,7 +397,8 @@
         <menuitem  id="contact_menu_root_config" 
         name="CRM" 
         parent="pms_menu_config"
-        sequence="2"/>
+        sequence="2" 
+        groups="group_property_user,group_property_manager"/>
         <!-- <menuitem  id="contact_person_menu_root" 
         name="Person" 
         parent="contact_menu_root_config"

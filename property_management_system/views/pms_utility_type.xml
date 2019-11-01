@@ -41,6 +41,7 @@
       <field name="name">Utility Supply Type list</field>
       <field name="model">pms.utility.supply.type</field>
       <field name="arch" type="xml">
+      
         <search>
           <field name="code"/>
           <field name="name"/>

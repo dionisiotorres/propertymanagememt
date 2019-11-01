@@ -13,6 +13,7 @@ class PMSFloor(models.Model):
     floor_code_ref = fields.Char("Floor Ref Code")
     active = fields.Boolean("Active", default=True)
     property_id = fields.Many2one("pms.properties", "Property", required=True)
+
     _sql_constraints = [
         ('name_unique', 'unique(name)',
          'Please add other name that is exiting in the database.'),

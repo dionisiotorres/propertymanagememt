@@ -50,6 +50,7 @@
             name="Company Type" 
             parent="contact_menu_root_config"
             action="action_pms_company_type"
+            groups="base.group_no_one"
             sequence="99"/>
     </data>
 </odoo>

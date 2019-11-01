@@ -176,6 +176,48 @@
         </tree>
       </field>
     </record>
+    <record model="ir.ui.view" id="pms_lease_agreement_kanbans_view">
+        <field name="name">pms.lease_agreement.kanban</field>
+        <field name="model">pms.lease_agreement</field>
+        <field name="arch" type="xml">
+        <kanban class="o_pms_partner_kanban">
+            <field name="id"/>
+            <field name="name"/>
+            <field name="property_id"/>
+            <field name="company_tanent_id"/>
+            <field name="unit_no"/>
+            <field name="lease_no"/>
+            <field name="start_date" />
+            <field name="state"/>
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_pms_partner_kanban">
+                        <!-- <t t-if="record.id.raw_value">
+                          <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{kanban_image('pms.lease_agreement', 'image_medium', record.id.raw_value)}')">
+                              <img alt="Logo" class="o_kanban_image_inner_pic" t-att-src="kanban_image('pms.lease_agreement', 'image_small',record.id.raw_value)"/>
+                          </div>
+                        </t> -->
+                        <t t-if="record.id.raw_value">
+                            <img alt="Logo" t-att-src='_s + "/property_management_system/static/src/image/lease.jpg"'/>
+                        </t>
+                        <div class="oe_kanban_details">
+                            <strong class="o_kanban_record_title oe_partner_heading"><field name="name"/></strong>
+                            <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                            <ul>
+                                <li t-if="record.property_id.raw_value"><field name="property_id"/></li>
+                                <!-- <li t-if="record.company_tanent_id.raw_value"><field name="company_tanent_id"/></li>
+                                <li t-if="record.unit_no.raw_value"><field name="unit_no"/></li> -->
+                                <li t-if="record.lease_no.raw_value"><field name="lease_no"/></li>
+                                <li t-if="record.state.raw_value"><field name="state"/></li>
+                            </ul>
+                            <div class="oe_kanban_partner_links"/>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+      </field>
+    </record>
      <record model="ir.ui.view" id="view_lease_agreement_filter">
       <field name="name">Lease Agreement list</field>
       <field name="model">pms.lease_agreement</field>
@@ -197,7 +239,7 @@
        <field name="name">Lease Agreements</field>
        <field name="res_model">pms.lease_agreement</field>
        <field name="view_type">form</field>
-       <field name="view_mode">tree,form</field>
+       <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_lease_agreement_tree"/> 
        <field name="search_view_id" ref="view_lease_agreement_filter"/> 
     </record>

@@ -22,9 +22,10 @@
           </div>
             <group>
               <group>
-              <field name="floor_code_ref" string="Reference Code"/>
+                <field name="property_id"/>
               </group>
               <group>
+                <field name="floor_code_ref" string="Reference Code"/>
               </group>
             </group>
           </sheet>
@@ -43,6 +44,44 @@
         </tree>
       </field>
     </record>
+    <record model="ir.ui.view" id="pms_floor_kanbans_view">
+         <field name="model">pms.floor.kanban</field>
+        <field name="model">pms.floor</field>
+        <field name="arch" type="xml">
+        <kanban class="o_pms_partner_kanban">
+            <field name="id"/>
+            <field name="name"/>
+            <field name="code"/>
+            <field name="floor_code_ref" string="Reference Code"/>
+          <field name="active"/>   
+            <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_pms_partner_kanban">
+                        <!-- <t t-if="record.id.raw_value">
+                          <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{kanban_image('pms.lease_agreement', 'image_medium', record.id.raw_value)}')">
+                              <img alt="Logo" class="o_kanban_image_inner_pic" t-att-src="kanban_image('pms.lease_agreement', 'image_small',record.id.raw_value)"/>
+                          </div>
+                        </t> -->
+                        <t t-if="record.id.raw_value">
+                            <img alt="Logo" t-att-src='_s + "/property_management_system/static/src/image/floor.png"'/>
+                        </t>
+                        <div class="oe_kanban_details">
+                            <strong class="o_kanban_record_title oe_partner_heading"><field name="name"/></strong>
+                            <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                            <ul>
+                                <li t-if="record.code.raw_value"><field name="code"/></li>
+                                <li t-if="record.floor_code_ref.raw_value"><field name="floor_code_ref"/></li>
+                                <div class="text-success float-right mb4" t-if="record.active.raw_value"><i class="fa fa-circle" role="img" aria-label="Active" title="Active"></i></div>
+                                <div class="text-danger float-right mb4" t-if="!record.active.raw_value"><i class="fa fa-circle" role="img" aria-label="Other" title="Other"></i></div>
+                            </ul>
+                            <div class="oe_kanban_partner_links"/>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+        </kanban>
+      </field>
+    </record>
      <record model="ir.ui.view" id="view_floor_filter">
       <field name="name">Floor list</field>
       <field name="model">pms.floor</field>
@@ -59,7 +98,7 @@
        <field name="name">Floors</field>
        <field name="res_model">pms.floor</field>
        <field name="view_type">form</field>
-       <field name="view_mode">tree,form</field>
+       <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_floor_tree"/> 
     </record> 
     <!-- <menuitem  id="floor_menu_root_sub" 

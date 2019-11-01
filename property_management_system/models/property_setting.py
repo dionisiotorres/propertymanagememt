@@ -6,7 +6,9 @@ class PMSRentCharge(models.Model):
     _name = 'pms.rent_schedule'
     _description = 'Rent Schedule'
 
-    property_id = fields.Many2one("pms.properties", "Property ID")
+    property_id = fields.Many2one("pms.properties",
+                                  "Property ID",
+                                  required=True)
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
                                               string="Lease Agreement Item")
     charge_type = fields.Selection([('base', 'Base'),
@@ -27,6 +29,7 @@ class PMSEquipmentType(models.Model):
 
     name = fields.Char("Equipment Type", required=True)
     active = fields.Boolean(default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -44,6 +47,7 @@ class PMSEquipment(models.Model):
     manufacutrue = fields.Char("Manufacture")
     ref_code = fields.Char("RefCode")
     active = fields.Boolean(default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
 
 
 class PMSPropertyType(models.Model):
@@ -52,6 +56,7 @@ class PMSPropertyType(models.Model):
 
     name = fields.Char("Property Type", required=True)
     active = fields.Boolean(default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -82,6 +87,7 @@ class PMSUtilitySourceType(models.Model):
                                       "Utility Supply Type",
                                       required=True)
     active = fields.Boolean(default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your name/code is exiting in the database.')]
 
@@ -108,6 +114,7 @@ class PMSUtilitySupplyType(models.Model):
     name = fields.Char("Utility Name", required=True)
     code = fields.Char("Utility Code", required=True)
     active = fields.Boolean(default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -146,6 +153,7 @@ class PMSFacilities(models.Model):
     status = fields.Boolean("Status", default=True)
     facilities_line = fields.One2many("pms.facility.lines", "facility_id",
                                       "Facility Lines")
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
 
@@ -168,6 +176,10 @@ class PMSFacilitiesline(models.Model):
     _name = 'pms.facility.lines'
     _description = "Facility Lines"
 
+    def get_property_id(self):
+        if self._context.get('property_id') != False:
+            return self._context.get('property_id')
+
     facility_id = fields.Many2one("pms.facilities", "Facilities")
     supplier_type_id = fields.Many2one('pms.utility.source.type',
                                        "Utility Source Type",
@@ -178,19 +190,11 @@ class PMSFacilitiesline(models.Model):
     start_date = fields.Date("Start Date")
     end_date = fields.Date("End Date")
     status = fields.Boolean("Status", default=True)
-
-    # @api.onchange('supplier_type_id')
-    # def onchange_supplier_type_id(self):
-    #     parent = []
-    #     domain = {}
-    #     if self.utility_type_id:
-    #         supplier_ids = self.env['pms.supplier.type'].search([
-    #             ('utility_type_id', '=', self.utility_type_id.id)
-    #         ])
-    #         for s in supplier_ids:
-    #             parent.append(s.id)
-    #         domain = {'supplier_type_id': [('id', 'in', parent)]}
-    #     return {'domain': domain}
+    property_id = fields.Many2one("pms.properties",
+                                  "Property",
+                                  default=get_property_id,
+                                  required=True,
+                                  store=True)
 
 
 class PMSSpaceUntiManagement(models.Model):
@@ -232,6 +236,7 @@ class PMSSpaceType(models.Model):
     _description = 'Space Type'
 
     name = fields.Char("Name", required=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
     chargeable = fields.Boolean("Chargeable")
     divisible = fields.Boolean("Divisible")
 

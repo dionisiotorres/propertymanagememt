@@ -25,13 +25,15 @@
               </group>
               <group>
                 <!-- <field name="start_date"/> -->
+                <field name="property_id"/>
                 <field name="remark"/>
               </group>
             </group>
             <notebook>
               <page>
-               <field name="facilities_line">
+               <field name="facilities_line" context="{'property_id': property_id}">
                 <tree editable="bottom" options="{'no_quick_create':True}">
+                  <field name="property_id" invisible='1'/>
                   <field name="supplier_type_id"/>
                   <field name="install_date"/>
                   <field name="start_reading_value"/>

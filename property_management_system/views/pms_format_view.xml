@@ -126,11 +126,11 @@
       name="Format Detail" 
       parent="pms_menu_config"
       action="action_format_detail_all"
-      sequence="40"/>
+      sequence="40" groups="base.group_no_one"/>
      <menuitem  id="sub_rule_menu_root" 
       name="Format" 
       parent="pms_menu_config"
       action="action_format_all"
-      sequence="50"/>
+      sequence="50" groups="base.group_no_one"/>
   </data>
 </odoo>

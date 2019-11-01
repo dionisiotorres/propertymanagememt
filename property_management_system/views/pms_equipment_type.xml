@@ -18,7 +18,8 @@
             </h1>
           </div>
           <group>
-            <group>    
+            <group>
+              <field name='property_id'/>
             </group>
           </group>
           </sheet>
@@ -30,6 +31,7 @@
       <field name="model">pms.equipment.type</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="name"/>
         </tree>
       </field>
     </record>

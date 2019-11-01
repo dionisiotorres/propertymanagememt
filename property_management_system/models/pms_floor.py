@@ -9,9 +9,10 @@ class PMSFloor(models.Model):
     _order = "code,name"
 
     name = fields.Char("Description", required=True)
-    code = fields.Char("Floor Code")
+    code = fields.Char("Floor Code", required=True)
     floor_code_ref = fields.Char("Floor Ref Code")
     active = fields.Boolean("Active", default=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [
         ('name_unique', 'unique(name)',
          'Please add other name that is exiting in the database.'),

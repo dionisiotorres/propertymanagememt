@@ -19,6 +19,7 @@
           </div>
           <group>
             <group>
+                <field name="property_id"/>
                 <field name="equipment_type_id"/>
                 <field name="model"/>
             </group>

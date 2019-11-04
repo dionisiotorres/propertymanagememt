@@ -56,7 +56,7 @@ class PMSPropertyType(models.Model):
 
     name = fields.Char("Property Type", required=True)
     active = fields.Boolean(default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
+    # property_id = fields.Many2one("pms.properties", "Property")
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]

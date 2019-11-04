@@ -7,9 +7,14 @@ class PMSSpaceUnit(models.Model):
     _description = "Space Units"
     _order = "parent_id"
 
+    def get_property_id(self):
+        if not self.property_id:
+            return self.env.user.company_id.property_id
+
     def get_floor(self):
         if not self.floor_id:
             floor_ids = self.env['pms.floor'].search([], order='id asc')
+            property_id = self.property_id or self.env.user.company_id.property_id
             if floor_ids:
                 floor_id = floor_ids[0]
                 return floor_id
@@ -17,6 +22,7 @@ class PMSSpaceUnit(models.Model):
                 val = {
                     'name': 'Floor 1',
                     'code': 'F1',
+                    'property_id': property_id.id,
                     'floor_code_ref': '01',
                     'active': True
                 }
@@ -33,6 +39,7 @@ class PMSSpaceUnit(models.Model):
                             readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",
+                                  default=get_property_id,
                                   required=True)
     floor_id = fields.Many2one("pms.floor",
                                string="Floor",

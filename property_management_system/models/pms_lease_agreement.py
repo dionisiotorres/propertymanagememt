@@ -465,10 +465,13 @@ class PMSLeaseAgreement(models.Model):
         for se in self.env['pms.lease_agreement'].search([]):
             notify_date = new_lease_ids = extend_lease_ids = par_id = None
             par_id = partner_obj.search([('id','=',se.company_tanent_id.id)])
+            noti = None
             if se.state == 'NEW':
+                noti = 'extend or renew'
                 notify_date = se.end_date - relativedelta(months=se.property_id.new_lease_term.notify_period) + relativedelta(days=1)
                 new_lease_ids = se.search([('end_date','=',notify_date)])
             if se.state == 'EXTENDED':
+                noti = 'extend'
                 notify_date = se.extend_to - relativedelta(months=se.property_id.extend_lease_term.notify_period)
                 extend_lease_ids = se.search([('extend_to','=',notify_date)])
             if new_lease_ids or extend_lease_ids:
@@ -477,7 +480,7 @@ class PMSLeaseAgreement(models.Model):
                     name = val.name                
                     subject = "Mall Notify"
                     body = _("Hello %s,\n" %(name))                 
-                    body += _("\tPlease Check Your Lease Agreements for Lease No(%s)\n"%(se.lease_no))                     
+                    body += _("\tPlease Check Your Lease Agreements for Lease No(%s) to %s\n"%(se.lease_no, noti))                     
                     footer = _("Kind regards.\n")         
                     footer += _("%s\n\n"%val.company_id.name)
                     mail_ids = mail_mail.create({
@@ -653,10 +656,14 @@ class PMSLeaseAgreementLine(models.Model):
         if self._context.get('end_date') != False:
             return self._context.get('end_date')
 
+    def get_property_id(self):
+        if not self.property_id:
+            return self.lease_agreement_id.property_id or self.env.user.company_id.property_id
+
     name = fields.Char("Name", compute="compute_name")
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
                                          "Lease Agreement")
-    property_id = fields.Many2one("pms.properties", related="lease_agreement_id.property_id", store=True)
+    property_id = fields.Many2one("pms.properties", default=get_property_id, store=True)
     lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
@@ -783,7 +790,12 @@ class PMSLeaseAgreementLine(models.Model):
                 })
             self.invoice_count += 1
             return inv_ids
-            
+
+    @api.model
+    def create(self, values):
+        print (values)
+        return super(PMSLeaseAgreementLine, self).create(values)            
+
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'
     _description = "Charge Types"

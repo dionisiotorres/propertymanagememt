@@ -6,7 +6,7 @@
     General utilities.
 '''
 
-from rauth.compat import quote, parse_qsl, is_basestring
+from .compat import quote, parse_qsl, is_basestring
 
 from requests.structures import CaseInsensitiveDict as cidict
 from requests.auth import AuthBase

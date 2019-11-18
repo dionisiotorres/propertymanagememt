@@ -45,61 +45,6 @@
                </field>
               </page>
             </notebook>
-            
-            <!-- <table style="width:100%;">
-                <tr style="width:100%;padding:10px;background-color:white;">
-                    <th style="width:13%;border:1px solid lightgray;">
-                        <span>
-                            Supplier Type
-                        </span>
-                    </th>
-                    <th style="width:13%;border:1px solid lightgray;">
-                        <span>
-                            Install Date
-                        </span>
-                    </th>
-                    <th style="width:18%;border:1px solid lightgray;">
-                        <span>
-                            Last Reading Value
-                        </span>
-                    </th>
-                    <th style="width:18%;border:1px solid lightgray;">
-                        Digit
-                    </th>
-                    <th style="width:13%;border:1px solid lightgray;">
-                        Start Date
-                    </th>
-                    <th style="width:13%;border:1px solid lightgray;">
-                        End Date
-                    </th>
-                    <th style="width:13%;border:1px solid lightgray;">
-                        Status
-                    </th>
-                </tr>
-                <tr tyle="width:100%;">
-                 <td style="width:13%;border:1px solid lightgray;">
-                        <field name="supplier_type_id" nolabel="1"/>
-                    </td>
-                    <td style="width:13%;border:1px solid lightgray;">
-                        <field name="install_date" nolabel="1"/>
-                    </td>
-                    <td style="width:18%;border:1px solid lightgray;">
-                        <field name="start_reading_value" nolabel="1"/>
-                    </td>
-                    <td style="width:18%;border:1px solid lightgray;">
-                        <field name="digit" nolabel="1"/>
-                    </td>
-                    <td style="width:13%;border:1px solid lightgray;">
-                        <field name="start_date" nolabel="1"/>
-                    </td>
-                    <td style="width:13%;border:1px solid lightgray;">
-                        <field name="end_date" nolabel="1"/>
-                    </td>
-                    <td style="width:13%;text-align:center;border:1px solid lightgray;">
-                        <field name="status" nolabel="1"/>
-                    </td>
-                </tr>
-            </table> -->
           </sheet>
         </form>
       </field>

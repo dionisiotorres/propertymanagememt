@@ -52,6 +52,7 @@
         'views/pms_equipment_view.xml',
         'views/pms_lease_agreement_line_view.xml',
         'views/account_invoice_view.xml',
+        'views/pms_api_integration.xml',
     ],
     'installable':
     True,

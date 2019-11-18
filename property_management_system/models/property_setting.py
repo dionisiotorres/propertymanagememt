@@ -29,7 +29,6 @@ class PMSEquipmentType(models.Model):
 
     name = fields.Char("Equipment Type", required=True)
     active = fields.Boolean(default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -87,7 +86,6 @@ class PMSUtilitySourceType(models.Model):
                                       "Utility Supply Type",
                                       required=True)
     active = fields.Boolean(default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your name/code is exiting in the database.')]
 
@@ -114,7 +112,6 @@ class PMSUtilitySupplyType(models.Model):
     name = fields.Char("Utility Name", required=True)
     code = fields.Char("Utility Code", required=True)
     active = fields.Boolean(default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -236,7 +233,7 @@ class PMSSpaceType(models.Model):
     _description = 'Space Type'
 
     name = fields.Char("Name", required=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
+    # property_id = fields.Many2one("pms.properties", "Property", required=True)
     chargeable = fields.Boolean("Chargeable")
     divisible = fields.Boolean("Divisible")
 

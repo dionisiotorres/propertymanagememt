@@ -19,11 +19,11 @@
           </div>
           <group>
             <group>
-              <field name="property_id"/>
+              <!-- <field name="property_id"/> -->
+              <field name="chargeable"/>
+              <field name="divisible"/> 
             </group>
-            <group>    
-                <field name="chargeable"/>
-                <field name="divisible"/> 
+            <group>
             </group>
           </group>
           </sheet>
@@ -36,7 +36,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <field name="property_id"/>
+          <!-- <field name="property_id"/> -->
           <field name="chargeable"/>
           <field name="divisible"/>
         </tree>
@@ -48,7 +48,7 @@
       <field name="arch" type="xml">
         <search>
           <field name="name"/>
-          <field name="property_id"/>
+          <!-- <field name="property_id"/> -->
           <!-- <field name="chargeable"/>
           <field name="divisible"/> -->
         </search>

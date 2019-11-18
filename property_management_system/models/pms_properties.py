@@ -1,6 +1,6 @@
+import pytz
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
-import pytz
 
 _tzs = [
     (tz, tz)

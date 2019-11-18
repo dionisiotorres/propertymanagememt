@@ -1,5 +1,6 @@
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
+from odoo.addons import decimal_precision as dp
 
 
 class PMSSpaceUnit(models.Model):
@@ -62,11 +63,15 @@ class PMSSpaceUnit(models.Model):
                               string="Status",
                               default="vacant")
     rate = fields.Float("Rate")
+    min_rate = fields.Float("Min Rate", digits=dp.get_precision('Min Rate'))
+    max_rate = fields.Float("Max Rate", digits=dp.get_precision('Max Rate'))
     remark = fields.Text("Remark")
 
     facility_line = fields.Many2many("pms.facilities", "pms_unit_facility_rel",
                                      "unit_id", "facilities_id",
                                      "Facility Lines")
+    rent_record = fields.Many2many("pms.rent_record", "pms_unit_record_rel",
+                                   "unit_id", "record_id", "Add Records")
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 
@@ -143,8 +148,48 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
-        return super(PMSSpaceUnit, self).create(values)
+        api_integ = []
+        headers = {}
+        payload = None
+        integ_obj = self.env['pms.api.integration']
+        api_type = self.env['pms.api.type'].search([('name', '=', "Space Unit")
+                                                    ])
+        api_integ_id = integ_obj.search([('property_id', '=',
+                                          values['property_id']),
+                                         ('api_type', '=', api_type.name)])
+        if api_integ_id:
+            api_integ = api_integ_id.generate_api_data({
+                'id': api_integ_id.id,
+                'data': values
+            })
+            headers = api_integ['header']
+            payload_code = str(values['code'])
+            payload_name = str(values['name'])
+            url_save = api_integ_id.url + api_integ_id.post_api
+            if values['active'] == True:
+                payload_active = 'true'
+            else:
+                payload_active = 'false'
+            payload = str(
+                '{\r\n        \"SpaceUnitID\": \"\",\r\n        \"PropertyCode\":'
+            ) + '"' + str(payload_code) + '"' + str(
+                ',\r\n        \"SpaceUnitNo\":'
+            ) + '"' + str(payload_name) + '"' + str(
+                ',\r\n        \"displayOrdinal\": null,\r\n       \"remark\": null,\r\n        \"active\":'
+            ) + payload_active + str('\r\n    }')
+        id = None
+        id = super(PMSSpaceUnit, self).create(values)
+        if id:
+            requests.request("POST", url_save, data=payload, headers=headers)
+        return id
 
     @api.multi
     def write(self, val):
         return super(PMSSpaceUnit, self).write(val)
+
+
+class PMSRentRecord(models.Model):
+    _name = "pms.rent_record"
+
+    sequence_no = fields.Integer("No")
+    name = fields.Text("Remark")

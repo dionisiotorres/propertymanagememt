@@ -66,3 +66,9 @@ access_pms_rent_schedule,pms.rent_schedule,model_pms_rent_schedule,group_propert
 access_pms_rent_schedule_manager,pms.rent_schedule,model_pms_rent_schedule,group_property_manager,1,1,1,1
 access_ir_sequence_user,ir.sequence,base.model_ir_sequence,group_property_user,1,1,1,0
 access_ir_sequence_manager,ir.sequence,base.model_ir_sequence,group_property_manager,1,1,1,0
+access_pms_rent_record,pms.rent_record,model_pms_rent_record,group_property_user,1,1,1,1
+access_pms_rent_record_manager,pms.rent_record,model_pms_rent_record,group_property_manager,1,1,1,1
+access_pms_api_integration,pms.api.integration,model_pms_api_integration,group_property_user,1,1,1,0
+access_pms_api_integration_manager,pms.api.integration,model_pms_api_integration,group_property_manager,1,1,1,0
+access_pms_api_type,pms.api.type,model_pms_api_type,group_property_user,1,1,1,0
+access_pms_api_type_manager,pms.api.type,model_pms_api_type,group_property_manager,1,1,1,0

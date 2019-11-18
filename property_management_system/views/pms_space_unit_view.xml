@@ -29,13 +29,16 @@
                   <field name="floor_id"/>
                   <field name="unittype_id"/>
                   <field name="uom"/>
+                  <field name="remark"/>
                 </group>
                 <group> 
                   <field name="area"/>
+                  <!-- <field name="rate"/> -->
+                  <field name="min_rate" string="Min Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
+                  <field name="max_rate" string="Max Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
                   <field name="rate"/>
                   <field name="start_date"/>
                   <field name="end_date"/>
-                  <field name="remark"/>
                   <!-- <field name="status"/>       -->
                 </group>
               </group>
@@ -65,6 +68,28 @@
                             </t>
                           </templates>
                         </kanban> 
+                  </field>
+              </page>
+              <page name="records" string="Rent Records">
+                <field name="rent_record" widget="kanban">
+                    <kanban>
+                        <field name="id"/>
+                        <field name="sequence_no" />
+                        <field name="name"/>
+                        <templates>
+                            <t t-name="kanban-box">
+                                <div t-att-class="' oe_kanban_global_click'">
+                                    <div class="o_kanban_image">
+                                      <img alt="image"  t-att-src='_s + "/property_management_system/static/src/image/cpaild-maint_man.jpg"'/>
+                                    </div>
+                                    <div class="oe_kanban_details">                                     
+                                        <div t-if="record.sequence_no.raw_value">No: <field name="sequence_no"/></div>
+                                        <div t-if="record.name.raw_value">Remark: <field name="name"/></div>
+                                    </div>
+                                </div>
+                            </t>
+                          </templates>
+                      ]</kanban> 
                   </field>
               </page>
               </notebook>

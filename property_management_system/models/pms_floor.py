@@ -60,8 +60,9 @@ class PMSFloor(models.Model):
         api_integ_id = integ_obj.search([('property_id', '=', values['property_id']), ('api_type', '=', api_type.name)])
         api_integ = []
         headers = {}
+        payload_code = payload_name = modify_date = None
         payload = None
-        if api_integ_id:
+        if api_integ_id and self.property_id.api_integration == True:
             api_integ = api_integ_id.generate_api_data({'id': api_integ_id.id, 'data': values})
             headers = api_integ['header']
             payload_code = str(values['code'])
@@ -74,7 +75,7 @@ class PMSFloor(models.Model):
                 payload_active = 'false'
         id = None
         id = super(PMSFloor, self).create(values)
-        if id:
+        if id and self.property_id.api_integration == True:
             payload = str('{\r\n        \"floorID\": \"\",\r\n        \"floorCode\":') + '"' + str(payload_code) + '"' + str(',\r\n        \"floorDesc\":') + '"' + str(payload_name) + '"' + str(',\r\n        \"displayOrdinal\": null,\r\n       \"remark\": null,\r\n        \"ExtDataSourceID\":') + '"' + str("odoo") + '"' + str(',\r\n        \"ExtFloorID\":') + '"' + str(id) + '"' + str(',\r\n        \"ModifiedDate\":') + '"' + modify_date + '"' + str(',\r\n        \"active\":') + payload_active + str('\r\n    }')
             requests.request("POST", url_save, data=payload, headers=headers)
         return id
@@ -86,7 +87,7 @@ class PMSFloor(models.Model):
         f_codes = []
         api_type = self.env['pms.api.type'].search([('name', '=', "Floor")])
         api_integ_id = self.env['pms.api.integration'].search([('property_id', '=', self.property_id.id), ('api_type', '=', api_type.name)])
-        if api_integ_id:
+        if api_integ_id and self.property_id.api_integration == True:
             url = api_integ_id.url
             get_api = url + api_integ_id.get_api
             CLIENT_ID = api_integ_id.client_id

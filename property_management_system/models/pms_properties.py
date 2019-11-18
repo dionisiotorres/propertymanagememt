@@ -185,6 +185,7 @@ class PMSProperties(models.Model):
         default=lambda self: self.env.user.company_id.rentschedule_type,
         string="Rent Schedule Type",
     )
+    api_integration = fields.Boolean("API Integration")
 
     # company_id = fields.Many2many('res.partner')
 

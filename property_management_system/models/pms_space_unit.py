@@ -157,7 +157,7 @@ class PMSSpaceUnit(models.Model):
         api_integ_id = integ_obj.search([('property_id', '=',
                                           values['property_id']),
                                          ('api_type', '=', api_type.name)])
-        if api_integ_id:
+        if api_integ_id and self.property_id.api_integration == True:
             api_integ = api_integ_id.generate_api_data({
                 'id': api_integ_id.id,
                 'data': values
@@ -179,7 +179,7 @@ class PMSSpaceUnit(models.Model):
             ) + payload_active + str('\r\n    }')
         id = None
         id = super(PMSSpaceUnit, self).create(values)
-        if id:
+        if id and self.property_id.api_integration == True:
             requests.request("POST", url_save, data=payload, headers=headers)
         return id
 

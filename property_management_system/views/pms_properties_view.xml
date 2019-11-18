@@ -216,6 +216,9 @@
                   <group string="Define Rent Schedule Type">
                     <field name="rentschedule_type"/>
                   </group>
+                   <group string="API Information">
+                    <field name="api_integration"/>
+                  </group>
                 </group>
               </page>
             </notebook>

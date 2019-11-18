@@ -1,7 +1,7 @@
 import requests
 import json
 from odoo import tools, _
-from rauth import OAuth2Service
+# from rauth import OAuth2Service
 
 
 class Auth2Client:

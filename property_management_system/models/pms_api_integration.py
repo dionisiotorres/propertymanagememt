@@ -1,7 +1,7 @@
 import requests
-import requests-oauth2
 from odoo import api, fields, models
-from requests-oauth2 import OAuth2BearerToken
+from odoo.addons.property_management_system import requests_oauth2
+from requests_oauth2 import OAuth2BearerToken
 from odoo.addons.property_management_system.models import api_rauth_config
 
 

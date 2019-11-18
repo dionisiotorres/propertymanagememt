@@ -16,10 +16,8 @@
 
 '''
 
-__all__ = [
-    'OAuth1Service', 'OAuth2Service', 'OflyService', 'OAuth1Session',
-    'OAuth2Session', 'OflySession'
-]
+__all__ = ['OAuth1Service', 'OAuth2Service', 'OflyService', 'OAuth1Session',
+           'OAuth2Session', 'OflySession']
 
 from .service import OAuth1Service, OAuth2Service, OflyService  # NOQA
 from .session import OAuth1Session, OAuth2Session, OflySession  # NOQA

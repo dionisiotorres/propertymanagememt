@@ -2,7 +2,6 @@ import base64
 import json
 import requests
 import datetime as datetime
-from odoo.addons.property_management_system import requests_oauth2
 from odoo.addons.property_management_system.requests_oauth2 import OAuth2BearerToken
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError

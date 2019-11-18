@@ -12,11 +12,12 @@ from hashlib import sha1, md5
 from random import SystemRandom
 from time import time
 
-from .compat import parse_qsl, urljoin, urlsplit, is_basestring
-from .oauth import HmacSha1Signature
-from .utils import (absolute_url, CaseInsensitiveDict, OAuth1Auth, OAuth2Auth,
-                    ENTITY_METHODS, FORM_URLENCODED, get_sorted_params,
-                    OPTIONAL_OAUTH_PARAMS)
+from rauth.compat import parse_qsl, urljoin, urlsplit, is_basestring
+from rauth.oauth import HmacSha1Signature
+from rauth.utils import (absolute_url, CaseInsensitiveDict,
+                         OAuth1Auth, OAuth2Auth,
+                         ENTITY_METHODS, FORM_URLENCODED,
+                         get_sorted_params, OPTIONAL_OAUTH_PARAMS)
 
 from requests.sessions import Session
 
@@ -91,10 +92,11 @@ class OAuth1Session(RauthSession):
         `None`.
     :type service: :class:`rauth.Service`
     '''
-    __attrs__ = RauthSession.__attrs__ + [
-        'consumer_key', 'consumer_secret', 'access_token',
-        'access_token_secret', 'signature'
-    ]
+    __attrs__ = RauthSession.__attrs__ + ['consumer_key',
+                                          'consumer_secret',
+                                          'access_token',
+                                          'access_token_secret',
+                                          'signature']
 
     VERSION = '1.0'
 
@@ -120,7 +122,12 @@ class OAuth1Session(RauthSession):
 
         super(OAuth1Session, self).__init__(service)
 
-    def request(self, method, url, header_auth=False, realm='', **req_kwargs):
+    def request(self,
+                method,
+                url,
+                header_auth=False,
+                realm='',
+                **req_kwargs):
         '''
         A loose wrapper around Requests' :class:`~requests.sessions.Session`
         which injects OAuth 1.0/a parameters.
@@ -232,8 +239,8 @@ class OAuth1Session(RauthSession):
         oauth_params = {}
 
         oauth_params['oauth_consumer_key'] = self.consumer_key
-        oauth_params['oauth_nonce'] = sha1(str(
-            random()).encode('ascii')).hexdigest()
+        oauth_params['oauth_nonce'] = sha1(
+            str(random()).encode('ascii')).hexdigest()
         oauth_params['oauth_signature_method'] = self.signature.NAME
         oauth_params['oauth_timestamp'] = int(time())
 
@@ -295,9 +302,9 @@ class OAuth2Session(RauthSession):
         `'access_token'`.
     :type access_token_key: str
     '''
-    __attrs__ = RauthSession.__attrs__ + [
-        'client_id', 'client_secret', 'access_token'
-    ]
+    __attrs__ = RauthSession.__attrs__ + ['client_id',
+                                          'client_secret',
+                                          'access_token']
 
     def __init__(self,
                  client_id=None,
@@ -343,8 +350,8 @@ class OAuth2Session(RauthSession):
         if bearer_auth and self.access_token is not None:
             req_kwargs['auth'] = OAuth2Auth(self.access_token)
         else:
-            req_kwargs['params'].update(
-                {self.access_token_key: self.access_token})
+            req_kwargs['params'].update({self.access_token_key:
+                                         self.access_token})
 
         req_kwargs.setdefault('timeout', OAUTH2_DEFAULT_TIMEOUT)
 
@@ -390,9 +397,15 @@ class OflySession(RauthSession):
         `None`.
     :type service: :class:`rauth.Service`
     '''
-    __attrs__ = RauthSession.__attrs__ + ['app_id', 'app_secret', 'user_id']
+    __attrs__ = RauthSession.__attrs__ + ['app_id',
+                                          'app_secret',
+                                          'user_id']
 
-    def __init__(self, app_id, app_secret, user_id=None, service=None):
+    def __init__(self,
+                 app_id,
+                 app_secret,
+                 user_id=None,
+                 service=None):
 
         #: Client credentials.
         self.app_id = app_id
@@ -480,11 +493,9 @@ class OflySession(RauthSession):
         milliseconds = now.microsecond // 1000
 
         time_format = '%Y-%m-%dT%H:%M:%S.{0}Z'.format(milliseconds)
-        ofly_params = {
-            'oflyAppId': app_id,
-            'oflyHashMeth': hash_meth_str.upper(),
-            'oflyTimestamp': now.strftime(time_format)
-        }
+        ofly_params = {'oflyAppId': app_id,
+                       'oflyHashMeth': hash_meth_str.upper(),
+                       'oflyTimestamp': now.strftime(time_format)}
 
         url_path = urlsplit(url).path
 

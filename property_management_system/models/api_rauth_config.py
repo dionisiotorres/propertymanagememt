@@ -1,6 +1,5 @@
 import requests
 import json
-from odoo.addons.property_management_system import rauth
 from odoo.addons.property_management_system.rauth import OAuth2Service
 from odoo import tools, _
 

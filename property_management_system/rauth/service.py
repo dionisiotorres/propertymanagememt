@@ -6,9 +6,9 @@
     Provides OAuth 1.0/a, 2.0 and Ofly service containers.
 '''
 
-from .compat import urlencode
-from .session import OAuth1Session, OAuth2Session, OflySession
-from .utils import ENTITY_METHODS, parse_utf8_qsl
+from rauth.compat import urlencode
+from rauth.session import OAuth1Session, OAuth2Session, OflySession
+from rauth.utils import ENTITY_METHODS, parse_utf8_qsl
 
 PROCESS_TOKEN_ERROR = ('Decoder failed to handle {key} with data as returned '
                        'by provider. A different decoder may be needed. '
@@ -38,8 +38,8 @@ class Service(object):
         self.authorize_url = authorize_url
 
     def __getstate__(self):
-        return dict(
-            (attr, getattr(self, attr, None)) for attr in self.__attrs__)
+        return dict((attr, getattr(self, attr, None)) for
+                    attr in self.__attrs__)
 
     def __setstate__(self, state):
         for attr, value in state.items():
@@ -125,10 +125,11 @@ class OAuth1Service(Service):
          to :class:`rauth.oauth.HmacSha1Signature <HmacSha1Signature>`
     :type signature_obj: :class:`SignatureMethod`
     '''
-    __attrs__ = Service.__attrs__ + [
-        'consumer_key', 'consumer_secret', 'request_token_url',
-        'access_token_url', 'session_obj'
-    ]
+    __attrs__ = Service.__attrs__ + ['consumer_key',
+                                     'consumer_secret',
+                                     'request_token_url',
+                                     'access_token_url',
+                                     'session_obj']
 
     def __init__(self,
                  consumer_key,
@@ -159,7 +160,9 @@ class OAuth1Service(Service):
         self.request_token_response = None
         self.access_token_response = None
 
-        super(OAuth1Service, self).__init__(name, base_url, authorize_url)
+        super(OAuth1Service, self).__init__(name,
+                                            base_url,
+                                            authorize_url)
 
     def get_session(self, token=None, signature=None):
         '''
@@ -425,9 +428,10 @@ class OAuth2Service(Service):
         :class:`OAuth2Session`
     :type session_obj: :class:`rauth.Session`
     '''
-    __attrs__ = Service.__attrs__ + [
-        'client_id', 'client_secret', 'access_token_url', 'session_obj'
-    ]
+    __attrs__ = Service.__attrs__ + ['client_id',
+                                     'client_secret',
+                                     'access_token_url',
+                                     'session_obj']
 
     def __init__(self,
                  client_id,
@@ -451,7 +455,9 @@ class OAuth2Service(Service):
         #: Access token response.
         self.access_token_response = None
 
-        super(OAuth2Service, self).__init__(name, base_url, authorize_url)
+        super(OAuth2Service, self).__init__(name,
+                                            base_url,
+                                            authorize_url)
 
     def get_session(self, token=None):
         '''
@@ -503,10 +509,8 @@ class OAuth2Service(Service):
             key = 'data'
 
         kwargs.setdefault(key, {})
-        kwargs[key].update({
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
-        })
+        kwargs[key].update({'client_id': self.client_id,
+                            'client_secret': self.client_secret})
 
         session = self.get_session()
         self.access_token_response = session.request(method,
@@ -601,9 +605,10 @@ class OflyService(Service):
         `rauth.OflySession`
     :type session_obj: :class:`rauth.Session`
     '''
-    __attrs__ = Service.__attrs__ + [
-        'app_id', 'app_secret', 'user_id', 'session_obj'
-    ]
+    __attrs__ = Service.__attrs__ + ['app_id',
+                                     'app_secret',
+                                     'user_id',
+                                     'session_obj']
 
     def __init__(self,
                  app_id,
@@ -623,7 +628,9 @@ class OflyService(Service):
         #: Object used to construct sessions with.
         self.session_obj = session_obj or OflySession
 
-        super(OflyService, self).__init__(name, base_url, authorize_url)
+        super(OflyService, self).__init__(name,
+                                          base_url,
+                                          authorize_url)
 
     def get_session(self, token):
         '''
@@ -648,8 +655,10 @@ class OflyService(Service):
             request querystring.
         :type \*\*params: dict
         '''
-        params = self.session_obj.sign(self.authorize_url, self.app_id,
-                                       self.app_secret, **params)
+        params = self.session_obj.sign(self.authorize_url,
+                                       self.app_id,
+                                       self.app_secret,
+                                       **params)
         return self.authorize_url + '?' + params
 
     def get_auth_session(self, user_id, **kwargs):

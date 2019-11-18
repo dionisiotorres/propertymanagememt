@@ -7,6 +7,7 @@
 '''
 import sys
 
+
 if sys.version_info < (3, 0):  # pragma: no cover
     from urllib import quote, urlencode
     from urlparse import parse_qsl, urlsplit, urlunsplit, urljoin

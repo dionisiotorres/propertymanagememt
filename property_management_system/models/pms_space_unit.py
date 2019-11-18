@@ -190,6 +190,7 @@ class PMSSpaceUnit(models.Model):
 
 class PMSRentRecord(models.Model):
     _name = "pms.rent_record"
+    _description = "Rent Records"
 
     sequence_no = fields.Integer("No")
     name = fields.Text("Remark")

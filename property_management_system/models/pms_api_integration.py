@@ -6,6 +6,7 @@ from odoo.addons.property_management_system.models import api_rauth_config
 
 class PMSApiIntegration(models.Model):
     _name = 'pms.api.integration'
+    _description = "Api Integration"
     _orders = 'id, name'
 
     name = fields.Char("Name")
@@ -56,6 +57,7 @@ class PMSApiIntegration(models.Model):
 
 class PMSApiType(models.Model):
     _name = 'pms.api.type'
+    _description = "API Type"
     _orders = 'id, name'
 
     name = fields.Char("Name")

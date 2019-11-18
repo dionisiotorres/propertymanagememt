@@ -2,7 +2,7 @@ import requests
 
 from six.moves.urllib.parse import quote, urlencode, parse_qs
 
-from requests_oauth2.errors import ConfigurationError
+from .errors import ConfigurationError
 
 
 class OAuth2(object):
@@ -15,9 +15,15 @@ class OAuth2(object):
     revoke_url = '/oauth2/revoke'
     scope_sep = None
 
-    def __init__(self, client_id=None, client_secret=None, site=None,
-                 redirect_uri=None, authorization_url=None,
-                 token_url=None, revoke_url=None, scope_sep=None):
+    def __init__(self,
+                 client_id=None,
+                 client_secret=None,
+                 site=None,
+                 redirect_uri=None,
+                 authorization_url=None,
+                 token_url=None,
+                 revoke_url=None,
+                 scope_sep=None):
         """
         Initializes the hook with OAuth2 parameters
         """
@@ -71,8 +77,8 @@ class OAuth2(object):
             'scope': scope,
         }
         oauth_params.update(kwargs)
-        return "%s%s?%s" % (self.site, quote(self.authorization_url),
-                            urlencode(oauth_params))
+        return "%s%s?%s" % (self.site, quote(
+            self.authorization_url), urlencode(oauth_params))
 
     def get_token(self, code, headers=None, **kwargs):
         """

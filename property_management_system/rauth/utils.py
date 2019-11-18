@@ -6,7 +6,7 @@
     General utilities.
 '''
 
-from rauth.compat import quote, parse_qsl, is_basestring
+from .compat import quote, parse_qsl, is_basestring
 
 from requests.structures import CaseInsensitiveDict as cidict
 from requests.auth import AuthBase
@@ -39,6 +39,7 @@ def get_sorted_params(params):
     def sorting_gen():
         for k in sorted(params.keys()):
             yield '='.join((k, params[k]))
+
     return '&'.join(sorting_gen())
 
 
@@ -92,8 +93,10 @@ class OAuth1Auth(AuthBase):
     def _get_auth_header(self):
         ''' Constructs and returns an authentication header. '''
         realm = 'realm="{realm}"'.format(realm=self.realm)
-        params = ['{k}="{v}"'.format(k=k, v=quote(str(v), safe=''))
-                  for k, v in self.oauth_params.items()]
+        params = [
+            '{k}="{v}"'.format(k=k, v=quote(str(v), safe=''))
+            for k, v in self.oauth_params.items()
+        ]
         return 'OAuth ' + ','.join([realm] + params)
 
     def __call__(self, r):

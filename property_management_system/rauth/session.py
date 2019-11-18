@@ -12,9 +12,9 @@ from hashlib import sha1, md5
 from random import SystemRandom
 from time import time
 
-from rauth.compat import parse_qsl, urljoin, urlsplit, is_basestring
-from rauth.oauth import HmacSha1Signature
-from rauth.utils import (absolute_url, CaseInsensitiveDict,
+from .compat import parse_qsl, urljoin, urlsplit, is_basestring
+from .oauth import HmacSha1Signature
+from .utils import (absolute_url, CaseInsensitiveDict,
                          OAuth1Auth, OAuth2Auth,
                          ENTITY_METHODS, FORM_URLENCODED,
                          get_sorted_params, OPTIONAL_OAUTH_PARAMS)

@@ -11,15 +11,14 @@ import hmac
 
 from hashlib import sha1
 
-from rauth.compat import is_basestring, quote, urlencode, urlsplit, urlunsplit
-from rauth.utils import FORM_URLENCODED
+from .compat import is_basestring, quote, urlencode, urlsplit, urlunsplit
+from .utils import FORM_URLENCODED
 
 
 class SignatureMethod(object):
     '''
     A base class for signature methods providing a set of common methods.
     '''
-
     def _ensure_unicode(self, s):
         if not isinstance(s, bytes):
             return s.encode('utf-8')
@@ -112,13 +111,8 @@ class HmacSha1Signature(SignatureMethod):
     '''
     NAME = 'HMAC-SHA1'
 
-    def sign(self,
-             consumer_secret,
-             access_token_secret,
-             method,
-             url,
-             oauth_params,
-             req_kwargs):
+    def sign(self, consumer_secret, access_token_secret, method, url,
+             oauth_params, req_kwargs):
         '''Sign request parameters.
 
         :param consumer_secret: Consumer secret.
@@ -173,13 +167,8 @@ class RsaSha1Signature(SignatureMethod):
         except ImportError:  # pragma: no cover
             raise NotImplementedError('PyCrypto is required for ' + self.NAME)
 
-    def sign(self,
-             consumer_secret,
-             access_token_secret,
-             method,
-             url,
-             oauth_params,
-             req_kwargs):
+    def sign(self, consumer_secret, access_token_secret, method, url,
+             oauth_params, req_kwargs):
         '''Sign request parameters.
 
         :param consumer_secret: RSA private key.

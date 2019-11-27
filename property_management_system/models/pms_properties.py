@@ -218,10 +218,14 @@ class PMSProperties(models.Model):
         default=lambda self: self.env.user.company_id.rentschedule_type,
         string="Rent Schedule Type",
     )
-    api_integration = fields.Boolean("API Integration", track_visibility=True,)
+    api_integration = fields.Boolean(
+        "API Integration",
+        track_visibility=True,
+    )
 
     # company_id = fields.Many2one('res.partner',
     #                              "Company",
+    #                              default=lambda self: self.env.user.company_id,
     #                              readonly=True,
     #                              required=True,
     #                              store=True)

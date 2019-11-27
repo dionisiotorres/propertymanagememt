@@ -18,7 +18,7 @@ class PMSFloor(models.Model):
     code = fields.Char("Floor Code", required=True, track_visibility=True)
     floor_code_ref = fields.Char("Floor Ref Code", track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True, track_visibility=True)
+    property_id = fields.Many2one("pms.properties", "Property", index=True, required=True, track_visibility=True)
 
     _sql_constraints = [
         ('name_unique', 'unique(name)',

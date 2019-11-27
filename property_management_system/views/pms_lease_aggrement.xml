@@ -10,7 +10,7 @@
             <button name="action_cancel" states="BOOKING" type="object" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
             <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/> -->
-            <button name="action_extend" states="NEW,EXTENDED" type="object" string="Extend"/>
+            <!-- <button name="action_extend" states="NEW,EXTENDED" type="object" string="Extend"/> -->
             <button name="%(action_extend_wiz)d" states="NEW,EXTENDED" type="action" string="Extend" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
             <button name="action_renew" states="NEW,EXTENDED" type="object" string="Renew"/>
             <button name="action_terminate" states="NEW,EXTENDED" type="object" string="TERMINATE"/>
@@ -155,8 +155,23 @@
                     </group>
                   </group>
                 </page>
+                <page string="Rent Configruation">
+                  <field name = "lease_rent_config_id">
+                    <tree editable="buttom">
+                      <field name="lease_agreement_line_id"/>
+                      <field name="charge_type"/>
+                      <field name="gto_amount"/>
+                      <field name="start_date"/>
+                      <field name="end_date"/>
+                    </tree>
+                  </field>
+                </page>
             </notebook>
           </sheet>
+           <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers"/>
+              <field name="message_ids" widget="mail_thread"/>
+          </div>
         </form>
       </field>
     </record>
@@ -231,6 +246,7 @@
           <!-- <field name="state"/> -->
           <group expand="0" name="group_by" string="Group By">
             <filter name="Status" string="Status" domain="[]" context="{'group_by' : 'state'}" />
+            <filter name="group_property_id" string="Property" icon="terp-partner" context="{'group_by':'property_id'}"/>
           </group>
         </search>
       </field>
@@ -242,6 +258,7 @@
        <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_lease_agreement_tree"/> 
        <field name="search_view_id" ref="view_lease_agreement_filter"/> 
+       <field name="context">{'search_default_group_property_id': 1}</field> 
     </record>
     <menuitem  id="lease_management_menu_sub" 
       name="Lease Management" 
@@ -310,7 +327,7 @@
        <field name="res_model">pms.trade_category</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
-       <field name="view_id" ref="view_trade_category_tree"/> 
+       <field name="view_id" ref="view_trade_category_tree"/>
     </record> 
     <menuitem  id="trade_category_menu_sub" 
       name="Trade Category" 

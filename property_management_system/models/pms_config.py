@@ -98,32 +98,54 @@ class PmsFormatDetail(models.Model):
     value = fields.Char("Value", compute='get_value_type')
 
 
+class Users(models.Model):
+    _inherit = "res.users"
+
+    property_id = fields.Many2many("pms.properties",
+                                   'property_id',
+                                   'user_id',
+                                   "pms_property_user_rel",
+                                   "Property",
+                                   store=True,
+                                   track_visibility=True)
+
+
 class Company(models.Model):
     _inherit = "res.company"
 
-    property_id = fields.Many2one("pms.properties", "Property")
-    property_code_len = fields.Integer("Property Code Length")
-    floor_code_len = fields.Integer('Floor Code Length')
+    # property_id = fields.Many2one("pms.properties", "Property")
+    property_code_len = fields.Integer("Property Code Length",
+                                       track_visibility=True)
+    floor_code_len = fields.Integer('Floor Code Length', track_visibility=True)
     space_unit_code_len = fields.Integer('Space Unit Code Length')
-    space_unit_code_format = fields.Many2one('pms.format', 'Space Unit Format')
-    pos_id_format = fields.Many2one('pms.format', 'POS ID Format')
+    space_unit_code_format = fields.Many2one('pms.format',
+                                             'Space Unit Format',
+                                             track_visibility=True)
+    pos_id_format = fields.Many2one('pms.format',
+                                    'POS ID Format',
+                                    track_visibility=True)
     new_lease_term = fields.Many2one('pms.leaseterms',
-                                     string="Add New Lease Term")
+                                     string="Add New Lease Term",
+                                     track_visibility=True)
     extend_lease_term = fields.Many2one('pms.leaseterms',
-                                        string="Extened Lease Term")
+                                        string="Extened Lease Term",
+                                        track_visibility=True)
     # terminate_lease_term = fields.Many2one(
     #     'pms.leaseterms',
     #     string="Terminate Lease Term",
     # )
     lease_agre_format_id = fields.Many2one('pms.format',
-                                           'Lease Agreement Format')
+                                           'Lease Agreement Format',
+                                           track_visibility=True)
     rentschedule_type = fields.Selection(
         [('prorated', "Prorated"), ('calendar', "Calendar")],
         default='prorated',
         string="Rent Schedule Type",
+        track_visibility=True,
     )
-    extend_count = fields.Integer("Extend count")
-    pre_notice_terminate_term = fields.Integer("Pre-Terminate Terms(Days)")
+    extend_count = fields.Integer("Extend count", track_visibility=True)
+    pre_notice_terminate_term = fields.Integer("Pre-Terminate Terms(Days)",
+                                               track_visibility=True)
 
 
 class ResConfigSettings(models.TransientModel):
@@ -254,12 +276,13 @@ class PMSLeaseTerms(models.Model):
     _description = "Property LeaseTerms"
     _order = "name"
 
-    name = fields.Char("Description", required=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
     lease_period_type = fields.Selection([('month', "Month"),
                                           ('year', "Year")],
-                                         string="Lease Period Type")
-    min_time_period = fields.Integer("Min Time Period")
-    max_time_period = fields.Integer("Max Time Period")
+                                         string="Lease Period Type",
+                                         track_visibility=True)
+    min_time_period = fields.Integer("Min Time Period", track_visibility=True)
+    max_time_period = fields.Integer("Max Time Period", track_visibility=True)
     # extend_count = fields.Integer("Extend count")
-    notify_period = fields.Integer("Notice Period(mon)")
-    active = fields.Boolean("Active", default=True)
+    notify_period = fields.Integer("Notice Period(mon)", track_visibility=True)
+    active = fields.Boolean("Active", default=True, track_visibility=True)

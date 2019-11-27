@@ -9,16 +9,20 @@ class PMSApiIntegration(models.Model):
     _description = "Api Integration"
     _orders = 'id, name'
 
-    name = fields.Char("Name")
-    url = fields.Char("URL")
-    get_api = fields.Char("GET API")
-    post_api = fields.Char('POST API')
-    access_token = fields.Char("Access Token")
-    client_id = fields.Char("Client ID")
-    client_secret = fields.Char("Client Secret")
-    api_type = fields.Many2one("pms.api.type", "API Type")
-    property_id = fields.Many2one("pms.properties", "Property")
-    active = fields.Boolean("Active", default=True)
+    name = fields.Char("Name", track_visibility=True)
+    url = fields.Char("URL", track_visibility=True)
+    get_api = fields.Char("GET API", track_visibility=True)
+    post_api = fields.Char('POST API', track_visibility=True)
+    access_token = fields.Char("Access Token", track_visibility=True)
+    client_id = fields.Char("Client ID", track_visibility=True)
+    client_secret = fields.Char("Client Secret", track_visibility=True)
+    api_type = fields.Many2one("pms.api.type",
+                               "API Type",
+                               track_visibility=True)
+    property_id = fields.Many2one("pms.properties",
+                                  "Property",
+                                  track_visibility=True)
+    active = fields.Boolean("Active", default=True, track_visibility=True)
 
     @api.multi
     def generate_api_data(self, values):
@@ -60,4 +64,4 @@ class PMSApiType(models.Model):
     _description = "API Type"
     _orders = 'id, name'
 
-    name = fields.Char("Name")
+    name = fields.Char("Name", track_visibility=True)

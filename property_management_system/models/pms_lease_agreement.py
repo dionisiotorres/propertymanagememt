@@ -9,65 +9,67 @@ from dateutil.relativedelta import relativedelta
 
 class PMSLeaseAgreement(models.Model):
     _name = 'pms.lease_agreement'
+    _inherit = ['mail.thread']
     _description = "Lease Agreements"
     _order = "property_id, company_tanent_id, state, start_date"
 
-    name = fields.Char("Name", default="New", compute="compute_tanent")
-    property_id = fields.Many2one("pms.properties")
+    name = fields.Char("Name", default="New", compute="compute_tanent", track_visibility=True)
+    property_id = fields.Many2one("pms.properties", track_visibility=True)
     company_tanent_id = fields.Many2one("res.partner",
-                                        "Tenant",
+                                        "Tenant", track_visibility=True,
                                         domain=[('company_channel_type.name', '=',
                                                  "Tenant")])
-    start_date = fields.Date("Start Date")
-    end_date = fields.Date("End Date")
-    extend_to = fields.Date("Extend End")
-    vendor_type = fields.Char("Vendor Type")
+    start_date = fields.Date("Start Date", track_visibility=True)
+    end_date = fields.Date("End Date", track_visibility=True)
+    extend_to = fields.Date("Extend End", track_visibility=True)
+    vendor_type = fields.Char("Vendor Type", track_visibility=True)
     company_vendor_id = fields.Many2one('res.partner',
-                                        "Vendor",
+                                        "Vendor", track_visibility=True,
                                         domain=[('company_channel_type.name', '=',
                                                  "Vendor")])
-    currency_id = fields.Many2one('res.currency', "Currency", related="property_id.currency_id")
-    pos_submission = fields.Boolean("Pos Submission")
+    currency_id = fields.Many2one('res.currency', "Currency", related="property_id.currency_id", track_visibility=True)
+    pos_submission = fields.Boolean("Pos Submission", track_visibility=True)
     pos_submission_type = fields.Selection([('fpt', 'FTP'), ('ws', 'WS SOAP'),
                                             ('rap', 'Restful API'),
                                             ('manual', 'Manual')],
                                            "Submission Type",
-                                           default='fpt')
+                                           default='fpt', track_visibility=True)
     sale_data_type = fields.Selection([('TRAN', 'Transaction'),
                                        ('TRANW', 'Transaction /w Item'),
                                        ('DAILYSALE', 'Daily Sales'),
                                        ('MONTHLYSALE', 'Monthly Sales')],
                                       "Sales Data Type",
-                                      default='TRAN')
+                                      default='TRAN', track_visibility=True)
     pos_submission_frequency = fields.Selection([('15MINUTE', '15 Minutes'),
                                                  ('DAILY', 'Daily'),
                                                  ('MONTHLY', 'Monthly')],
                                                 "Submit Frequency",
-                                                default='15MINUTE')
-    reset_gp_flat = fields.Boolean("Reset GP Flag")
-    reset_date = fields.Date("Reset Date")
-    remark = fields.Text("Remark")
+                                                default='15MINUTE', track_visibility=True)
+    reset_gp_flat = fields.Boolean("Reset GP Flag", track_visibility=True)
+    reset_date = fields.Date("Reset Date", track_visibility=True)
+    remark = fields.Text("Remark", track_visibility=True)
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
                               ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
                               ('TERMINATED', 'Terminated'),
                               ('EXPIRED', "Expired")],
                              string="Status",
-                             default="BOOKING")
-    active = fields.Boolean(default=True)
+                             default="BOOKING", track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
-                                           "Lease Agreement Items")
-    lease_no = fields.Char("Lease No", default="New", store=True)
-    old_lease_no = fields.Char("Old Lease No", default="", store=True)
-    extend_count = fields.Integer("Extend Times", store=True)
-    is_terminate = fields.Boolean("Is Terminate")
-    terminate_period = fields.Date("Terminate Date")
-    unit_no = fields.Char("Unit", default='', compute="compute_tanent", store =True)
+                                           "Lease Agreement Items", track_visibility=True)
+    lease_no = fields.Char("Lease No", default="New", store=True, track_visibility=True)
+    old_lease_no = fields.Char("Old Lease No", default="", store=True, track_visibility=True)
+    extend_count = fields.Integer("Extend Times", store=True, track_visibility=True)
+    is_terminate = fields.Boolean("Is Terminate", track_visibility=True)
+    terminate_period = fields.Date("Terminate Date", track_visibility=True)
+    unit_no = fields.Char("Unit", default='', compute="compute_tanent", store =True, track_visibility=True)
     company_id = fields.Many2one(
         'res.company',
         "Company",
-        default=lambda self: self.env.user.company_id.id)
+        default=lambda self: self.env.user.company_id.id, track_visibility=True)
+    lease_rent_config_id = fields.One2many("pms.rent_schedule", "lease_agreement_id", "Rental Details", track_visibility=True)
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -645,6 +647,7 @@ class PMSLeaseAgreement(models.Model):
 
 class PMSLeaseAgreementLine(models.Model):
     _name = 'pms.lease_agreement.line'
+    _inherit = ['mail.thread']
     _description = "Lease Agreement Line"
     _order = "id,name"
 
@@ -658,46 +661,46 @@ class PMSLeaseAgreementLine(models.Model):
 
     def get_property_id(self):
         if not self.property_id:
-            return self.lease_agreement_id.property_id or self.env.user.company_id.property_id
+            return self.lease_agreement_id.property_id or None
 
-    name = fields.Char("Name", compute="compute_name")
+    name = fields.Char("Name", compute="compute_name", track_visibility=True)
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
-                                         "Lease Agreement")
-    property_id = fields.Many2one("pms.properties", default=get_property_id, store=True)
-    lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True)
+                                         "Lease Agreement", track_visibility=True)
+    property_id = fields.Many2one("pms.properties", default=get_property_id, store=True, track_visibility=True)
+    lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True, track_visibility=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
-                                      ('unittype_id.chargeable', '=', True)])
-    start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True)
-    end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True)
-    extend_to = fields.Date("Extend End")
-    rent = fields.Float(string="Rent", related="unit_no.rate", store=True)
+                                      ('unittype_id.chargeable', '=', True)], track_visibility=True)
+    start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True, track_visibility=True)
+    end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True, track_visibility=True)
+    extend_to = fields.Date("Extend End", track_visibility=True)
+    rent = fields.Float(string="Rent", related="unit_no.rate", store=True, track_visibility=True)
     company_tanent_id = fields.Many2one(
         'res.company',
-        "Shop",
+        "Shop", track_visibility=True,
     )
-    pos_id = fields.Char("POS ID")
-    remark = fields.Text("Remark")
+    pos_id = fields.Char("POS ID", track_visibility=True)
+    remark = fields.Text("Remark", track_visibility=True)
     rental_charge_type = fields.Selection([('base', 'Base'),
                                            ('base+gto', 'Base + GTO'),
                                            ('baseorgto', 'Base or GTO')], default='base',
-                                          string="Rental Charge Type")
+                                          string="Rental Charge Type", track_visibility=True)
 
-    rent_schedule_line = fields.One2many('pms.rent_schedule', 'lease_agreement_line_id', "Rent Schedules")
-    rent_total = fields.Float("Amount(per month)", compute="get_total_rent", store=True, readonly=False)
-    area = fields.Integer("Area", related="unit_no.area")
-    gto_percentage = fields.Integer("GTO Percent(%)")
+    rent_schedule_line = fields.One2many('pms.rent_schedule', 'lease_agreement_line_id', "Rent Schedules", track_visibility=True)
+    rent_total = fields.Float("Amount(per month)", compute="get_total_rent", store=True, readonly=False, track_visibility=True)
+    area = fields.Integer("Area", related="unit_no.area", track_visibility=True)
+    gto_percentage = fields.Integer("GTO Percent(%)", track_visibility=True)
     maintain_charge = fields.Float("Maintain Charge", store=True, readonly=False)
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
                               ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
                               ('TERMINATED', 'Terminated'),
                               ('EXPIRED', "Expired")],
-                             related="lease_agreement_id.state", string='Status', readonly=True, copy=False, store=True, default='BOOKING')
+                             related="lease_agreement_id.state", string='Status', readonly=True, copy=False, store=True, default='BOOKING', track_visibility=True)
 
-    invoice_count = fields.Integer(default=0)
-    extend_start = fields.Date("Extend Start", store=True)
-    extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True)
+    invoice_count = fields.Integer(default=0, track_visibility=True)
+    extend_start = fields.Date("Extend Start", store=True, track_visibility=True)
+    extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
 
     @api.one
     @api.depends('unit_no', 'lease_no')
@@ -800,9 +803,9 @@ class PMSChargeType(models.Model):
     _name = 'pms.charge_type'
     _description = "Charge Types"
 
-    name = fields.Char("Description", required=True)
-    code = fields.Char("Code", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [
         ('name_code_unique', 'unique(code)',
          'Please add other CODE that is exiting in the database.')
@@ -820,9 +823,9 @@ class PMSChargeFormula(models.Model):
     _name = 'pms.charge.formula'
     _description = "Charge Formulas"
 
-    name = fields.Char("Description", required=True)
-    code = fields.Char("Code", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [
         ('code_unique', 'unique(code)',
          'Please add other CODE that is exiting in the database.')
@@ -840,9 +843,9 @@ class PMSTradeCategory(models.Model):
     _name = "pms.trade_category"
     _description = "Trade Category"
 
-    name = fields.Char("Descritpion", required=True)
-    code = fields.Char("Code", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Descritpion", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
     def name_get(self):
@@ -857,10 +860,10 @@ class PMSSubTradeCategory(models.Model):
     _name = "pms.sub_trade_category"
     _description = "Sub Trade Category"
 
-    name = fields.Char("Description", required=True)
-    code = fields.Char("Code", required=True)
-    trade_id = fields.Many2one("pms.trade_category", "Trade")
-    active = fields.Boolean(default=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
+    trade_id = fields.Many2one("pms.trade_category", "Trade", track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
     def name_get(self):

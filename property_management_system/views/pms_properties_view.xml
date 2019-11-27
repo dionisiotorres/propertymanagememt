@@ -223,6 +223,10 @@
               </page>
             </notebook>
           </sheet>
+           <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers"/>
+              <field name="message_ids" widget="mail_thread"/>
+          </div>
         </form>
       </field>
     </record>
@@ -299,7 +303,7 @@
        <field name="res_model">pms.properties</field>
        <field name="view_type">form</field>
        <field name="view_mode">kanban,tree,form</field>
-       <field name="view_id" ref="pms_property_kanbans_view"/> 
+       <field name="view_id" ref="pms_property_kanbans_view"/>
     </record>
      <menuitem  id="property_management_menu" 
       name="Property Management" 

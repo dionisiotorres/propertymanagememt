@@ -30,7 +30,7 @@ class PMSLeaseExtendWizard(models.TransientModel):
                     _("Pease set management company with your mall."))
             else:
                 company = None
-                company = lease_extends.property_id.property_management_id
+                company = lease_extends.property_id
                 if not company.extend_lease_term:
                     raise UserError(
                         _("Please set extend lease term in Setting."))
@@ -59,16 +59,16 @@ class PMSLeaseExtendWizard(models.TransientModel):
     extend_end_date = fields.Date('Extend End Date', default=get_end_date)
 
     @api.multi
-    def action_lease_extend(self):
+    def action_extend_wiz(self):
         lease_extends = self.env['pms.lease_agreement'].browse(
             self._context.get('active_id', []))
 
-        if not lease_extends.company_id.extend_lease_term:
+        if not lease_extends.property_id.extend_lease_term:
             raise UserError(
-                _("Please set extend term in the property setting."))
+                _("Please set extend term in the property configuration."))
         else:
             lease_extends.extend_count += 1
-            if lease_extends.extend_count > lease_extends.company_id.extend_count:
+            if lease_extends.extend_count > lease_extends.property_id.extend_count:
                 raise UserError(_("Extend Limit is Over."))
             # if self.extend_to:
             #     self.extend_to = self.extend_to + relativedelta(

@@ -15,6 +15,7 @@ def _tz_get(self):
 
 class PMSProperties(models.Model):
     _name = 'pms.properties'
+    _inherit = ['mail.thread']
     _description = 'Property Management System'
     _order = "code"
 
@@ -59,73 +60,94 @@ class PMSProperties(models.Model):
         "pms.property.type",
         "Property Type",
         required=True,
+        track_visibility=True,
         help="The properties's type is set the specific type.")
     uom_id = fields.Many2one("uom.uom",
                              "UOM",
                              required=True,
                              default=get_uom_id,
+                             track_visibility=True,
                              help="Unit Of Measure is need to set for Area.")
-    bank_id = fields.Many2one('res.bank', "Bank Information")
+    bank_id = fields.Many2one('res.bank',
+                              "Bank Information",
+                              track_visibility=True)
     township = fields.Many2one("pms.township",
                                string='Township',
                                ondelete='restrict',
+                               track_visibility=True,
                                domain="[('city_id', '=?', city_id)]")
     city_id = fields.Many2one("pms.city",
                               string='City',
                               ondelete='restrict',
+                              track_visibility=True,
                               domain="[('state_id', '=?', state_id)]")
     state_id = fields.Many2one("res.country.state",
                                string='State',
                                ondelete='restrict',
+                               track_visibility=True,
                                domain="[('country_id', '=?', country_id)]")
     currency_id = fields.Many2one("res.currency",
                                   "Currency",
                                   default=default_get_curency,
                                   readonly=False,
+                                  track_visibility=True,
                                   store=True)
     country_id = fields.Many2one('res.country',
                                  string='Country',
                                  default=default_get_country,
                                  readonly=False,
                                  requried=True,
+                                 track_visibility=True,
                                  ondelete='restrict')
-    name = fields.Char("Name", required=True, size=250)
-    code = fields.Char("Code", size=250, required=True)
+    name = fields.Char("Name", required=True, size=250, track_visibility=True)
+    code = fields.Char("Code", size=250, required=True, track_visibility=True)
     gross_floor_area = fields.Float('GFA',
                                     digits=(16, 2),
-                                    help="Gross Floor Area")
+                                    help="Gross Floor Area",
+                                    track_visibility=True)
     net_lett_able_area = fields.Float('NLA',
                                       digits=(16, 2),
-                                      help="Net Lett-able Area")
-    web_site_url = fields.Char("Website", size=250, help="Website URL")
+                                      help="Net Lett-able Area",
+                                      track_visibility=True)
+    web_site_url = fields.Char("Website",
+                               size=250,
+                               help="Website URL",
+                               track_visibility=True)
     is_autogenerate_posid = fields.Boolean("Auto Generate Pos ID",
-                                           help="Auto Generating POS ID?")
-    project_start_date = fields.Date("Project Start Date")
-    target_open_date = fields.Date("Target Opening Date")
-    actual_opening_date = fields.Date("Actual Openiing Date")
+                                           help="Auto Generating POS ID?",
+                                           track_visibility=True)
+    project_start_date = fields.Date("Project Start Date",
+                                     track_visibility=True)
+    target_open_date = fields.Date("Target Opening Date",
+                                   track_visibility=True)
+    actual_opening_date = fields.Date("Actual Openiing Date",
+                                      track_visibility=True)
     timezone = fields.Selection(
         _tz_get,
         string='Timezone',
         default=lambda self: self._context.get('tz'),
+        track_visibility=True,
         help=
         "The partner's timezone, used to output proper date and time values "
         "inside printed reports. It is important to set a value for this field. "
         "You should use the same timezone that is otherwise used to pick and "
         "render date and time values: your computer's timezone.")
-    no = fields.Char()
-    street = fields.Char()
-    zip = fields.Char(change_default=True)
+    no = fields.Char(track_visibility=True)
+    street = fields.Char(track_visibility=True)
+    zip = fields.Char(change_default=True, track_visibility=True)
     property_contact_id = fields.Many2many(
         'res.partner',
         'pms_property_contact_rel',
         'property_id',
         'partner_id',
         string='Contacts',
+        track_visibility=True,
         domain="[('is_company', '!=', True)]")
     property_management_id = fields.Many2many('res.company',
                                               'pms_property_managements_rel',
                                               'property_id',
                                               'partner_id',
+                                              track_visibility=True,
                                               string='Managements')
     # leaseterms_line_id = fields.Many2many("pms.leaseterms",
     #                                       "pms_properties_leaseterms_rel",
@@ -135,59 +157,74 @@ class PMSProperties(models.Model):
     image = fields.Binary(
         "Image",
         attachment=True,
+        track_visibility=True,
         help=
         "This field holds the image used as avatar for this contact, limited to 1024x1024px",
     )
-    image_medium = fields.Binary("Medium-sized image", attachment=True, help="Medium-sized image of this contact. It is automatically "\
+    image_medium = fields.Binary("Medium-sized image", attachment=True, track_visibility=True, help="Medium-sized image of this contact. It is automatically "\
         "resized as a 128x128px image, with aspect ratio preserved. "\
         "Use this field in form views or some kanban views.")
-    image_small = fields.Binary("Small-sized image", attachment=True, help="Small-sized image of this contact. It is automatically "\
+    image_small = fields.Binary("Small-sized image", attachment=True, track_visibility=True, help="Small-sized image of this contact. It is automatically "\
         "resized as a 64x64px image, with aspect ratio preserved. "\
         "Use this field anywhere a small image is required.")
 
     property_code_len = fields.Integer(
         "Property Code Length",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.property_code_len)
     unit_code_len = fields.Integer(
         "Unit Code Length",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.space_unit_code_len)
     floor_code_len = fields.Integer(
         "Floor Code Length",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.floor_code_len)
     unit_format = fields.Many2one("pms.format",
                                   "Unit Format",
+                                  track_visibility=True,
                                   default=lambda self: self.env.user.company_id
                                   .space_unit_code_format.id)
     lease_format = fields.Many2one(
         "pms.format",
         "Lease Format",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.lease_agre_format_id.id)
     pos_id_format = fields.Many2one(
         "pms.format",
         "POS ID  Format",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.pos_id_format.id)
     new_lease_term = fields.Many2one(
         "pms.leaseterms",
         "New Lease Term",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.new_lease_term.id)
     extend_lease_term = fields.Many2one(
         "pms.leaseterms",
         "Extend Lease Term",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.extend_lease_term.id)
     terminate_days = fields.Integer("Terminate Days",
                                     default=lambda self: self.env.user.
                                     company_id.pre_notice_terminate_term)
     extend_count = fields.Integer(
         "Extend Count",
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.extend_count)
     rentschedule_type = fields.Selection(
         [('prorated', "Prorated"), ('calendar', "Calendar")],
+        track_visibility=True,
         default=lambda self: self.env.user.company_id.rentschedule_type,
         string="Rent Schedule Type",
     )
-    api_integration = fields.Boolean("API Integration")
+    api_integration = fields.Boolean("API Integration", track_visibility=True,)
 
-    # company_id = fields.Many2many('res.partner')
+    # company_id = fields.Many2one('res.partner',
+    #                              "Company",
+    #                              readonly=True,
+    #                              required=True,
+    #                              store=True)
 
     # next_pos_id = fields.Char("Next Pos ID")
     _sql_constraints = [('code_unique', 'unique(code)',

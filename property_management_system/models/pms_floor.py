@@ -10,14 +10,15 @@ from odoo.addons.property_management_system.models import api_rauth_config
 
 class PMSFloor(models.Model):
     _name = 'pms.floor'
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = "PMS Floor"
     _order = "code,name"
 
-    name = fields.Char("Description", required=True)
-    code = fields.Char("Floor Code", required=True)
-    floor_code_ref = fields.Char("Floor Ref Code")
-    active = fields.Boolean("Active", default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Floor Code", required=True, track_visibility=True)
+    floor_code_ref = fields.Char("Floor Ref Code", track_visibility=True)
+    active = fields.Boolean("Active", default=True, track_visibility=True)
+    property_id = fields.Many2one("pms.properties", "Property", required=True, track_visibility=True)
 
     _sql_constraints = [
         ('name_unique', 'unique(name)',
@@ -135,5 +136,9 @@ class PMSFloor(models.Model):
                 'Connection': "keep-alive",
                 'cache-control': "no-cache"
             }
-        return super(PMSFloor, self).write(vals), requests.request(
+        id = None
+        id = super(PMSFloor, self).write(vals)
+        if id and self.property_id.api_integration == True:
+            requests.request(
             "POST", url_save, data=payload, headers=headers)
+        return id 

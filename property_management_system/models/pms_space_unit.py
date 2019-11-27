@@ -5,17 +5,20 @@ from odoo.addons import decimal_precision as dp
 
 class PMSSpaceUnit(models.Model):
     _name = 'pms.space.unit'
+    _inherit = ['mail.thread']
     _description = "Space Units"
     _order = "parent_id"
 
     def get_property_id(self):
         if not self.property_id:
-            return self.env.user.company_id.property_id
+            property_id = None
+            property_id = self.env.user.property_id[0]
+            return property_id
 
     def get_floor(self):
         if not self.floor_id:
             floor_ids = self.env['pms.floor'].search([], order='id asc')
-            property_id = self.property_id or self.env.user.company_id.property_id
+            property_id = self.property_id or self.env.user.property_id[0]
             if floor_ids:
                 floor_id = floor_ids[0]
                 return floor_id
@@ -33,45 +36,71 @@ class PMSSpaceUnit(models.Model):
     name = fields.Char("Unit No",
                        compute='get_unit_no',
                        store=True,
+                       track_visibility=True,
                        readonly=True)
     unit_code = fields.Char("Unit",
                             compute='get_unit_no',
                             store=True,
+                            track_visibility=True,
                             readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",
                                   default=get_property_id,
+                                  track_visibility=True,
                                   required=True)
     floor_id = fields.Many2one("pms.floor",
                                string="Floor",
                                default=get_floor,
+                               track_visibility=True,
                                required=True)
     floor_code = fields.Char(string="Floor Code",
                              related="floor_id.code",
+                             track_visibility=True,
                              store=False)
-    unit_no = fields.Char("Space Unit No", store=True, required=True)
-    parent_id = fields.Many2one("pms.space.unit", "Parent", store=True)
-    unittype_id = fields.Many2one("pms.space.type", "Space Type")
+    unit_no = fields.Char("Space Unit No",
+                          store=True,
+                          required=True,
+                          track_visibility=True)
+    parent_id = fields.Many2one("pms.space.unit",
+                                "Parent",
+                                store=True,
+                                track_visibility=True)
+    unittype_id = fields.Many2one("pms.space.type",
+                                  "Space Type",
+                                  track_visibility=True)
     uom = fields.Many2one("uom.uom",
                           "UOM",
                           related="property_id.uom_id",
-                          store=True)
-    area = fields.Integer("Area")
-    start_date = fields.Date("Start Date")
-    end_date = fields.Date("End Date")
+                          store=True,
+                          track_visibility=True)
+    area = fields.Integer("Area", track_visibility=True)
+    start_date = fields.Date("Start Date", track_visibility=True)
+    end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Selection([('vacant', 'Vacant'), ('occupied', 'Occupied')],
                               string="Status",
-                              default="vacant")
-    rate = fields.Float("Rate")
-    min_rate = fields.Float("Min Rate", digits=dp.get_precision('Min Rate'))
-    max_rate = fields.Float("Max Rate", digits=dp.get_precision('Max Rate'))
-    remark = fields.Text("Remark")
+                              default="vacant",
+                              track_visibility=True)
+    rate = fields.Float("Rate", track_visibility=True)
+    min_rate = fields.Float("Min Rate",
+                            digits=dp.get_precision('Min Rate'),
+                            track_visibility=True)
+    max_rate = fields.Float("Max Rate",
+                            digits=dp.get_precision('Max Rate'),
+                            track_visibility=True)
+    remark = fields.Text("Remark", track_visibility=True)
 
-    facility_line = fields.Many2many("pms.facilities", "pms_unit_facility_rel",
-                                     "unit_id", "facilities_id",
-                                     "Facility Lines")
-    rent_record = fields.Many2many("pms.rent_record", "pms_unit_record_rel",
-                                   "unit_id", "record_id", "Add Records")
+    facility_line = fields.Many2many("pms.facilities",
+                                     "pms_unit_facility_rel",
+                                     "unit_id",
+                                     "facilities_id",
+                                     "Facility Lines",
+                                     track_visibility=True)
+    rent_record = fields.Many2many("pms.rent_record",
+                                   "pms_unit_record_rel",
+                                   "unit_id",
+                                   "record_id",
+                                   "Add Records",
+                                   track_visibility=True)
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your Name is exiting in the database.')]
 
@@ -148,6 +177,12 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
+        property_id = self.env['pms.floor'].search([
+            ('id', '=', values['floor_id'])
+        ]).property_id
+        if values['property_id'] != property_id.id:
+            raise UserError(
+                _('Please set floor in  %s property.') % values['property_id'])
         api_integ = []
         headers = {}
         payload = None
@@ -185,6 +220,30 @@ class PMSSpaceUnit(models.Model):
 
     @api.multi
     def write(self, val):
+        property_id = None
+        if 'floor_id' in val or 'property_id' in val:
+            if 'floor_id' in val:
+                property_id = self.env['pms.floor'].search([
+                    ('id', '=', val['floor_id'])
+                ]).property_id
+            if 'property_id' in val:
+                if property_id:
+                    if val['property_id'] != property_id.id:
+                        raise UserError(
+                            _('Please set floor in  %s property.') %
+                            self.env['pms.properties'].search(
+                                [('id', '=', val['property_id'])]).name)
+                else:
+                    if val['property_id'] != self.floor_id.property_id.id:
+                        raise UserError(
+                            _('Please set floor in  %s property.') %
+                            self.env['pms.properties'].search(
+                                [('id', '=', val['property_id'])]).name)
+            else:
+                if self.property_id != property_id.id:
+                    raise UserError(
+                        _('Please set floor in  %s property.') %
+                        self.property_id.name)
         return super(PMSSpaceUnit, self).write(val)
 
 
@@ -192,5 +251,5 @@ class PMSRentRecord(models.Model):
     _name = "pms.rent_record"
     _description = "Rent Records"
 
-    sequence_no = fields.Integer("No")
-    name = fields.Text("Remark")
+    sequence_no = fields.Integer("No", track_visibility=True)
+    name = fields.Text("Remark", track_visibility=True)

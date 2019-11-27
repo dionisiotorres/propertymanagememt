@@ -8,18 +8,35 @@ class PMSRentCharge(models.Model):
 
     property_id = fields.Many2one("pms.properties",
                                   "Property ID",
+                                  track_visibility=True,
                                   required=True)
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
+                                              track_visibility=True,
                                               string="Lease Agreement Item")
-    charge_type = fields.Selection([('base', 'Base'),
-                                    ('base+gto', 'Base + GTO'),
-                                    ('baseorgto', 'Base or GTO')],
-                                   string="Charge Type")
-    gto_amount = fields.Float("Gto Amount")
-    start_date = fields.Date("Start Date")
-    end_date = fields.Date("End Date")
+    charge_type = fields.Selection(
+        [('base', 'Base'), ('base+gto', 'Base + GTO'),
+         ('baseorgto', 'Base or GTO')],
+        string="Charge Type",
+        track_visibility=True,
+    )
+    gto_amount = fields.Float(
+        "Gto Amount",
+        track_visibility=True,
+    )
+    start_date = fields.Date(
+        "Start Date",
+        track_visibility=True,
+    )
+    end_date = fields.Date("End Date", track_visibility=True)
     extend_count = fields.Integer("Extend Times", store=True)
     extend_to = fields.Date('Extend To')
+    lease_agreement_id = fields.Many2one("pms.lease_agreement",
+                                         'Lease Agreement',
+                                         track_visibility=True)
+    unit_no = fields.Many2one("pms.space.unit",
+                              "Space Unit",
+                              track_visibility=True)
+
     # paid = fields.Boolean("")
 
 
@@ -27,8 +44,8 @@ class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'
     _description = 'Equipment Types'
 
-    name = fields.Char("Equipment Type", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Equipment Type", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -40,21 +57,25 @@ class PMSEquipment(models.Model):
 
     equipment_type_id = fields.Many2one("pms.equipment.type",
                                         string="Equipment Type",
+                                        track_visibility=True,
                                         required=True)
-    name = fields.Char("Serial No", required=True)
-    model = fields.Char("Model", required=True)
-    manufacutrue = fields.Char("Manufacture")
-    ref_code = fields.Char("RefCode")
-    active = fields.Boolean(default=True)
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
+    name = fields.Char("Serial No", required=True, track_visibility=True)
+    model = fields.Char("Model", required=True, track_visibility=True)
+    manufacutrue = fields.Char("Manufacture", track_visibility=True)
+    ref_code = fields.Char("RefCode", track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
+    property_id = fields.Many2one("pms.properties",
+                                  "Property",
+                                  required=True,
+                                  track_visibility=True)
 
 
 class PMSPropertyType(models.Model):
     _name = 'pms.property.type'
     _description = 'Property Types'
 
-    name = fields.Char("Property Type", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Property Type", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     # property_id = fields.Many2one("pms.properties", "Property")
 
     _sql_constraints = [('name_unique', 'unique(name)',
@@ -80,12 +101,13 @@ class PMSUtilitySourceType(models.Model):
     _name = "pms.utility.source.type"
     _description = "Utility Source Types"
 
-    name = fields.Char("Description", required=True)
-    code = fields.Char("Code", required=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
     utility_type_id = fields.Many2one('pms.utility.supply.type',
                                       "Utility Supply Type",
-                                      required=True)
-    active = fields.Boolean(default=True)
+                                      required=True,
+                                      track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your name/code is exiting in the database.')]
 
@@ -109,9 +131,9 @@ class PMSUtilitySupplyType(models.Model):
     _name = "pms.utility.supply.type"
     _description = "Utility Supply Types"
 
-    name = fields.Char("Utility Name", required=True)
-    code = fields.Char("Utility Code", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Utility Name", required=True, track_visibility=True)
+    code = fields.Char("Utility Code", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -139,18 +161,30 @@ class PMSFacilities(models.Model):
                        related='meter_no.name',
                        readonly=True,
                        store=True,
-                       required=True)
+                       required=True,
+                       track_visibility=True)
     utility_type_id = fields.Many2one('pms.utility.supply.type',
                                       "Utility Supply Type",
-                                      required=True)
-    meter_no = fields.Many2one("pms.equipment", "Meter No", required=True)
+                                      required=True,
+                                      track_visibility=True)
+    meter_no = fields.Many2one("pms.equipment",
+                               "Meter No",
+                               required=True,
+                               track_visibility=True)
     interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
-                                       ('mobile', 'Mobile')], "Interface Type")
-    remark = fields.Text("Remark")
-    status = fields.Boolean("Status", default=True)
-    facilities_line = fields.One2many("pms.facility.lines", "facility_id",
-                                      "Facility Lines")
-    property_id = fields.Many2one("pms.properties", "Property", required=True)
+                                       ('mobile', 'Mobile')],
+                                      "Interface Type",
+                                      track_visibility=True)
+    remark = fields.Text("Remark", track_visibility=True)
+    status = fields.Boolean("Status", default=True, track_visibility=True)
+    facilities_line = fields.One2many("pms.facility.lines",
+                                      "facility_id",
+                                      "Facility Lines",
+                                      track_visibility=True)
+    property_id = fields.Many2one("pms.properties",
+                                  "Property",
+                                  required=True,
+                                  track_visibility=True)
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
 
@@ -177,45 +211,58 @@ class PMSFacilitiesline(models.Model):
         if self._context.get('property_id') != False:
             return self._context.get('property_id')
 
-    facility_id = fields.Many2one("pms.facilities", "Facilities")
+    facility_id = fields.Many2one("pms.facilities",
+                                  "Facilities",
+                                  track_visibility=True)
     supplier_type_id = fields.Many2one('pms.utility.source.type',
                                        "Utility Source Type",
-                                       required=True)
-    install_date = fields.Date("Install Date")
-    start_reading_value = fields.Integer("Last Reading Value")
-    digit = fields.Integer("Digit")
-    start_date = fields.Date("Start Date")
-    end_date = fields.Date("End Date")
-    status = fields.Boolean("Status", default=True)
+                                       required=True,
+                                       track_visibility=True)
+    install_date = fields.Date("Install Date", track_visibility=True)
+    start_reading_value = fields.Integer("Last Reading Value",
+                                         track_visibility=True)
+    digit = fields.Integer("Digit", track_visibility=True)
+    start_date = fields.Date("Start Date", track_visibility=True)
+    end_date = fields.Date("End Date", track_visibility=True)
+    status = fields.Boolean("Status", default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   default=get_property_id,
                                   required=True,
-                                  store=True)
+                                  store=True,
+                                  track_visibility=True)
 
 
 class PMSSpaceUntiManagement(models.Model):
     _name = 'pms.space.unit.management'
     _description = "Space Unit Management"
 
-    name = fields.Char("Name", default="New", readonly=True)
-    floor_id = fields.Many2one("pms.floor", "Floor")
-    space_unit_id = fields.Many2one("pms.space.unit", "From Unit")
-    area = fields.Integer("Area")
-    no_of_unit = fields.Integer("No of Unit")
-    to_unit = fields.Char("To Unit")
-    combination_type = fields.Selection(
-        [('random', 'Random'), ('range', 'Range')],
-        "Combination Type",
-    )
+    name = fields.Char("Name",
+                       default="New",
+                       readonly=True,)
+    floor_id = fields.Many2one("pms.floor", "Floor", track_visibility=True)
+    space_unit_id = fields.Many2one("pms.space.unit",
+                                    "From Unit",
+                                    track_visibility=True)
+    area = fields.Integer("Area", track_visibility=True)
+    no_of_unit = fields.Integer("No of Unit", track_visibility=True)
+    to_unit = fields.Char("To Unit", track_visibility=True)
+    combination_type = fields.Selection([('random', 'Random'),
+                                         ('range', 'Range')],
+                                        "Combination Type",
+                                        track_visibility=True)
     action_type = fields.Selection([('division', 'Division'),
                                     ('combination', 'Combination')],
                                    "Action Type",
-                                   default="division")
+                                   default="division",
+                                   track_visibility=True)
     state = fields.Selection([('draft', "Draft"), ('done', "Done")],
                              "Status",
-                             default="draft")
-    space_unit = fields.Many2many("pms.space.unit", string="Unit")
+                             default="draft",
+                             track_visibility=True)
+    space_unit = fields.Many2many("pms.space.unit",
+                                  string="Unit",
+                                  track_visibility=True)
 
     @api.multi
     def action_division(self):
@@ -232,19 +279,19 @@ class PMSSpaceType(models.Model):
     _name = 'pms.space.type'
     _description = 'Space Type'
 
-    name = fields.Char("Name", required=True)
+    name = fields.Char("Name", required=True, track_visibility=True)
     # property_id = fields.Many2one("pms.properties", "Property", required=True)
-    chargeable = fields.Boolean("Chargeable")
-    divisible = fields.Boolean("Divisible")
+    chargeable = fields.Boolean("Chargeable", track_visibility=True)
+    divisible = fields.Boolean("Divisible", track_visibility=True)
 
 
 class PMSDisplayType(models.Model):
     _name = "pms.display.type"
     _description = 'Display Type'
 
-    name = fields.Char("Name")
-    code = fields.Char("Code")
-    active = fields.Boolean(default=True)
+    name = fields.Char("Name", track_visibility=True)
+    code = fields.Char("Code", track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
     def name_get(self):
@@ -274,16 +321,27 @@ class PMSTerms(models.Model):
     _name = "pms.terms"
     _description = 'Terms'
 
-    name = fields.Char("Name", default="New", readonly=True)
+    name = fields.Char("Name",
+                       default="New",
+                       readonly=True,
+                       track_visibility=True)
     space_unit_fromat_id = fields.Many2one("pms.format",
-                                           string="Unit Code Format")
-    pos_id_format_id = fields.Many2one("pms.format", string="POS ID Format")
-    company_id = fields.Many2one("res.company", string="Company")
-    is_auto_generate_posid = fields.Boolean("Auto Generate POS ID")
-    property_code_len = fields.Integer("Property Code Len")
-    floor_code_len = fields.Integer("Floor Code Len")
-    space_unit_code_len = fields.Integer("Space Unit Code Len")
-    active = fields.Boolean("Active", default=True)
+                                           string="Unit Code Format",
+                                           track_visibility=True)
+    pos_id_format_id = fields.Many2one("pms.format",
+                                       string="POS ID Format",
+                                       track_visibility=True)
+    company_id = fields.Many2one("res.company",
+                                 string="Company",
+                                 track_visibility=True)
+    is_auto_generate_posid = fields.Boolean("Auto Generate POS ID",
+                                            track_visibility=True)
+    property_code_len = fields.Integer("Property Code Len",
+                                       track_visibility=True)
+    floor_code_len = fields.Integer("Floor Code Len", track_visibility=True)
+    space_unit_code_len = fields.Integer("Space Unit Code Len",
+                                         track_visibility=True)
+    active = fields.Boolean("Active", default=True, track_visibility=True)
 
     @api.multi
     def toggle_active(self):
@@ -297,30 +355,34 @@ class PMSBank(models.Model):
     _name = 'pms.bank'
     _description = "Bank"
 
-    country = fields.Many2one("pms.country", "Country Name")
-    city_id = fields.Many2one("pms.city", "City Name")
-    state_id = fields.Many2one("pms.state", "State Name")
-    name = fields.Char("Name")
-    bic = fields.Char("Bank Identifier Code")
-    phone = fields.Char("Phone")
-    email = fields.Char("Email")
-    no = fields.Char("No")
-    street = fields.Char("Street")
-    zip_code = fields.Char("Zip")
-    active = fields.Char(default=True)
+    country = fields.Many2one("pms.country",
+                              "Country Name",
+                              track_visibility=True)
+    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
+    state_id = fields.Many2one("pms.state",
+                               "State Name",
+                               track_visibility=True)
+    name = fields.Char("Name", track_visibility=True)
+    bic = fields.Char("Bank Identifier Code", track_visibility=True)
+    phone = fields.Char("Phone", track_visibility=True)
+    email = fields.Char("Email", track_visibility=True)
+    no = fields.Char("No", track_visibility=True)
+    street = fields.Char("Street", track_visibility=True)
+    zip_code = fields.Char("Zip", track_visibility=True)
+    active = fields.Char(default=True, track_visibility=True)
 
 
 class Bank(models.Model):
     _inherit = 'res.bank'
 
     bic = fields.Char('Switch Code',
-                      index=True,
+                      index=True, track_visibility=True,
                       help="Sometimes called BIC or Swift.")
     branch = fields.Char("Branch Name",
-                         index=True,
+                         index=True, track_visibility=True,
                          help="Sometimes called BIC or Swift.")
-    city_id = fields.Many2one("pms.city", "City Name", ondelete='cascade')
-    township = fields.Many2one("pms.township", "Township")
+    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True, ondelete='cascade')
+    township = fields.Many2one("pms.township", "Township", track_visibility=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -333,9 +395,9 @@ class PMSCity(models.Model):
 
     state_id = fields.Many2one("res.country.state",
                                "State Name",
-                               required=True)
-    name = fields.Char("City Name", required=True)
-    code = fields.Char("City Code", required=True)
+                               required=True, track_visibility=True)
+    name = fields.Char("City Name", required=True, track_visibility=True)
+    code = fields.Char("City Code", required=True, track_visibility=True)
 
 
 class Company(models.Model):
@@ -346,16 +408,16 @@ class Company(models.Model):
     city_id = fields.Many2one("pms.city",
                               "City Name",
                               compute='_compute_address',
-                              inverse='_inverse_city',
+                              inverse='_inverse_city', track_visibility=True,
                               ondelete='cascade')
     township = fields.Many2one("pms.township",
                                "Township Name",
                                compute='_compute_address',
-                               inverse='_inverse_township',
+                               inverse='_inverse_township', track_visibility=True,
                                ondelete='cascade')
     company_type = fields.Many2many('pms.company.category',
                                     "res_company_type_rel", 'company_id',
-                                    'category_id')
+                                    'category_id', track_visibility=True)
 
     def _get_company_address_fields(self, partner):
         return {
@@ -387,38 +449,38 @@ class PMSTownship(models.Model):
     _description = "Township"
     _order = "code,name"
 
-    name = fields.Char("Name", required=True)
-    code = fields.Char("Code", required=True)
+    name = fields.Char("Name", required=True, track_visibility=True)
+    code = fields.Char("Code", required=True, track_visibility=True)
     city_id = fields.Many2one("pms.city",
                               "City",
                               ondelete='cascade',
-                              required=True)
+                              required=True, track_visibility=True)
 
 
 class PMSState(models.Model):
     _name = "pms.state"
     _description = "State"
 
-    country_id = fields.Many2one("pms.country", "Country Name", required=True)
-    name = fields.Char("State Name", required=True)
-    code = fields.Char("State Code", required=True)
+    country_id = fields.Many2one("pms.country", "Country Name", required=True, track_visibility=True)
+    name = fields.Char("State Name", required=True, track_visibility=True)
+    code = fields.Char("State Code", required=True, track_visibility=True)
 
 
 class PMSCountry(models.Model):
     _name = "pms.country"
     _description = "Country"
 
-    name = fields.Char("Country Name", required=True)
-    code = fields.Char("Country Code", required=True)
+    name = fields.Char("Country Name", required=True, track_visibility=True)
+    code = fields.Char("Country Code", required=True, track_visibility=True)
 
 
 class PMSCurrency(models.Model):
     _name = "pms.currency"
     _description = "Currency"
 
-    name = fields.Char("Name", required=True)
-    symbol = fields.Char("Symbol", required=True)
-    status = fields.Boolean("Active")
+    name = fields.Char("Name", required=True, track_visibility=True)
+    symbol = fields.Char("Symbol", required=True, track_visibility=True)
+    status = fields.Boolean("Active", track_visibility=True)
 
     @api.multi
     def action_status(self):
@@ -432,7 +494,7 @@ class PMSCompany(models.Model):
     _name = "pms.company"
     _description = "Company"
 
-    name = fields.Char("Name", required=True)
+    name = fields.Char("Name", required=True, track_visibility=True)
 
 
 class PMSDepartment(models.Model):
@@ -440,16 +502,16 @@ class PMSDepartment(models.Model):
     _description = "Department"
     _order = "name"
 
-    name = fields.Char("Name", required=True)
-    parent_id = fields.Many2one("pms.department", "Parent Department")
+    name = fields.Char("Name", required=True, track_visibility=True)
+    parent_id = fields.Many2one("pms.department", "Parent Department", track_visibility=True)
 
 
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
     _description = "Company Categorys"
 
-    name = fields.Char("Description", required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char("Description", required=True, track_visibility=True)
+    active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
     def toggle_active(self):
@@ -462,12 +524,12 @@ class PMSCompanyCategory(models.Model):
 class Partner(models.Model):
     _inherit = "res.partner"
 
-    city_id = fields.Many2one("pms.city", "City Name")
+    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
     company_type = fields.Selection(
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
         compute='_compute_company_type',
-        inverse='_write_company_type',
+        inverse='_write_company_type', track_visibility=True,
     )
     # type = fields.Selection(
     #     [('contact', 'Contact'), ('invoice', 'Invoice')],
@@ -476,15 +538,15 @@ class Partner(models.Model):
     # )
     child_ids = fields.One2many('res.partner',
                                 'parent_id',
-                                string='Contacts',
+                                string='Contacts', track_visibility=True,
                                 domain=[('is_company', '!=', True)])
     company_channel_type = fields.Many2many('pms.company.category',
-                                            string="Type")
-    township = fields.Many2one('pms.township', "Township")
+                                            string="Type", track_visibility=True)
+    township = fields.Many2one('pms.township', "Township", track_visibility=True)
     is_tanent = fields.Boolean('Is Tanent',
                                compute="get_tanent",
                                readonly=False,
-                               store=True)
+                               store=True, track_visibility=True)
     # partner_contact_id = fields.Many2many(
     #     "res.partner",
     #     "company_partner_contact_rel",
@@ -492,8 +554,8 @@ class Partner(models.Model):
     #     "partner_id",
     #     domain="[('is_company', '!=', True)]",
     #     store=True)
-    trade_id = fields.Many2one("pms.trade_category", "Trade")
-    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade")
+    trade_id = fields.Many2one("pms.trade_category", "Trade", track_visibility=True)
+    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade", track_visibility=True)
 
     @api.one
     @api.depends('company_channel_type')

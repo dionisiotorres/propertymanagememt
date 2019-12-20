@@ -5,6 +5,7 @@ from odoo import api, fields, models
 
 class POSDailySale(models.Model):
     _name = "pos.daily.sale"
+    _description = 'POS Daily Sale'
 
     property_id = fields.Many2one("pms.properties", "Mall", store=True)
     batch_code = fields.Char("BatchCode")

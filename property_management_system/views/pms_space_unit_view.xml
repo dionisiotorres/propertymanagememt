@@ -44,7 +44,7 @@
               </group>
               <notebook>
                   <page string="Facilities" >
-                      <field name="facility_line" widget="kanban">               
+                      <field name="facility_line" options="{'no_create_edit': True}" widget="kanban">               
                         <kanban>
                         <field name="id"/>
                         <field name="utility_type_id"/> 
@@ -71,11 +71,14 @@
                   </field>
               </page>
               <page name="records" string="Rent Records">
-                <field name="rent_record" widget="kanban">
+                <field name="rent_record" widget="kanban" context="{'active_id': active_id}">
                     <kanban>
                         <field name="id"/>
                         <field name="sequence_no" />
                         <field name="name"/>
+                        <field name="property_id" 
+                        invisible="1"
+                        />
                         <templates>
                             <t t-name="kanban-box">
                                 <div t-att-class="' oe_kanban_global_click'">

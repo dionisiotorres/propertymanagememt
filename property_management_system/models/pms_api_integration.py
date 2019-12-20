@@ -26,7 +26,7 @@ class PMSApiIntegration(models.Model):
 
     @api.multi
     def generate_api_data(self, values):
-        payload = payload_name = payload_code = payload_active = url = url_save = None
+        payload = payload_name = payload_code = payload_active = url = get_api = url_get = data = url_save = None
         headers = {}
         CLIENT_ID = self.client_id
         CLIENT_SECRET = self.client_secret
@@ -35,14 +35,17 @@ class PMSApiIntegration(models.Model):
         authon = api_rauth_config.Auth2Client(url, CLIENT_ID, CLIENT_SECRET,
                                               access_token)
         print(authon)
-        get_api = url + self.get_api
-        with requests.Session() as s:
-            s.auth = OAuth2BearerToken(authon.access_token)
-            r = s.get(get_api)
-            r.raise_for_status()
-            data = r.json()
+        if self.get_api:
+            get_api = url + self.get_api
+            with requests.Session() as s:
+                s.auth = OAuth2BearerToken(authon.access_token)
+                r = s.get(get_api)
+                r.raise_for_status()
+                data = r.json()
         if authon.access_token:
-            url_save = url + self.post_api
+            # url_get = url + self.get_api
+            if self.post_api:
+                url_get = url + self.post_api
             host = url.split("//")[1]
             headers = {
                 'Content-Type': "application/json",
@@ -56,7 +59,12 @@ class PMSApiIntegration(models.Model):
                 'Connection': "keep-alive",
                 'cache-control': "no-cache"
             }
-            return {'url': url_save, 'data': data, 'header': headers}
+            return {'url': get_api or url_get, 'data': data, 'header': headers}
+
+    # @api.multi
+    # def send_api_text_file(self):
+    #     integrat_ids = self.search([('active', '=', True)])
+    #     if
 
 
 class PMSApiType(models.Model):

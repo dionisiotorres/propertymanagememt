@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Sequences for lease.agreement -->
         <record id="seq_lease_agreement" model="ir.sequence">
             <field name="name">Lease Agreement</field>
             <field name="code">pms.lease_agreement</field>

@@ -1,0 +1,8 @@
+id,name
+api_floor,Floor
+api_crm_account,CRMAccount
+api_space_unit,SpaceUnit
+api_lease,LeaseAgreement
+api_lease_item,LeaseAgreementItem
+api_space_unit_facility,Facilities
+api_facility_line,FacilitieLine

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, tools
+from odoo.addons.property_management_system.models import api_rauth_config
 
 
 class PMSRentCharge(models.Model):
@@ -202,6 +203,20 @@ class PMSFacilities(models.Model):
     #         domain = {'supplier_type_id': [('id', 'in', parent_id)]}
     #     return {'domain': domain}
 
+    @api.model
+    def create(self, values):
+        id = None
+        id = super(PMSFacilities, self).create(values)
+        if id:
+            property_obj = self.env['pms.properties'].browse(
+                values['property_id'])
+            integ_obj = self.env['pms.api.integration']
+            api_type_obj = self.env['pms.api.type'].search([('name', '=',
+                                                             "SpaceUnitFacility")])
+            datas = api_rauth_config.APIData(id, values, property_obj,
+                                             integ_obj, api_type_obj)
+        return id
+
 
 class PMSFacilitiesline(models.Model):
     _name = 'pms.facility.lines'
@@ -231,6 +246,20 @@ class PMSFacilitiesline(models.Model):
                                   required=True,
                                   store=True,
                                   track_visibility=True)
+
+    # @api.model
+    # def create(self, values):
+    #     id = None
+    #     id = super(PMSFacilitiesline, self).create(values)
+    #     if id:
+    #         property_obj = self.env['pms.properties'].browse(
+    #             values['property_id'])
+    #         integ_obj = self.env['pms.api.integration']
+    #         api_type_obj = self.env['pms.api.type'].search([('name', '=',
+    #                                                          "FacilitieLine")])
+    #         datas = api_rauth_config.APIData(id, values, property_obj,
+    #                                          integ_obj, api_type_obj)
+    #     return id
 
 
 class PMSSpaceUntiManagement(models.Model):

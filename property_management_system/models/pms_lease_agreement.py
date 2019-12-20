@@ -104,8 +104,7 @@ class PMSLeaseAgreement(models.Model):
                 self.end_date = self.start_date + relativedelta(
                     months=company.new_lease_term.min_time_period) - relativedelta(days=1)
             if company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
-                self.end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
-                
+                self.end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)              
 
     @api.multi
     def toggle_active(self):
@@ -426,6 +425,13 @@ class PMSLeaseAgreement(models.Model):
         elif self.state == 'EXTENDED':
             return self.write({'state': 'EXTENDED'})
         else:
+            val = []
+            if self.lease_agreement_line:
+                for lease in self.lease_agreement_line:
+                    if lease.rent_schedule_line:
+                        for sche in lease.rent_schedule_line:
+                            val.append(sche.id)
+            self.lease_agreement_line.action_invoice(inv_type='INITIAL_PAYMENT',vals=val)
             return self.write({'state': 'NEW'})
 
     @api.multi
@@ -642,7 +648,17 @@ class PMSLeaseAgreement(models.Model):
             force_company=values['company_id']).next_by_code(
                 'pms.lease_agreement')
         values['lease_no'] = lease_no_pre + lease_no
-        return super(PMSLeaseAgreement, self).create(values)
+        id = None
+        id = super(PMSLeaseAgreement, self).create(values)
+        if id:
+            property_obj = self.env['pms.properties'].browse(
+                values['property_id'])
+            integ_obj = self.env['pms.api.integration']
+            api_type_obj = self.env['pms.api.type'].search([('name', '=',
+                                                             "LeaseAgreement")])
+            datas = api_rauth_config.APIData(id, values, property_obj,
+                                             integ_obj, api_type_obj)
+        return id
 
 
 class PMSLeaseAgreementLine(models.Model):
@@ -721,7 +737,7 @@ class PMSLeaseAgreementLine(models.Model):
         total = 0
         total = self.area * self.rent
         self.rent_total = total
-    
+
     @api.multi
     def action_view_invoice(self):
         invoices = self.env['account.invoice'].search([('lease_no', '=', self.name)])
@@ -738,22 +754,61 @@ class PMSLeaseAgreementLine(models.Model):
     @api.multi
     def action_invoice(self, inv_type, vals):
         invoice_month = invoices = None
+        sch_ids = start_date = end_date = []
+        if inv_type == 'INITIAL_PAYMENT':
+            domain_sch_ids = [('id','in',vals)]
+            sch_ids= self.env['pms.rent_schedule'].search(domain_sch_ids, limit=6)
+            for sch in sch_ids:
+                start_date.append(sch.start_date)
+                end_date.append(sch.end_date)
+            st_date = start_date[0]
+            e_date = end_date[11]
+            invoice_month = str(calendar.month_name[st_date.month])+ '/' + str(st_date.year) + ' - ' + str(calendar.month_name[e_date.month]) + '/' + str(e_date.year)
+            # invoices = self.env['account.invoice'].search([('lease_no', '=', self.name)])
         if inv_type == 'MONTHLY':
             if vals[0][0] and vals[0][1]:
                 invoice_month = str(calendar.month_name[vals[0][0]]) + ' - ' + str(vals[0][1])
-        invoices = self.env['account.invoice'].search([('lease_no', '=', self.name), ('inv_month', '=', invoice_month)])
+            invoices = self.env['account.invoice'].search([('lease_no', '=', self.name), ('inv_month', '=', invoice_month)])
         if invoices:
             raise UserError(_("Already create invoice for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
         else:
             invoice_lines = []
             payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
-            product_name = product_id = prod_id = product_tmp_id = None
+            product_name = product_id = prod_ids = prod_id = product_tmp_id = None
             for l in self.rent_schedule_line:
+                product_name = l.lease_agreement_line_id.unit_no.name
+                prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
+                prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
                 if inv_type == 'MONTHLY':
                     if l.start_date.month == vals[0][0] and l.start_date.year == vals[0][1]:
-                        product_name = l.lease_agreement_line_id.unit_no.name
-                        prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
-                        prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
+                        if not prod_ids:
+                            val = {'name': product_name,
+                                'sale_ok': False,
+                                'is_unit': True}
+                            product_tmp_id = self.env['product.template'].create(val)
+                            product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
+                            if not product_tmp_ids:
+                                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+                            product_id = product_tmp_ids or product_id
+                        else:
+                            product_id = prod_id
+                        account_id = False
+                        if product_id.id:
+                            account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+                        taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
+                        unit = self.lease_agreement_id.lease_no
+                        inv_line_id = self.env['account.invoice.line'].create({
+                            'name': _(unit),
+                            'account_id': account_id,
+                            'price_unit': self.rent,
+                            'quantity': self.area,
+                            'uom_id': self.unit_no.uom.id,
+                            'product_id': product_id.id,
+                            'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+                        })
+                        invoice_lines.append(inv_line_id.id)
+                if inv_type == 'INITIAL_PAYMENT':
+                    if l.start_date in start_date:
                         if not prod_ids:
                             val = {'name': product_name,
                                 'sale_ok': False,
@@ -784,7 +839,7 @@ class PMSLeaseAgreementLine(models.Model):
                 raise UserError(_("No have Invoice Line for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
             inv_ids = self.env['account.invoice'].create({
                 'lease_no': self.name,
-                'inv_month': calendar.month_name[vals[0][0]] + ' - ' + str(vals[0][1]),
+                'inv_month': invoice_month,
                 'partner_id': self.lease_agreement_id.company_tanent_id.id,
                 'property_id': self.lease_agreement_id.property_id.id,
                 'company_id': self.lease_agreement_id.company_id.id,
@@ -792,12 +847,34 @@ class PMSLeaseAgreementLine(models.Model):
                 'invoice_line_ids': [(6, 0, invoice_lines)],
                 })
             self.invoice_count += 1
+            inv_ids.action_invoice_open()
+            is_email =  self.env.user.company_id.invoice_is_email
+            template_id =self.env.ref('account.email_template_edi_invoice', False)
+            composer = self.env['mail.compose.message'].create({'composition_mode': 'comment'})
+            # active_id = self.env['account.invoice.send'].default_get({'is_email':is_email,
+            #     'invoice_ids':inv_ids.id,
+            #     'template_id':template_id.id,
+            #     'composer_id':composer.id})
+            # self.env['account.invoice.send']create({'is_email':is_email,
+            #     'invoice_ids':inv_ids.id,
+            #     'template_id':template_id.id,
+            #     'composer_id':composer.id})
+            # send_id.send_and_print_action()
             return inv_ids
-
     @api.model
     def create(self, values):
-        print (values)
-        return super(PMSLeaseAgreementLine, self).create(values)            
+        id = None
+        id = super(PMSLeaseAgreementLine, self).create(values)
+        if id:
+            property_obj = self.env['pms.properties'].browse(
+                values['property_id'])
+            integ_obj = self.env['pms.api.integration']
+            api_type_obj = self.env['pms.api.type'].search([('name', '=',
+                                                             "LeaseAgreementItem")])
+            datas = api_rauth_config.APIData(id, values, property_obj,
+                                             integ_obj, api_type_obj)
+        return id
+
 
 class PMSChargeType(models.Model):
     _name = 'pms.charge_type'

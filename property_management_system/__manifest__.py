@@ -20,8 +20,10 @@
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
         'data/pms_lease_schedular_data.xml',
+        'data/pos_run_schedule_data_view.xml',
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
+        'data/pms.api.type.csv',
         'data/pms.charge_type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
@@ -54,6 +56,7 @@
         'views/account_invoice_view.xml',
         'views/pms_api_integration.xml',
         'views/users_view.xml',
+        'views/pos_daily_sale_view.xml',
     ],
     'installable':
     True,

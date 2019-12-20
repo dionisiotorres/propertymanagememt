@@ -1,6 +1,7 @@
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
 from odoo.addons import decimal_precision as dp
+from odoo.addons.property_management_system.models import api_rauth_config
 
 
 class PMSSpaceUnit(models.Model):
@@ -183,39 +184,27 @@ class PMSSpaceUnit(models.Model):
         if values['property_id'] != property_id.id:
             raise UserError(
                 _('Please set floor in  %s property.') % values['property_id'])
-        api_integ = []
-        headers = {}
-        payload = None
-        integ_obj = self.env['pms.api.integration']
-        api_type = self.env['pms.api.type'].search([('name', '=', "Space Unit")
-                                                    ])
-        api_integ_id = integ_obj.search([('property_id', '=',
-                                          values['property_id']),
-                                         ('api_type', '=', api_type.name)])
-        if api_integ_id and self.property_id.api_integration == True:
-            api_integ = api_integ_id.generate_api_data({
-                'id': api_integ_id.id,
-                'data': values
-            })
-            headers = api_integ['header']
-            payload_code = str(values['code'])
-            payload_name = str(values['name'])
-            url_save = api_integ_id.url + api_integ_id.post_api
-            if values['active'] == True:
-                payload_active = 'true'
-            else:
-                payload_active = 'false'
-            payload = str(
-                '{\r\n        \"SpaceUnitID\": \"\",\r\n        \"PropertyCode\":'
-            ) + '"' + str(payload_code) + '"' + str(
-                ',\r\n        \"SpaceUnitNo\":'
-            ) + '"' + str(payload_name) + '"' + str(
-                ',\r\n        \"displayOrdinal\": null,\r\n       \"remark\": null,\r\n        \"active\":'
-            ) + payload_active + str('\r\n    }')
         id = None
         id = super(PMSSpaceUnit, self).create(values)
-        if id and self.property_id.api_integration == True:
-            requests.request("POST", url_save, data=payload, headers=headers)
+        if id:
+            property_obj = self.env['pms.properties'].browse(
+                values['property_id'])
+            integ_obj = self.env['pms.api.integration']
+            api_type_obj = self.env['pms.api.type'].search([('name', '=',
+                                                             "SpaceUnit")])
+            datas = api_rauth_config.APIData(id, values, property_obj,
+                                             integ_obj, api_type_obj)
+        #     if values['facility_line']:
+        #         for fl in values['facility_line'][0][2]:
+        #             facility_id = self.env['pms.facilities'].browse(fl)
+        #             property_objs = self.env['pms.properties'].browse(
+        #                 facility_id.property_id.id)
+        #             integ_objs = self.env['pms.api.integration']
+        #             api_type_objs = self.env['pms.api.type'].search([
+        #                 ('name', '=', "Facilities")
+        #             ])
+        #  datas = api_rauth_config.APIData(id, values, property_obj,
+        #                                      integ_obj, api_type_obj)
         return id
 
     @api.multi
@@ -251,5 +240,15 @@ class PMSRentRecord(models.Model):
     _name = "pms.rent_record"
     _description = "Rent Records"
 
+    def get_property_id(self):
+        property_id = space_unit_id = active_id = None
+        active_id = self._context.get('active_id')
+        space_unit_id = self.env['pms.space.unit'].browse(int(active_id))
+        property_id = space_unit_id.property_id
+        return property_id
+
     sequence_no = fields.Integer("No", track_visibility=True)
     name = fields.Text("Remark", track_visibility=True)
+    property_id = fields.Many2one("pms.properties",
+                                  "Property",
+                                  default=get_property_id)

@@ -648,17 +648,18 @@ class PMSLeaseAgreement(models.Model):
             force_company=values['company_id']).next_by_code(
                 'pms.lease_agreement')
         values['lease_no'] = lease_no_pre + lease_no
-        id = None
-        id = super(PMSLeaseAgreement, self).create(values)
-        if id:
-            property_obj = self.env['pms.properties'].browse(
-                values['property_id'])
-            integ_obj = self.env['pms.api.integration']
-            api_type_obj = self.env['pms.api.type'].search([('name', '=',
-                                                             "LeaseAgreement")])
-            datas = api_rauth_config.APIData(id, values, property_obj,
-                                             integ_obj, api_type_obj)
-        return id
+        return super(PMSLeaseAgreement, self).create(values)
+        # id = None
+        # id = super(PMSLeaseAgreement, self).create(values)
+        # if id and property_id.api_integration == True:
+        #     property_obj = self.env['pms.properties'].browse(
+        #         values['property_id'])
+        #     integ_obj = self.env['pms.api.integration']
+        #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
+        #                                                      "LeaseAgreement")])
+        #     datas = api_rauth_config.APIData(id, values, property_obj,
+        #                                      integ_obj, api_type_obj)
+        # return id
 
 
 class PMSLeaseAgreementLine(models.Model):
@@ -861,19 +862,19 @@ class PMSLeaseAgreementLine(models.Model):
             #     'composer_id':composer.id})
             # send_id.send_and_print_action()
             return inv_ids
-    @api.model
-    def create(self, values):
-        id = None
-        id = super(PMSLeaseAgreementLine, self).create(values)
-        if id:
-            property_obj = self.env['pms.properties'].browse(
-                values['property_id'])
-            integ_obj = self.env['pms.api.integration']
-            api_type_obj = self.env['pms.api.type'].search([('name', '=',
-                                                             "LeaseAgreementItem")])
-            datas = api_rauth_config.APIData(id, values, property_obj,
-                                             integ_obj, api_type_obj)
-        return id
+    # @api.model
+    # def create(self, values):
+    #     # id = None
+    #     # id = super(PMSLeaseAgreementLine, self).create(values)
+    #     # if id and api_integration == True:
+    #     #     property_obj = self.env['pms.properties'].browse(
+    #     #         values['property_id'])
+    #     #     integ_obj = self.env['pms.api.integration']
+    #     #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
+    #     #                                                      "LeaseAgreementItem")])
+    #     #     datas = api_rauth_config.APIData(id, values, property_obj,
+    #     #                                      integ_obj, api_type_obj)
+    #     return  super(PMSLeaseAgreementLine, self).create(values)
 
 
 class PMSChargeType(models.Model):

@@ -39,6 +39,7 @@
                   <field name="rate"/>
                   <field name="start_date"/>
                   <field name="end_date"/>
+                  <field name="active"/>
                   <!-- <field name="status"/>       -->
                 </group>
               </group>
@@ -116,7 +117,8 @@
           <field name="uom"/>   
           <field name="start_date"/> 
           <field name="end_date"/>
-          <field name="status"/>   
+          <field name="status"/>
+          <field name="active"/> 
         </tree>
       </field>
     </record>
@@ -180,7 +182,7 @@
        <field name="view_type">form</field>
        <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_space_tree"/>
-       <field name="context">{'search_default_group_property_id': 1}</field>
+       <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record>
     <menuitem  id="space_menu_root" 
       name="Unit" 

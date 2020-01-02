@@ -9,3 +9,4 @@ from . import pms_config
 from . import pms_lease_agreement
 from . import product_template
 from . import pos_daily_sale
+from . import pms_applicable_charge_type

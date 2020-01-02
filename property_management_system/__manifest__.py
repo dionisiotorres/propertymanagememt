@@ -24,7 +24,7 @@
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
         'data/pms.api.type.csv',
-        'data/pms.charge_type.csv',
+        'data/pms.charge_types.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
         'data/pms.township.csv',

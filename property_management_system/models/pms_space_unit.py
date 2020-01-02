@@ -13,6 +13,8 @@ class PMSSpaceUnit(models.Model):
     def get_property_id(self):
         if not self.property_id:
             property_id = None
+            if not self.env.user.property_id:
+                raise UserError(_("Please set property in user setting."))
             property_id = self.env.user.property_id[0]
             return property_id
 
@@ -102,8 +104,15 @@ class PMSSpaceUnit(models.Model):
                                    "record_id",
                                    "Add Records",
                                    track_visibility=True)
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your Name is exiting in the database.')]
+    active = fields.Boolean("Active", default=True)
+
+    @api.multi
+    @api.onchange('end_date')
+    def onchange_active(self):
+        if self.end_date:
+            self.active = False
+        else:
+            self.active = True
 
     @api.one
     @api.depends('unit_no', 'floor_id', 'property_id')
@@ -178,12 +187,47 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
-        property_id = self.env['pms.floor'].search([
-            ('id', '=', values['floor_id'])
-        ]).property_id
+        floor_id = self.env['pms.floor'].search([('id', '=',
+                                                  values['floor_id'])])
+        property_id = floor_id.property_id
         if values['property_id'] != property_id.id:
             raise UserError(
                 _('Please set floor in  %s property.') % values['property_id'])
+        unit = ''
+        if property_id.unit_format:
+            for line in property_id.unit_format.format_line_id:
+                if line.value_type == 'dynamic':
+                    if line.dynamic_value == 'floor ref code':
+                        unit += str(floor_id.floor_code_ref)
+                    if line.dynamic_value == 'floor code':
+                        unit += str(floor_id.floor_code)
+                if line.value_type == 'fix':
+                    unit += str(line.fix_value)
+                if line.value_type == 'digit':
+                    unit += str(values['unit_no'])
+                unit_ids = self.search([('name', '=', unit),
+                                        ('property_id', '=',
+                                         values['property_id']),
+                                        ('active', '=', True)])
+                if unit_ids:
+                    raise UserError(
+                        _("%s Units is exiting in the database." % (unit)))
+                # else:
+                #     unit_id = self.search([('name', '=', unit),
+                #                            ('property_id', '=',
+                #                             values['property_id']),
+                #                            ('active', '=', True)])
+                #     unit_id1 = self.search([
+                #         ('name', '=', unit),
+                #         ('property_id', '=', values['property_id']),
+                #         ('start_date', '>=', values['start_date']),
+                #         ('end_date', '=', False)
+                #     ])
+                #     if unit_id and not unit_id.end_date:
+                #         raise UserError(
+                #             _("%s Units is exiting in the database and please set end date and retry."
+                #               % (unit)))
+
         id = None
         id = super(PMSSpaceUnit, self).create(values)
         if id:

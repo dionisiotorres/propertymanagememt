@@ -35,8 +35,10 @@ access_pms_company_category,pms.company.category,model_pms_company_category,grou
 access_pms_company_category_manager,pms.company.category,model_pms_company_category,group_property_manager,1,1,1,1
 access_pms_lease_agreement,pms.lease.agreement,model_pms_lease_agreement,group_property_user,1,1,1,0
 access_pms_lease_agreement_manager,pms.lease.agreement,model_pms_lease_agreement,group_property_manager,1,1,1,0
-access_pms_charge_type,pms.charge.type,model_pms_charge_type,group_property_user,1,1,1,1
-access_pms_charge_type_manager,pms.charge.type,model_pms_charge_type,group_property_manager,1,1,1,1
+access_pms_charge_type,pms.charge.types,model_pms_charge_types,group_property_user,1,1,1,1
+access_pms_charge_type_manager,pms.charge.types,model_pms_charge_types,group_property_manager,1,1,1,1
+access_pms_ap_charge_type,pms.applicable.charge.type,model_pms_applicable_charge_type,group_property_user,1,1,1,0
+access_pms_ap_charge_type_manager,pms.applicable.charge.type,model_pms_applicable_charge_type,group_property_manager,1,1,1,1
 access_pms_trade_category,pms.trade.category,model_pms_trade_category,group_property_user,1,1,1,1
 access_pms_trade_category_manager,pms.trade.category,model_pms_trade_category,group_property_manager,1,1,1,1
 access_pms_sub_trade_category,pms.sub_trade_category,model_pms_sub_trade_category,group_property_user,1,1,1,1

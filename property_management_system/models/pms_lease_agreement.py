@@ -877,24 +877,19 @@ class PMSLeaseAgreementLine(models.Model):
     #     return  super(PMSLeaseAgreementLine, self).create(values)
 
 
-class PMSChargeType(models.Model):
-    _name = 'pms.charge_type'
+class PMSChargeTypes(models.Model):
+    _name = 'pms.charge_types'
     _description = "Charge Types"
 
     name = fields.Char("Description", required=True, track_visibility=True)
-    code = fields.Char("Code", required=True, track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-    _sql_constraints = [
-        ('name_code_unique', 'unique(code)',
-         'Please add other CODE that is exiting in the database.')
-    ]
-
+    
     @api.multi
     def toggle_active(self):
         for la in self:
             if not la.active:
                 la.active = self.active
-        super(PMSChargeType, self).toggle_active()
+        super(PMSChargeTypes, self).toggle_active()
 
 
 class PMSChargeFormula(models.Model):

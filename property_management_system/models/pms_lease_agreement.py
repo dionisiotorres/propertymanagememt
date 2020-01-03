@@ -687,7 +687,7 @@ class PMSLeaseAgreementLine(models.Model):
     lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True, track_visibility=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
-                                      ('unittype_id.chargeable', '=', True)], track_visibility=True)
+                                      ('spaceunittype_id.chargeable', '=', True)], track_visibility=True)
     start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True, track_visibility=True)
     end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True, track_visibility=True)
     extend_to = fields.Date("Extend End", track_visibility=True)
@@ -718,6 +718,7 @@ class PMSLeaseAgreementLine(models.Model):
     invoice_count = fields.Integer(default=0, track_visibility=True)
     extend_start = fields.Date("Extend Start", store=True, track_visibility=True)
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
+    appilication_type = fields.One2many('pms.application.charge.line','lease_line_id',"Charge Types")
 
     @api.one
     @api.depends('unit_no', 'lease_no')

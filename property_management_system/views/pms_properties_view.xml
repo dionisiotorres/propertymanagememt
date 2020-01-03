@@ -17,9 +17,9 @@
         <form>
           <sheet>
           <div class="oe_button_box" name="button_box">
-            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                <!-- <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/> -->
-            </button>
+            <button name="action_units" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('count_unit', '=', 0)]}">
+                  <field name="count_unit" widget="statinfo" string="Units"/>
+              </button>
           </div>
           <field name="image" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_medium&quot;}"/>
           <div class="oe_title">
@@ -27,7 +27,6 @@
             <h1>
                 <field name="name" placeholder="Name"/>
             </h1>
-            <!-- <label for="Code" string="Code"/> -->
             <h4>
               <field name="code"  placeholder="Code"/> 
             </h4>
@@ -81,7 +80,6 @@
                       <field name="email"/>
                       <field name="company_id"/>
                       <field name="is_company"/>
-                      <!-- <field name="department_id"/> -->
                       <field name="function"/>
                       <field name="phone"/>
                       <field name="street"/>
@@ -109,16 +107,7 @@
                                   </div>
                                   <div class="oe_kanban_details">
                                       <field name="name"/>
-                                      <!-- <div t-if="record.department_id.raw_value"><field name="department_id"/></div> -->
-                                      <!-- <div t-if="record.function.raw_value"><field name="function"/></div> -->
                                       <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
-                                      <!-- <div t-if="record.type.raw_value != 'type'">
-                                          <div>
-                                              <field name="zip"/>
-                                              <field name="city"/>
-                                          </div>
-                                          <field name="country_id"/>
-                                      </div> -->
                                       <div t-if="record.phone.raw_value">Phone: <field name="phone"/></div>
                                   </div>
                               </div>
@@ -131,63 +120,30 @@
               <field name="property_management_id" widget="kanban">                  
                      <kanban>
                       <field name="id"/>
-                      <!-- <field name="color"/> -->
                       <field name="name"/>
-                      <!-- <field name="type"/> -->
                       <field name="email"/>
-                      <!-- <field name="is_company"/> -->
-                      <!-- <field name="company_id"/>
-                      <field name="is_company"/> -->
-                      <!-- <field name="department_id"/> -->
-                      <!-- <field name="function"/> -->
                       <field name="phone"/>
-                      <!-- <field name="street"/>
-                      <field name="street2"/> -->
-                      <!-- <field name="zip"/>
-                      <field name="city"/> -->
-                      <!-- <field name="country_id"/> -->
-                      <!-- <field name="mobile"/> -->
-                      <!-- <field name="state_id"/> -->
+                      <field name="city"/>
                       <field name="logo"/>
-                      <!-- <field name="customer"/> -->
                       <templates>
                           <t t-name="kanban-box">
-                              <!-- <t t-set="color" t-value="kanban_color(record.color.raw_value)"/> -->
-                               <div t-att-class="' oe_kanban_global_click'">
-                                 <div class="o_kanban_image">
-                                      <img alt="logo" t-if="record.logo.raw_value" t-att-src="kanban_image('res.company', 'logo', record.id.raw_value)"/> 
-                                      <t t-if="!record.logo.raw_value">
-                                          <img alt="image"  t-att-src='_s + "/base/static/img/money.png"'/>
-                                      </t>
-                                  </div>
-                                  <div class="oe_kanban_details">
-                                      <field name="name"/>
-                                      <!-- <div t-if="record.department_id.raw_value"><field name="department_id"/></div> -->
-                                      <!-- <div t-if="record.function.raw_value"><field name="function"/></div> -->
-                                      <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
-                                      <!-- <div t-if="record.type.raw_value != 'type'">
-                                          <div>
-                                              <field name="zip"/>
-                                              <field name="city"/>
-                                          </div>
-                                          <field name="country_id"/>
-                                      </div> -->
-                                      <div t-if="record.phone.raw_value">Phone: <field name="phone"/></div>
-                                  </div>
-                              </div>
+                            <div t-att-class="' oe_kanban_global_click'">
+                                <div class="o_kanban_image">
+                                    <img alt="logo" t-if="record.logo.raw_value" t-att-src="kanban_image('res.company', 'logo', record.id.raw_value)"/> 
+                                    <t t-if="!record.logo.raw_value">
+                                        <img alt="Logo"  t-att-src='_s + "/base/static/img/company_image.png"'/>
+                                    </t>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <field name="name"/>
+                                    <div t-if="record.email.raw_value"><field name="email" widget="email"/></div>
+                                    <div t-if="record.phone.raw_value">Phone: <field name="phone"/></div>
+                                </div>
+                            </div>
                           </t>
                         </templates>
                       </kanban> 
                   </field>
-                <!-- <group>
-                  <group> 
-                    <field name="management_company" string="Company Name"  widget="selection"
-                    context="{'dis_company_type': True}"
-                    />
-                  </group>
-                  <group>
-                  </group>
-                </group> -->
               </page>
               <page name="Bank" string="Bank Information">
               <group>
@@ -217,7 +173,7 @@
                     <field name="rentschedule_type"/>
                   </group>
                    <group string="API Information">
-                    <field name="api_integration"/>
+                    <field name="api_integration" string="MIMS Integration"/>
                   </group>
                 </group>
               </page>

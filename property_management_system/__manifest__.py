@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.70',
+    '1.0.71',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
         'security/property_security.xml',
@@ -57,6 +57,8 @@
         'views/pms_api_integration.xml',
         'views/users_view.xml',
         'views/pos_daily_sale_view.xml',
+        'views/pms_applicable_charge_type.xml',
+        'views/pms_applicable_space_type_view.xml',
     ],
     'installable':
     True,

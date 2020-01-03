@@ -10,3 +10,8 @@ from . import pms_lease_agreement
 from . import product_template
 from . import pos_daily_sale
 from . import pms_applicable_charge_type
+from . import pms_applicable_charge_line
+from . import pms_space_type
+from . import pms_applicable_space_type
+from . import pms_facility
+from . import pms_equipment

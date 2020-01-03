@@ -222,7 +222,7 @@ class PMSProperties(models.Model):
         "API Integration",
         track_visibility=True,
     )
-
+    count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
     # company_id = fields.Many2one('res.partner',
     #                              "Company",
     #                              default=lambda self: self.env.user.company_id,
@@ -267,6 +267,33 @@ class PMSProperties(models.Model):
             code = record.code
             result.append((record.id, code))
         return result
+
+    @api.multi
+    def _get_count_unit(self):
+        count = 0
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        for unit in unit_ids:
+            self.count_unit += 1
+
+    @api.multi
+    def action_units(self):
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+
+        action = self.env.ref(
+            'property_management_system.action_space_all').read()[0]
+        if len(unit_ids) > 1:
+            action['domain'] = [('id', 'in', unit_ids.ids)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_space_unit_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
 
     @api.model
     def create(self, values):

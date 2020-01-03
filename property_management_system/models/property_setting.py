@@ -41,36 +41,6 @@ class PMSRentCharge(models.Model):
     # paid = fields.Boolean("")
 
 
-class PMSEquipmentType(models.Model):
-    _name = 'pms.equipment.type'
-    _description = 'Equipment Types'
-
-    name = fields.Char("Equipment Type", required=True, track_visibility=True)
-    active = fields.Boolean(default=True, track_visibility=True)
-
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
-
-
-class PMSEquipment(models.Model):
-    _name = 'pms.equipment'
-    _description = "Equipments"
-
-    equipment_type_id = fields.Many2one("pms.equipment.type",
-                                        string="Equipment Type",
-                                        track_visibility=True,
-                                        required=True)
-    name = fields.Char("Serial No", required=True, track_visibility=True)
-    model = fields.Char("Model", required=True, track_visibility=True)
-    manufacutrue = fields.Char("Manufacture", track_visibility=True)
-    ref_code = fields.Char("RefCode", track_visibility=True)
-    active = fields.Boolean(default=True, track_visibility=True)
-    property_id = fields.Many2one("pms.properties",
-                                  "Property",
-                                  required=True,
-                                  track_visibility=True)
-
-
 class PMSPropertyType(models.Model):
     _name = 'pms.property.type'
     _description = 'Property Types'
@@ -154,70 +124,6 @@ class PMSUtilitySupplyType(models.Model):
         super(PMSUtilityType, self).toggle_active()
 
 
-class PMSFacilities(models.Model):
-    _name = 'pms.facilities'
-    _description = "Facilities"
-
-    name = fields.Char(default="New",
-                       related='meter_no.name',
-                       readonly=True,
-                       store=True,
-                       required=True,
-                       track_visibility=True)
-    utility_type_id = fields.Many2one('pms.utility.supply.type',
-                                      "Utility Supply Type",
-                                      required=True,
-                                      track_visibility=True)
-    meter_no = fields.Many2one("pms.equipment",
-                               "Meter No",
-                               required=True,
-                               track_visibility=True)
-    interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
-                                       ('mobile', 'Mobile')],
-                                      "Interface Type",
-                                      track_visibility=True)
-    remark = fields.Text("Remark", track_visibility=True)
-    status = fields.Boolean("Status", default=True, track_visibility=True)
-    facilities_line = fields.One2many("pms.facility.lines",
-                                      "facility_id",
-                                      "Facility Lines",
-                                      track_visibility=True)
-    property_id = fields.Many2one("pms.properties",
-                                  "Property",
-                                  required=True,
-                                  track_visibility=True)
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
-
-    # @api.onchange('utility_type_id')
-    # def onchange_utility_type_id(self):
-    #     parent_id = []
-    #     domain = {}
-    #     utility_id = None
-    #     if self.utility_type_id != None:
-    #         utility_ids = self.env['pms.utility.source.type'].search([
-    #             ('utility_type_id', '=', self.utility_type_id.id)
-    #         ])
-    #         for loop in utility_ids:
-    #             parent_id.append(loop.id)
-    #         domain = {'supplier_type_id': [('id', 'in', parent_id)]}
-    #     return {'domain': domain}
-
-    @api.model
-    def create(self, values):
-        id = None
-        id = super(PMSFacilities, self).create(values)
-        if id:
-            property_obj = self.env['pms.properties'].browse(
-                values['property_id'])
-            integ_obj = self.env['pms.api.integration']
-            api_type_obj = self.env['pms.api.type'].search([('name', '=',
-                                                             "SpaceUnitFacility")])
-            datas = api_rauth_config.APIData(id, values, property_obj,
-                                             integ_obj, api_type_obj)
-        return id
-
-
 class PMSFacilitiesline(models.Model):
     _name = 'pms.facility.lines'
     _description = "Facility Lines"
@@ -233,10 +139,10 @@ class PMSFacilitiesline(models.Model):
                                        "Utility Source Type",
                                        required=True,
                                        track_visibility=True)
-    install_date = fields.Date("Install Date", track_visibility=True)
+    # install_date = fields.Date("Install Date", track_visibility=True)
     start_reading_value = fields.Integer("Last Reading Value",
                                          track_visibility=True)
-    digit = fields.Integer("Digit", track_visibility=True)
+    # digit = fields.Integer("Digit", track_visibility=True)
     start_date = fields.Date("Start Date", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
@@ -302,16 +208,6 @@ class PMSSpaceUntiManagement(models.Model):
     def action_combination(self):
         if self.state == 'draft':
             self.state = "done"
-
-
-class PMSSpaceType(models.Model):
-    _name = 'pms.space.type'
-    _description = 'Space Type'
-
-    name = fields.Char("Name", required=True, track_visibility=True)
-    # property_id = fields.Many2one("pms.properties", "Property", required=True)
-    chargeable = fields.Boolean("Chargeable", track_visibility=True)
-    divisible = fields.Boolean("Divisible", track_visibility=True)
 
 
 class PMSDisplayType(models.Model):

@@ -28,7 +28,7 @@
                         <field name="lease_agreement_id" invisible="1"/>
                         <field name="property_id"/>
                         <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>   
-                        <field name="pos_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <!-- <field name="pos_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/> -->
                         <!-- <field name="rental_charge_type"/> -->
                         <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                     </group>
@@ -38,9 +38,10 @@
                         <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="extend_start" />
                         <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="pos_id" readonly="1"/>
                     </group>
                     </group>
-                    <group name="rent_detail" string="Rent Charge Detail">
+                    <!-- <group name="rent_detail" string="Rent Charge Detail">
                     <group>
                         <field name="rental_charge_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="area" />
@@ -57,19 +58,29 @@
                         </group>
                         <group>                          
                         </group>
-                    </group>
+                    </group> -->
                     <notebook>
-                        <page string="Rent Schedule lines" >
-                            <field name="rent_schedule_line" readonly="1">
-                              <tree>
-                                <field name="charge_type"/>
-                                <field name="start_date"/>
-                                <field name="end_date"/>
-                                <field name="gto_amount" />
-                                <field name="extend_count"/>
-                              </tree>
-                            </field> 
-                        </page>
+                      <page string="Lease Units Charge" >
+                        <field name="appilication_type">
+                          <tree editable="buttom">
+                            <field name="application_id"/>
+                            <field name="charge_type"/>
+                            <field name="calculatedby"/>
+                            <field name="amount" />
+                            <field name="total_amount"/>
+                          </tree>
+                        </field> 
+                      </page>
+                      <!-- <page string="Rent Schedule lines" >
+                          <field name="rent_schedule_line" readonly="1">
+                            <tree>
+                              <field name="charge_type"/>
+                              <field name="start_date"/>
+                              <field name="end_date"/>
+                              <field name="gto_amount" string="Amount"/>
+                            </tree>
+                          </field> 
+                      </page> -->
                     </notebook>
                 </sheet>
                  <div class="oe_chatter">
@@ -119,7 +130,7 @@
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_lease_aggrement_line_tree"/>
-       <field name="context">{'search_default_group_property_id': 1}</field>
+       <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record> 
     <menuitem  id="lease_agreement_line_menu" 
       name="Lease Agreement Detail" 

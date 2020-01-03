@@ -19,8 +19,8 @@ class PmsFormat(models.Model):
     def name_get(self):
         result = []
         for record in self:
-            code = record.name
-            result.append((record.id, code))
+            sample = record.sample
+            result.append((record.id, sample))
         return result
 
     @api.model
@@ -72,6 +72,14 @@ class PmsFormatDetail(models.Model):
                 self.value = self.digit_value
             if self.value_type == 'datetime':
                 self.value = self.datetime_value
+
+    # @api.model
+    # def get_position_order(self):
+    #     if self.mapped('format_id.format_line_id'):
+    #         count = 0
+    #         for cf in self.mapped('format_id'):
+    #             count += 1
+    #             cf.position_order = count
 
     name = fields.Char("Name", default="New")
     # autogenerate = fields.Boolean("Auto Generate?")

@@ -15,6 +15,8 @@ access_pms_terms,pms.terms,model_pms_terms,group_property_user,1,1,1,1
 access_pms_terms_manager,pms.terms,model_pms_terms,group_property_manager,1,1,1,1
 access_pms_space_type,pms.space.type,model_pms_space_type,group_property_user,1,1,1,1
 access_pms_space_type_manager,pms.space.type,model_pms_space_type,group_property_manager,1,1,1,1
+access_pms_app_space_type,pms.applicable.space.type,model_pms_applicable_space_type,group_property_user,1,1,1,1
+access_pms_app_space_type_manager,pms.applicable.space.type,model_pms_applicable_space_type,group_property_manager,1,1,1,1
 access_pms_display_type,pms.display.type,model_pms_display_type,group_property_user,1,1,1,1
 access_pms_display_type_manager,pms.display.type,model_pms_display_type,group_property_manager,1,1,1,1
 access_pms_bank,pms.bank,model_pms_bank,group_property_user,1,1,1,1
@@ -76,3 +78,5 @@ access_pms_api_type,pms.api.type,model_pms_api_type,group_property_user,1,1,1,0
 access_pms_api_type_manager,pms.api.type,model_pms_api_type,group_property_manager,1,1,1,0
 access_pos_daily_sale,pos.daily.sale,model_pos_daily_sale,group_property_user,1,1,1,0
 access_pos_daily_sale_manager,pos.daily.sale,model_pos_daily_sale,group_property_manager,1,1,1,0
+access_pms_app_charge_line,pms.application.charge.line,model_pms_application_charge_line,group_property_user,1,1,1,0
+access_pos_app_charge_line_manager,pms.application.charge.line,model_pms_application_charge_line,group_property_manager,1,1,1,1

@@ -95,7 +95,7 @@
                           <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
                         </group>
                       </group>
-                      <group name="rent_detail" string="Rent Charge Detail">
+                      <!-- <group name="rent_detail" string="Rent Charge Detail">
                         <group>
                             <field name="rental_charge_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                             <field name="area" />
@@ -112,20 +112,30 @@
                           </group>
                           <group>                          
                           </group>
-                      </group>
+                      </group> -->
                       <notebook>
-                          <page string="Rent Schedule lines" >
+                          <page string="Lease Units Charge">
+                            <field name="appilication_type">
+                              <tree editable="bottom">
+                                <field name="application_id" options="{'no_quick_create':True}"/>
+                                <field name="charge_type"/>
+                                <field name="calculatedby"/>
+                                <field name="amount" />
+                                <field name="total_amount"/>
+                              </tree>
+                            </field> 
+                          </page>
+                          <!-- <page string="Rent Schedule lines" >
                              <field name="rent_schedule_line" readonly="1">
                               <tree>
                                 <field name="charge_type"/>
                                 <field name="start_date"/>
                                 <field name="end_date"/>
-                                <field name="gto_amount" />
-                                <field name="extend_count" />
-                                <field name="extend_to"/>
+                                <field name="gto_amount" string="Amount"/>
+                                
                               </tree>
                              </field> 
-                          </page>
+                          </page> -->
                       </notebook>
                       </sheet>
                     </form>
@@ -155,7 +165,7 @@
                     </group>
                   </group>
                 </page>
-                <page string="Rent Configruation">
+                <!-- <page string="Rent Configruation">
                   <field name = "lease_rent_config_id">
                     <tree editable="buttom">
                       <field name="lease_agreement_line_id"/>
@@ -165,7 +175,7 @@
                       <field name="end_date"/>
                     </tree>
                   </field>
-                </page>
+                </page> -->
             </notebook>
           </sheet>
            <div class="oe_chatter">
@@ -258,7 +268,7 @@
        <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_lease_agreement_tree"/> 
        <field name="search_view_id" ref="view_lease_agreement_filter"/> 
-       <field name="context">{'search_default_group_property_id': 1}</field> 
+       <!-- <field name="context">{'search_default_group_property_id': 1}</field>  -->
     </record>
     <menuitem  id="lease_management_menu_sub" 
       name="Lease Management" 

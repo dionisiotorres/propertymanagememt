@@ -68,9 +68,12 @@ class PMSSpaceUnit(models.Model):
                                 "Parent",
                                 store=True,
                                 track_visibility=True)
-    unittype_id = fields.Many2one("pms.space.type",
-                                  "Space Type",
-                                  track_visibility=True)
+    # unittype_id = fields.Many2one("pms.applicable.space.type",
+    #                               "Type",
+    #                               track_visibility=True)
+    spaceunittype_id = fields.Many2one("pms.applicable.space.type",
+                                       "Type",
+                                       track_visibility=True)
     uom = fields.Many2one("uom.uom",
                           "UOM",
                           related="property_id.uom_id",
@@ -105,6 +108,8 @@ class PMSSpaceUnit(models.Model):
                                    "Add Records",
                                    track_visibility=True)
     active = fields.Boolean("Active", default=True)
+    booking_date = fields.Date("Booking Date")
+    booking_expired_date = fields.Date("Booking Expired Date")
 
     @api.multi
     @api.onchange('end_date')

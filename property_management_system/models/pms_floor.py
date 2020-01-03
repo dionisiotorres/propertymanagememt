@@ -15,6 +15,7 @@ class PMSFloor(models.Model):
     code = fields.Char("Floor Code", required=True, track_visibility=True)
     floor_code_ref = fields.Char("Floor Ref Code", track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
+    count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   index=True,
@@ -50,10 +51,45 @@ class PMSFloor(models.Model):
 
     @api.multi
     def toggle_active(self):
+        if self.active == True:
+            unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
+                                                           self.id)])
+            for unit in unit_ids:
+                if unit.active == True:
+                    raise UserError(
+                        _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
+                          ) % (unit.name, self.code, self.name))
         for pt in self:
             if not pt.active:
                 pt.active = self.active
         super(PMSFloor, self).toggle_active()
+
+    @api.multi
+    def _get_count_unit(self):
+        count = 0
+        unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        for unit in unit_ids:
+            self.count_unit += 1
+
+    @api.multi
+    def action_units(self):
+        unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+
+        action = self.env.ref(
+            'property_management_system.action_space_all').read()[0]
+        if len(unit_ids) > 1:
+            action['domain'] = [('id', 'in', unit_ids.ids)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_space_unit_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
 
     @api.model
     def create(self, values):
@@ -130,3 +166,15 @@ class PMSFloor(models.Model):
         #     requests.request(
         #     "POST", url_save, data=payload0, headers=headers)
         return id
+
+    @api.multi
+    def unlink(self):
+        if self.active == True:
+            unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
+                                                           self.id)])
+            for unit in unit_ids:
+                if unit.active == True:
+                    raise UserError(
+                        _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
+                          ) % (unit.name, self.code, self.name))
+        return super(PMSFloor, self).unlink()

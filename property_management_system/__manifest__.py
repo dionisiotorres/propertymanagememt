@@ -28,6 +28,7 @@
         'data/res.country.state.csv',
         'data/pms.city.csv',
         'data/pms.township.csv',
+        'data/pms.space.type.csv',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',

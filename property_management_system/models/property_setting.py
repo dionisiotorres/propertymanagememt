@@ -14,14 +14,18 @@ class PMSRentCharge(models.Model):
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
                                               track_visibility=True,
                                               string="Lease Agreement Item")
-    charge_type = fields.Selection(
-        [('base', 'Base'), ('base+gto', 'Base + GTO'),
-         ('baseorgto', 'Base or GTO')],
-        string="Charge Type",
-        track_visibility=True,
-    )
+    # charge_type = fields.Selection(
+    #     [('base', 'Base'), ('base+gto', 'Base + GTO'),
+    #      ('baseorgto', 'Base or GTO')],
+    #     string="Charge Type",
+    #     track_visibility=True,
+    # )
+    charge_type = fields.Many2one("pms.charge_types",
+                                  required=True,
+                                  readonly=True,
+                                  track_visibility=True)
     gto_amount = fields.Float(
-        "Gto Amount",
+        "Amount",
         track_visibility=True,
     )
     start_date = fields.Date(
@@ -172,9 +176,11 @@ class PMSSpaceUntiManagement(models.Model):
     _name = 'pms.space.unit.management'
     _description = "Space Unit Management"
 
-    name = fields.Char("Name",
-                       default="New",
-                       readonly=True,)
+    name = fields.Char(
+        "Name",
+        default="New",
+        readonly=True,
+    )
     floor_id = fields.Many2one("pms.floor", "Floor", track_visibility=True)
     space_unit_id = fields.Many2one("pms.space.unit",
                                     "From Unit",
@@ -301,13 +307,20 @@ class Bank(models.Model):
     _inherit = 'res.bank'
 
     bic = fields.Char('Switch Code',
-                      index=True, track_visibility=True,
+                      index=True,
+                      track_visibility=True,
                       help="Sometimes called BIC or Swift.")
     branch = fields.Char("Branch Name",
-                         index=True, track_visibility=True,
+                         index=True,
+                         track_visibility=True,
                          help="Sometimes called BIC or Swift.")
-    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True, ondelete='cascade')
-    township = fields.Many2one("pms.township", "Township", track_visibility=True)
+    city_id = fields.Many2one("pms.city",
+                              "City Name",
+                              track_visibility=True,
+                              ondelete='cascade')
+    township = fields.Many2one("pms.township",
+                               "Township",
+                               track_visibility=True)
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -320,7 +333,8 @@ class PMSCity(models.Model):
 
     state_id = fields.Many2one("res.country.state",
                                "State Name",
-                               required=True, track_visibility=True)
+                               required=True,
+                               track_visibility=True)
     name = fields.Char("City Name", required=True, track_visibility=True)
     code = fields.Char("City Code", required=True, track_visibility=True)
 
@@ -333,16 +347,20 @@ class Company(models.Model):
     city_id = fields.Many2one("pms.city",
                               "City Name",
                               compute='_compute_address',
-                              inverse='_inverse_city', track_visibility=True,
+                              inverse='_inverse_city',
+                              track_visibility=True,
                               ondelete='cascade')
     township = fields.Many2one("pms.township",
                                "Township Name",
                                compute='_compute_address',
-                               inverse='_inverse_township', track_visibility=True,
+                               inverse='_inverse_township',
+                               track_visibility=True,
                                ondelete='cascade')
     company_type = fields.Many2many('pms.company.category',
-                                    "res_company_type_rel", 'company_id',
-                                    'category_id', track_visibility=True)
+                                    "res_company_type_rel",
+                                    'company_id',
+                                    'category_id',
+                                    track_visibility=True)
 
     def _get_company_address_fields(self, partner):
         return {
@@ -379,14 +397,18 @@ class PMSTownship(models.Model):
     city_id = fields.Many2one("pms.city",
                               "City",
                               ondelete='cascade',
-                              required=True, track_visibility=True)
+                              required=True,
+                              track_visibility=True)
 
 
 class PMSState(models.Model):
     _name = "pms.state"
     _description = "State"
 
-    country_id = fields.Many2one("pms.country", "Country Name", required=True, track_visibility=True)
+    country_id = fields.Many2one("pms.country",
+                                 "Country Name",
+                                 required=True,
+                                 track_visibility=True)
     name = fields.Char("State Name", required=True, track_visibility=True)
     code = fields.Char("State Code", required=True, track_visibility=True)
 
@@ -428,7 +450,9 @@ class PMSDepartment(models.Model):
     _order = "name"
 
     name = fields.Char("Name", required=True, track_visibility=True)
-    parent_id = fields.Many2one("pms.department", "Parent Department", track_visibility=True)
+    parent_id = fields.Many2one("pms.department",
+                                "Parent Department",
+                                track_visibility=True)
 
 
 class PMSCompanyCategory(models.Model):
@@ -454,7 +478,8 @@ class Partner(models.Model):
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
         compute='_compute_company_type',
-        inverse='_write_company_type', track_visibility=True,
+        inverse='_write_company_type',
+        track_visibility=True,
     )
     # type = fields.Selection(
     #     [('contact', 'Contact'), ('invoice', 'Invoice')],
@@ -463,15 +488,20 @@ class Partner(models.Model):
     # )
     child_ids = fields.One2many('res.partner',
                                 'parent_id',
-                                string='Contacts', track_visibility=True,
+                                string='Contacts',
+                                track_visibility=True,
                                 domain=[('is_company', '!=', True)])
     company_channel_type = fields.Many2many('pms.company.category',
-                                            string="Type", track_visibility=True)
-    township = fields.Many2one('pms.township', "Township", track_visibility=True)
+                                            string="Type",
+                                            track_visibility=True)
+    township = fields.Many2one('pms.township',
+                               "Township",
+                               track_visibility=True)
     is_tanent = fields.Boolean('Is Tanent',
                                compute="get_tanent",
                                readonly=False,
-                               store=True, track_visibility=True)
+                               store=True,
+                               track_visibility=True)
     # partner_contact_id = fields.Many2many(
     #     "res.partner",
     #     "company_partner_contact_rel",
@@ -479,8 +509,12 @@ class Partner(models.Model):
     #     "partner_id",
     #     domain="[('is_company', '!=', True)]",
     #     store=True)
-    trade_id = fields.Many2one("pms.trade_category", "Trade", track_visibility=True)
-    sub_trade_id = fields.Many2one("pms.sub_trade_category", "Sub Trade", track_visibility=True)
+    trade_id = fields.Many2one("pms.trade_category",
+                               "Trade",
+                               track_visibility=True)
+    sub_trade_id = fields.Many2one("pms.sub_trade_category",
+                                   "Sub Trade",
+                                   track_visibility=True)
 
     @api.one
     @api.depends('company_channel_type')

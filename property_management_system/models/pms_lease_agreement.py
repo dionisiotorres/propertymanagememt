@@ -119,307 +119,320 @@ class PMSLeaseAgreement(models.Model):
             for line in self.lease_agreement_line:
                 for unit in line.unit_no:
                     unit.write({'status': 'occupied'})
-                if self.property_id.rentschedule_type == 'prorated':
-                    date = None
-                    start_date = None
-                    end_date = None
-                    day = 1
-                    while day >= 1:
-                        if line.start_date and line.end_date:
-                            if not end_date:
-                                if line.state == 'NEW':
-                                    end_date = line.end_date
-                                elif line.state == 'EXTENDED':
-                                    end_date = line.extend_start
+                for ctype in line.appilication_type:
+                    if self.property_id.rentschedule_type == 'prorated':
+                        date = None
+                        start_date = None
+                        end_date = None
+                        day = 1
+                        while day >= 1:
+                            if line.start_date and line.end_date:
+                                if not end_date:
+                                    if line.state == 'NEW':
+                                        end_date = line.end_date
+                                    elif line.state == 'EXTENDED':
+                                        end_date = line.extend_start
+                                    else:
+                                        end_date = line.start_date
+                                if line.end_date > end_date:
+                                    if not start_date:
+                                        start_date = line.start_date
+                                    if start_date == line.start_date:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(
+                                            days=1)
+                                        start_date = date + relativedelta(
+                                            months=1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days=1)
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(days=1)
+                                        end_date
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
+                                    if not start_date:
+                                        start_date = line.end_date
+                                    if start_date == line.end_date:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(
+                                            days=1)
+                                        start_date = date + relativedelta(
+                                            months=1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days=1)
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(days=1)
+                                        end_date
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
+                                            days=2):
+                                    if not start_date:
+                                        start_date = line.extend_start
+                                    if start_date == line.extend_start:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(
+                                            days=1)
+                                        start_date = date + relativedelta(
+                                            months=1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days=1)
+                                        end_date = start_date + relativedelta(
+                                            months=1)
+                                        end_date = end_date - relativedelta(days=1)
+                                        end_date
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
                                 else:
-                                    end_date = line.start_date
-                            if line.end_date > end_date:
-                                if not start_date:
-                                    start_date = line.start_date
-                                if start_date == line.start_date:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(
-                                        days=1)
-                                    start_date = date + relativedelta(
-                                        months=1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
-                                else:
-                                    start_date = end_date + relativedelta(days=1)
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(days=1)
-                                    end_date
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                            elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
-                                if not start_date:
-                                    start_date = line.end_date
-                                if start_date == line.end_date:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(
-                                        days=1)
-                                    start_date = date + relativedelta(
-                                        months=1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
-                                else:
-                                    start_date = end_date + relativedelta(days=1)
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(days=1)
-                                    end_date
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                            elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
-                                        days=2):
-                                if not start_date:
-                                    start_date = line.extend_start
-                                if start_date == line.extend_start:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(
-                                        days=1)
-                                    start_date = date + relativedelta(
-                                        months=1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
-                                else:
-                                    start_date = end_date + relativedelta(days=1)
-                                    end_date = start_date + relativedelta(
-                                        months=1)
-                                    end_date = end_date - relativedelta(days=1)
-                                    end_date
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
+                                    day = 0
                             else:
-                                day = 0
-                        else:
-                            raise UserError(
-                                _("Please set start date and end date for your lease."
-                                  ))
-                if self.property_id.rentschedule_type == 'calendar':
-                    date = None
-                    start_date = None
-                    end_date = None
-                    s_day = 0
-                    last_day = 0
-                    day = 1
-                    first_month_day = 0
-                    while day >= 1:
-                        if line.start_date and line.end_date:
-                            if not end_date:
-                                if line.state == 'NEW':
-                                    end_date = line.end_date
-                                elif line.state == 'EXTENDED':
-                                    end_date = line.extend_start
-                                else:
-                                    end_date = line.start_date
-                            if line.end_date > end_date:
-                                s_day = line.start_date.day
-                                last_day = calendar.monthrange(line.start_date.year, line.start_date.month)[1]
-                                if not start_date:
-                                    start_date = line.start_date
-                                if start_date == line.start_date:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        days=last_day - s_day)
-                                    start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
-                                else:
-                                    start_date = end_date + relativedelta(days = 1)
-                                    l_day = calendar.monthrange(start_date.year, start_date.month)[1]
-                                    end_date = end_date + relativedelta(days = l_day)
-                                    if self.state == 'BOOKING' and end_date > line.end_date:
+                                raise UserError(
+                                    _("Please set start date and end date for your lease."
+                                    ))
+                    if self.property_id.rentschedule_type == 'calendar':
+                        date = None
+                        start_date = None
+                        end_date = None
+                        s_day = 0
+                        last_day = 0
+                        day = 1
+                        first_month_day = 0
+                        while day >= 1:
+                            if line.start_date and line.end_date:
+                                if not end_date:
+                                    if line.state == 'NEW':
                                         end_date = line.end_date
-                                    if self.state == 'NEW' and end_date > line.extend_to:
-                                        end_date = line.extend_to
-                                    if self.state == 'EXTENDED' and end_date > line.extend_to:
-                                        end_date = line.extend_to
-                                    
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                            elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
-                                s_day = line.end_date.day
-                                last_day = calendar.monthrange(line.end_date.year, line.end_date.month)[1]
-                                if not start_date:
-                                    start_date = line.end_date
-                                if start_date == line.end_date:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        days=last_day - s_day)
-                                    start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
+                                    elif line.state == 'EXTENDED':
+                                        end_date = line.extend_start
+                                    else:
+                                        end_date = line.start_date
+                                if line.end_date > end_date:
+                                    s_day = line.start_date.day
+                                    last_day = calendar.monthrange(line.start_date.year, line.start_date.month)[1]
+                                    if not start_date:
+                                        start_date = line.start_date
+                                    if start_date == line.start_date:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            days=last_day - s_day)
+                                        start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days = 1)
+                                        l_day = calendar.monthrange(start_date.year, start_date.month)[1]
+                                        end_date = end_date + relativedelta(days = l_day)
+                                        if self.state == 'BOOKING' and end_date > line.end_date:
+                                            end_date = line.end_date
+                                        if self.state == 'NEW' and end_date > line.extend_to:
+                                            end_date = line.extend_to
+                                        if self.state == 'EXTENDED' and end_date > line.extend_to:
+                                            end_date = line.extend_to
+                                        
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
+                                    s_day = line.end_date.day
+                                    last_day = calendar.monthrange(line.end_date.year, line.end_date.month)[1]
+                                    if not start_date:
+                                        start_date = line.end_date
+                                    if start_date == line.end_date:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            days=last_day - s_day)
+                                        start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days = 1)
+                                        l_day = calendar.monthrange(start_date.year, start_date.month)[1]
+                                        end_date = end_date + relativedelta(days = l_day)
+                                        if self.state == 'BOOKING' and end_date > line.end_date:
+                                            end_date = line.end_date
+                                        if self.state == 'NEW' and end_date > line.extend_to:
+                                            end_date = line.extend_to
+                                        if self.state == 'EXTENDED' and end_date > line.extend_to:
+                                            end_date = line.extend_to                                    
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
+                                            days=2):
+                                    s_day = line.extend_start.day
+                                    last_day = calendar.monthrange(line.extend_start.year, line.extend_start.month)[1]
+                                    if not start_date:
+                                        start_date = line.extend_start
+                                    if start_date == line.extend_start:
+                                        date = start_date
+                                        end_date = start_date + relativedelta(
+                                            days=last_day - s_day)
+                                        start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
+                                        day = 1
+                                    else:
+                                        start_date = end_date + relativedelta(days = 1)
+                                        l_day = calendar.monthrange(start_date.year, start_date.month)[1]
+                                        end_date = end_date + relativedelta(days = l_day)
+                                        if self.state == 'BOOKING' and end_date > line.end_date:
+                                            end_date = line.end_date
+                                        if self.state == 'NEW' and end_date > line.extend_to:
+                                            end_date = line.extend_to
+                                        if self.state == 'EXTENDED' and end_date > line.extend_to:
+                                            end_date = line.extend_to
+                                        day = 1
+                                        val = {
+                                            'property_id': self.property_id.id,
+                                            'lease_agreement_line_id': line.id,
+                                            'lease_agreement_id': self.id,
+                                            'charge_type': ctype.application_id.id,
+                                            'amount': ctype.total_amount,
+                                            'start_date': start_date,
+                                            'end_date': end_date,
+                                            'extend_count': line.extend_count,
+                                            'extend_to': line.extend_to,
+                                        }
+                                        self.env['pms.rent_schedule'].create(val)
                                 else:
-                                    start_date = end_date + relativedelta(days = 1)
-                                    l_day = calendar.monthrange(start_date.year, start_date.month)[1]
-                                    end_date = end_date + relativedelta(days = l_day)
-                                    if self.state == 'BOOKING' and end_date > line.end_date:
-                                        end_date = line.end_date
-                                    if self.state == 'NEW' and end_date > line.extend_to:
-                                        end_date = line.extend_to
-                                    if self.state == 'EXTENDED' and end_date > line.extend_to:
-                                        end_date = line.extend_to                                    
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                            elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
-                                        days=2):
-                                s_day = line.extend_start.day
-                                last_day = calendar.monthrange(line.extend_start.year, line.extend_start.month)[1]
-                                if not start_date:
-                                    start_date = line.extend_start
-                                if start_date == line.extend_start:
-                                    date = start_date
-                                    end_date = start_date + relativedelta(
-                                        days=last_day - s_day)
-                                    start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
-                                    day = 1
-                                else:
-                                    start_date = end_date + relativedelta(days = 1)
-                                    l_day = calendar.monthrange(start_date.year, start_date.month)[1]
-                                    end_date = end_date + relativedelta(days = l_day)
-                                    if self.state == 'BOOKING' and end_date > line.end_date:
-                                        end_date = line.end_date
-                                    if self.state == 'NEW' and end_date > line.extend_to:
-                                        end_date = line.extend_to
-                                    if self.state == 'EXTENDED' and end_date > line.extend_to:
-                                        end_date = line.extend_to
-                                    day = 1
-                                    val = {
-                                        'property_id': self.property_id.id,
-                                        'lease_agreement_line_id': line.id,
-                                        'charge_type': line.rental_charge_type,
-                                        'amount': line.rent,
-                                        'start_date': start_date,
-                                        'end_date': end_date,
-                                        'extend_count': line.extend_count,
-                                        'extend_to': line.extend_to,
-                                    }
-                                    self.env['pms.rent_schedule'].create(val)
+                                    day = 0
                             else:
-                                day = 0
-                        else:
-                            raise UserError(
-                                _("Please set start date and end date for your lease."
-                                  ))
+                                raise UserError(
+                                    _("Please set start date and end date for your lease."
+                                    ))
         if self.state == 'NEW':
             return self.write({'state': 'EXTENDED'})
         elif self.state == 'EXTENDED':
@@ -431,7 +444,7 @@ class PMSLeaseAgreement(models.Model):
                     if lease.rent_schedule_line:
                         for sche in lease.rent_schedule_line:
                             val.append(sche.id)
-            self.lease_agreement_line.action_invoice(inv_type='INITIAL_PAYMENT',vals=val)
+                    lease.action_invoice(inv_type='INITIAL_PAYMENT', vals=val)
             return self.write({'state': 'NEW'})
 
     @api.multi
@@ -515,7 +528,18 @@ class PMSLeaseAgreement(models.Model):
                                 months=company.new_lease_term.min_time_period) - relativedelta(days=1)
                         elif company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
                             end_date = les.end_date +relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
+                    appli_ids = []
+                    for ctype in les.appilication_type:
+                        app_id = self.env['pms.application.charge.line'].create({
+                            'id': ctype.id,
+                            'application_id': ctype.application_id.id,
+                            'charge_type': ctype.charge_type.id,
+                            'calculatedby': ctype.calculatedby,
+                            'amount': ctype.amount,
+                            'total_amount': ctype.total_amount})
+                        appli_ids.append(app_id.id)
                     value = {
+                        'property_id':les.property_id.id,
                         'unit_no': les.unit_no.id,
                         'start_date': les.end_date,
                         'end_date': end_date,
@@ -523,11 +547,11 @@ class PMSLeaseAgreement(models.Model):
                         'company_tanent_id': les.company_tanent_id.id,
                         'pos_id': les.pos_id,
                         'remark': les.remark,
-                        'rental_charge_type': les.rental_charge_type,
+                        'appilication_type': [(6, 0, appli_ids)],
                     }
                     line_id = self.env['pms.lease_agreement.line'].create(
-                        value).id
-                line.append(line_id)
+                        value)
+                line.append(line_id.id)
         val = {
             'name': self.name,
             'property_id': self.property_id.id,
@@ -760,14 +784,15 @@ class PMSLeaseAgreementLine(models.Model):
         if inv_type == 'INITIAL_PAYMENT':
             domain_sch_ids = [('id','in',vals)]
             sch_ids= self.env['pms.rent_schedule'].search(domain_sch_ids, limit=6)
-            for sch in sch_ids:
-                start_date.append(sch.start_date)
-                end_date.append(sch.end_date)
-            st_date = start_date[0]
-            e_date = end_date[11]
-            invoice_month = str(calendar.month_name[st_date.month])+ '/' + str(st_date.year) + ' - ' + str(calendar.month_name[e_date.month]) + '/' + str(e_date.year)
+            if sch_ids:
+                for sch in sch_ids:
+                    start_date.append(sch.start_date)
+                    end_date.append(sch.end_date)
+                st_date = start_date[0]
+                e_date = end_date[11]
+                invoice_month = str(calendar.month_name[st_date.month])+ '/' + str(st_date.year) + ' - ' + str(calendar.month_name[e_date.month]) + '/' + str(e_date.year)
             # invoices = self.env['account.invoice'].search([('lease_no', '=', self.name)])
-        if inv_type == 'MONTHLY':
+        if inv_type == 'MONTHLY' and vals:
             if vals[0][0] and vals[0][1]:
                 invoice_month = str(calendar.month_name[vals[0][0]]) + ' - ' + str(vals[0][1])
             invoices = self.env['account.invoice'].search([('lease_no', '=', self.name), ('inv_month', '=', invoice_month)])
@@ -781,7 +806,8 @@ class PMSLeaseAgreementLine(models.Model):
                 product_name = l.lease_agreement_line_id.unit_no.name
                 prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
                 prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
-                if inv_type == 'MONTHLY':
+                if inv_type == 'MONTHLY' and vals:
+                    area = rent = 0
                     if l.start_date.month == vals[0][0] and l.start_date.year == vals[0][1]:
                         if not prod_ids:
                             val = {'name': product_name,
@@ -799,17 +825,26 @@ class PMSLeaseAgreementLine(models.Model):
                             account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
+                        if l.charge_type.calculatedby == 'area':
+                            area = self.area
+                            rent = self.unit_no.min_rate
+                        elif l.charge_type.calculatedby == 'fix':
+                            area = 1
+                            rent = l.amount
+                        else:
+                            area = 1
                         inv_line_id = self.env['account.invoice.line'].create({
                             'name': _(unit),
                             'account_id': account_id,
-                            'price_unit': self.rent,
-                            'quantity': self.area,
+                            'price_unit': rent,
+                            'quantity': area,
                             'uom_id': self.unit_no.uom.id,
                             'product_id': product_id.id,
                             'invoice_line_tax_ids': [(6, 0, taxes.ids)],
                         })
                         invoice_lines.append(inv_line_id.id)
-                if inv_type == 'INITIAL_PAYMENT':
+                if inv_type == 'INITIAL_PAYMENT' and vals:
+                    area = rent = 0
                     if l.start_date in start_date:
                         if not prod_ids:
                             val = {'name': product_name,
@@ -827,17 +862,25 @@ class PMSLeaseAgreementLine(models.Model):
                             account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
+                        if l.charge_type.calculatedby == 'area':
+                            area = self.area
+                            rent = self.unit_no.min_rate
+                        elif l.charge_type.calculatedby == 'fix':
+                            area = 1
+                            rent = l.amount
+                        else:
+                            area = 1
                         inv_line_id = self.env['account.invoice.line'].create({
                             'name': _(unit),
                             'account_id': account_id,
-                            'price_unit': self.rent,
-                            'quantity': self.area,
+                            'price_unit': rent,
+                            'quantity': area,
                             'uom_id': self.unit_no.uom.id,
                             'product_id': product_id.id,
                             'invoice_line_tax_ids': [(6, 0, taxes.ids)],
                         })
                         invoice_lines.append(inv_line_id.id)
-            if not invoice_lines:
+            if not invoice_lines and vals:
                 raise UserError(_("No have Invoice Line for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
             inv_ids = self.env['account.invoice'].create({
                 'lease_no': self.name,

@@ -31,15 +31,13 @@
               </group>
             </group>
             <notebook>
-              <page>
+              <page string="Utilities">
                <field name="facilities_line" context="{'property_id': property_id}">
-                <tree editable="bottom" options="{'no_quick_create':True}">
+                <tree editable="buttom" options="{'no_quick_create':True}">
                   <field name="property_id" invisible='1'/>
                   <field name="supplier_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
-                  <!-- <field name="install_date"/> -->
-                  <field name="start_reading_value"/>
-                  <!-- <field name="digit"/> -->
                   <field name="start_date" string="Last Reading Date"/>
+                  <field name="start_reading_value"/>
                   <field name="end_date"/>
                   <field name="status"/>
                 </tree>
@@ -56,8 +54,11 @@
       <field name="arch" type="xml">
         <tree>
             <field name="utility_type_id"/>
-            <field name="meter_no"/>
             <field name="interface_type"/>
+            <field name="meter_no"/>
+            <field name="e_meter_type"/>
+            <field name="lmr_date"/>
+            <field name="lmr_value"/>
             <field name="status"/>
         </tree>
       </field>

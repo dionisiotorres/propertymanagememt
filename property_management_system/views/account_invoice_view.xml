@@ -16,6 +16,9 @@
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
                     <attribute name="string">Unit</attribute>
                 </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="attributes">
+                    <attribute name="string">Lease</attribute>
+                </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="attributes">
                     <attribute name="string">Area</attribute>
                 </xpath>

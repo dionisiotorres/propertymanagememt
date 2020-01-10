@@ -80,3 +80,5 @@ access_pos_daily_sale,pos.daily.sale,model_pos_daily_sale,group_property_user,1,
 access_pos_daily_sale_manager,pos.daily.sale,model_pos_daily_sale,group_property_manager,1,1,1,0
 access_pms_app_charge_line,pms.application.charge.line,model_pms_application_charge_line,group_property_user,1,1,1,0
 access_pos_app_charge_line_manager,pms.application.charge.line,model_pms_application_charge_line,group_property_manager,1,1,1,1
+access_pms_utility_monthly,pms.utility.monthly,model_pms_utility_monthly,group_property_user,1,1,1,0
+access_pms_utility_monthly_manager,pms.utility.monthly,model_pms_utility_monthly,group_property_manager,1,1,1,1

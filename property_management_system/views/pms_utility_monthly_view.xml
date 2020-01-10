@@ -1,0 +1,87 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_utility_monthly_form">
+      <field name="name">Utility Monthly Form</field>
+      <field name="model">pms.utility.monthly</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <group>
+                <field name="property_id" />
+                <field name="meter_no"/>
+                <field name="transaction_type" />
+                <!-- <field name="billingperiod"/> -->
+                <field name="start_value"/>
+                <field name="start_reading_date"/>
+                <field name="end_value"/>
+                <field name="end_reading_date"/>
+                <field name="use_value"/>
+              </group>
+              <group>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="batch_code"/>
+                <field name="lastbillingvalue"/>
+                <field name="utility_type"/>
+              </group>
+              <group>
+                <field name="lastreadingnoh"/>
+                <field name="leasegreementitem_id"/>
+                <field name="lastbilling_date"/>
+              </group>
+              <group>
+                <field name="restapicode"/>
+                <field name="mobilemac_address"/>
+                <field name="extleaseno"/>
+                <field name="status"/>
+                <!-- <field name="remark"/> -->
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_utility_monthly_tree">
+      <field name="name">Utility Monthly list</field>
+      <field name="model">pms.utility.monthly</field>
+      <field name="arch" type="xml">
+        <tree>
+            <field name="property_id"/>
+            <field name="meter_no"/>
+            <field name="transaction_type"/>
+            <field name="utility_type"/>
+            <field name="start_reading_date"/>
+            <field name="end_reading_date"/>
+            <field name="lastbilling_date"/>
+            <field name="lastbillingvalue"/>
+            <field name="use_value"/>
+            <field name="status"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_utility_monthly_filter">
+      <field name="name">Utility Monthly list</field>
+      <field name="model">pms.utility.monthly</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name='property_id'/>
+            <field name="meter_no"/>
+            <field name="leasegreementitem_id"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_utility_monthly_all" model="ir.actions.act_window">
+       <field name="name">Utility Monthly</field>
+       <field name="res_model">pms.utility.monthly</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_utility_monthly_tree"/> 
+    </record> 
+    <menuitem  id="utility_monthly_menu_root" 
+      name="Utility Monthly" 
+      parent="property_management_menu"
+      action="action_utility_monthly_all"
+      sequence="80"/>
+  </data>
+</odoo>

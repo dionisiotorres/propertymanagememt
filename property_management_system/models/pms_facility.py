@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, tools
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 from odoo.addons.property_management_system.models import api_rauth_config
 
 
@@ -37,6 +38,9 @@ class PMSFacilities(models.Model):
                                   track_visibility=True)
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
     install_date = fields.Date("Install Date", track_visibility=True)
+    e_meter_type = fields.Char("E Meter Type", track_visibility=True)
+    lmr_date = fields.Date("LMR Date")
+    lmr_value = fields.Char("LMR Value")
 
     # _sql_constraints = [('name_unique', 'unique(name)',
     #                      'Your name is exiting in the database.')]
@@ -85,6 +89,44 @@ class PMSFacilities(models.Model):
     @api.model
     def create(self, values):
         id = None
+        ldata = []
+        emetertype = lmrvalue = None
+        if 'facilities_line' in values:
+            if len(values['facilities_line']) > 0:
+                for line in values['facilities_line']:
+                    ldata.append(line[2]['supplier_type_id'])
+                    utiliy_id = self.env['pms.utility.source.type'].browse(
+                        line[2]['supplier_type_id'])
+                    if emetertype:
+                        emetertype += " | " + str(utiliy_id.code)
+                        lmrvalue += " | " + str(line[2]['start_reading_value'])
+                    if not emetertype:
+                        emetertype = str(utiliy_id.code)
+                        lmrvalue = str(line[2]['start_reading_value'])
+                        lmrdate = line[2]['start_date']
+
+                dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
+                if dupes:
+                    raise UserError(
+                        _("Plese can not set duplicate supply sourec type."))
+                else:
+
+                    fac_ids = self.search([('meter_no', '=',
+                                            values['meter_no'])])
+                    if fac_ids:
+                        for fid in fac_ids:
+                            if fid.facilities_line:
+                                for fl in fid.facilities_line:
+                                    if fl.supplier_type_id.id in ldata:
+                                        raise UserError(
+                                            _("Plese can not set duplicate supply sourec type."
+                                              ))
+        if emetertype:
+            values['e_meter_type'] = emetertype
+        if lmrvalue:
+            values['lmr_value'] = lmrvalue
+        if lmrdate:
+            values['lmr_date'] = lmrdate
         id = super(PMSFacilities, self).create(values)
         if id:
             property_obj = self.env['pms.properties'].browse(
@@ -96,3 +138,65 @@ class PMSFacilities(models.Model):
             datas = api_rauth_config.APIData(id, values, property_obj,
                                              integ_obj, api_type_obj)
         return id
+
+    @api.multi
+    def write(self, values):
+        ldata = []
+        emetertype = lmrvalue = utiliy_id = lmrdate = None
+        if 'facilities_line' in values:
+            if len(values['facilities_line']) > 0:
+                for line in values['facilities_line']:
+                    if line[2] == False:
+                        fids = self.env['pms.facility.lines'].browse(line[1])
+                        if lmrvalue:
+                            lmrvalue += " | " + str(fids.start_reading_value)
+                        if not lmrvalue:
+                            lmrvalue = str(fids.start_reading_value)
+                    if line[2] != False:
+                        if 'supplier_type_id' in line[2]:
+                            ldata.append(line[2]['supplier_type_id'])
+                            utiliy_id = self.env[
+                                'pms.utility.source.type'].browse(
+                                    line[2]['supplier_type_id'])
+                        if emetertype:
+                            emetertype += " | " + str(utiliy_id.code)
+                        # if lmrvalue:
+                        #     lmrvalue += " | " + str(
+                        #         line[2]['start_reading_value'])
+                        if not emetertype:
+                            if utiliy_id:
+                                emetertype = str(utiliy_id.code)
+                        if 'start_reading_value' in line[2]:
+                            if lmrvalue:
+                                lmrvalue += " | " + str(
+                                    line[2]['start_reading_value'])
+                            else:
+                                lmrvalue = str(line[2]['start_reading_value'])
+                        if 'start_date' in line[2]:
+                            lmrdate = line[2]['start_date']
+
+                dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
+                if dupes:
+                    raise UserError(
+                        _("Plese can not set duplicate supply sourec type."))
+                else:
+                    if 'meter_no' in values:
+                        fac_ids = self.search([('meter_no', '=',
+                                                values['meter_no'])])
+                        if fac_ids:
+                            for fid in fac_ids:
+                                if fid.facilities_line:
+                                    for fl in fid.facilities_line:
+                                        if fl.supplier_type_id.id in ldata:
+                                            raise UserError(
+                                                _("Plese can not set duplicate supply sourec type."
+                                                  ))
+        if emetertype:
+            values['e_meter_type'] = emetertype
+        if lmrvalue:
+            values['lmr_value'] = lmrvalue
+        if lmrdate:
+            values['lmr_date'] = lmrdate
+        result = super(PMSFacilities, self).write(values)
+
+        return result

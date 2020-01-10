@@ -20,11 +20,11 @@ class PMSRentCharge(models.Model):
     #     string="Charge Type",
     #     track_visibility=True,
     # )
-    charge_type = fields.Many2one("pms.charge_types",
+    charge_type = fields.Many2one("pms.applicable.charge.type",
                                   required=True,
                                   readonly=True,
                                   track_visibility=True)
-    gto_amount = fields.Float(
+    amount = fields.Float(
         "Amount",
         track_visibility=True,
     )
@@ -156,6 +156,19 @@ class PMSFacilitiesline(models.Model):
                                   required=True,
                                   store=True,
                                   track_visibility=True)
+
+    @api.onchange('supplier_type_id')
+    def onchange_supplier_type_id(self):
+        uti_ids = lst = []
+        domain = {}
+        if self.facility_id.utility_type_id:
+            utility_ids = self.env['pms.utility.source.type'].search([
+                ('utility_type_id', '=', self.facility_id.utility_type_id.id)
+            ])
+            for uti in utility_ids:
+                uti_ids.append(uti.id)
+            domain = {'supplier_type_id': [('id', 'in', uti_ids)]}
+        return {'domain': domain}
 
     # @api.model
     # def create(self, values):

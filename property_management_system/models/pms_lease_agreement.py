@@ -758,12 +758,12 @@ class PMSLeaseAgreementLine(models.Model):
         else:
             self.name = 'New'
 
-    @api.one
-    @api.depends('rent', 'area')
-    def get_total_rent(self):
-        total = 0
-        total = self.area * self.rent
-        self.rent_total = total
+    # @api.one
+    # @api.depends('rent', 'area')
+    # def get_total_rent(self):
+    #     total = 0
+    #     total = self.area * self.rent
+    #     self.rent_total = total
 
     @api.multi
     def action_view_invoice(self):

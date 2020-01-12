@@ -865,7 +865,7 @@ class PMSLeaseAgreementLine(models.Model):
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
                         if l.charge_type.calculatedby == 'area':
-                            area = self.unit_no.area
+                            area = 1
                             rent = l.amount
                         elif l.charge_type.calculatedby == 'meter_unit':
                             area = 1

@@ -35,8 +35,8 @@
                         <!-- <field name="rent"/> -->
                         <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                        <field name="extend_start" string="Extend Date" attrs="{'invisible': [('extend_start','=',False)]}"/>
-                        <field name="extend_to" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="extend_start" string="Extend From" attrs="{'invisible': [('extend_start','=',False)]}"/>
+                        <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
                         <!-- <field name="pos_id" invisible='1' readonly="1"/> -->
                         <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                     </group>

@@ -796,7 +796,7 @@ class PMSLeaseAgreementLine(models.Model):
         if inv_type == 'MONTHLY' and vals:
             if vals[0][0] and vals[0][1]:
                 invoice_month = str(calendar.month_name[vals[0][0]]) + ' - ' + str(vals[0][1])
-            invoices = self.env['account.invoice'].search([('lease_no', '=', self.name), ('inv_month', '=', invoice_month)])
+            invoices = self.env['account.invoice'].search([('lease_items', '=', self.name), ('inv_month', '=', invoice_month)])
         if invoices:
             raise UserError(_("Already create invoice for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
         else:

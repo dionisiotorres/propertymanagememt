@@ -78,10 +78,10 @@
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_utility_monthly_tree"/> 
     </record> 
-    <menuitem  id="utility_monthly_menu_root" 
+    <!-- <menuitem  id="utility_monthly_menu_root" 
       name="Utility Monthly" 
       parent="property_management_menu"
       action="action_utility_monthly_all"
-      sequence="80"/>
+      sequence="80"/> -->
   </data>
 </odoo>

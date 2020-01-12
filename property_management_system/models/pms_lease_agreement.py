@@ -444,7 +444,7 @@ class PMSLeaseAgreement(models.Model):
                     if lease.rent_schedule_line:
                         for sche in lease.rent_schedule_line:
                             val.append(sche.id)
-                    lease.action_invoice(inv_type='INITIAL_PAYMENT', vals=val)
+                    # lease.action_invoice(inv_type='INITIAL_PAYMENT', vals=val)
             return self.write({'state': 'NEW'})
 
     @api.multi
@@ -700,14 +700,14 @@ class PMSLeaseAgreementLine(models.Model):
         if self._context.get('end_date') != False:
             return self._context.get('end_date')
 
-    def get_property_id(self):
-        if not self.property_id:
-            return self.lease_agreement_id.property_id or None
+    # def get_property_id(self):
+    #     if not self.property_id:
+    #         return self.lease_agreement_id.property_id or None
 
     name = fields.Char("Name", compute="compute_name", track_visibility=True)
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
                                          "Lease Agreement", track_visibility=True)
-    property_id = fields.Many2one("pms.properties", default=get_property_id, store=True, track_visibility=True)
+    property_id = fields.Many2one("pms.properties", related="lease_agreement_id.property_id", store=True, track_visibility=True)
     lease_no = fields.Char("Lease No", related="lease_agreement_id.lease_no", store=True, track_visibility=True)
     unit_no = fields.Many2one("pms.space.unit",
                               domain=[('status', 'in', ['vacant']),
@@ -743,6 +743,7 @@ class PMSLeaseAgreementLine(models.Model):
     extend_start = fields.Date("Extend Start", store=True, track_visibility=True)
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
     appilication_type = fields.One2many('pms.application.charge.line','lease_line_id',"Charge Types")
+    company_tanent_id = fields.Many2one("res.partner", "Shop", related="lease_agreement_id.company_tanent_id")
 
     @api.one
     @api.depends('unit_no', 'lease_no')
@@ -766,7 +767,7 @@ class PMSLeaseAgreementLine(models.Model):
 
     @api.multi
     def action_view_invoice(self):
-        invoices = self.env['account.invoice'].search([('lease_no', '=', self.name)])
+        invoices = self.env['account.invoice'].search([('lease_items', '=', self.name)])
         action = self.env.ref('account.action_invoice_tree1').read()[0]
         if len(invoices) > 1:
             action['domain'] = [('id', 'in', invoices.ids)]
@@ -826,15 +827,16 @@ class PMSLeaseAgreementLine(models.Model):
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
                         if l.charge_type.calculatedby == 'area':
-                            area = self.area
-                            rent = self.unit_no.min_rate
-                        elif l.charge_type.calculatedby == 'fix':
+                            area = self.unit_no.area
+                            rent = l.amount
+                        elif l.charge_type.calculatedby == 'meter_unit':
                             area = 1
                             rent = l.amount
                         else:
                             area = 1
+                            rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'name': _(unit),
+                            'name': _(l.charge_type.name),
                             'account_id': account_id,
                             'price_unit': rent,
                             'quantity': area,
@@ -863,15 +865,16 @@ class PMSLeaseAgreementLine(models.Model):
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
                         if l.charge_type.calculatedby == 'area':
-                            area = self.area
-                            rent = self.unit_no.min_rate
-                        elif l.charge_type.calculatedby == 'fix':
+                            area = self.unit_no.area
+                            rent = l.amount
+                        elif l.charge_type.calculatedby == 'meter_unit':
                             area = 1
                             rent = l.amount
                         else:
                             area = 1
+                            rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'name': _(unit),
+                            'name': _(l.charge_type.name),
                             'account_id': account_id,
                             'price_unit': rent,
                             'quantity': area,
@@ -883,7 +886,9 @@ class PMSLeaseAgreementLine(models.Model):
             if not invoice_lines and vals:
                 raise UserError(_("No have Invoice Line for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
             inv_ids = self.env['account.invoice'].create({
-                'lease_no': self.name,
+                'lease_items':self.name,
+                'lease_no': self.lease_agreement_id.lease_no,
+                'unit_no': self.lease_agreement_id.unit_no,
                 'inv_month': invoice_month,
                 'partner_id': self.lease_agreement_id.company_tanent_id.id,
                 'property_id': self.lease_agreement_id.property_id.id,

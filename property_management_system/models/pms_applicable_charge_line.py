@@ -50,9 +50,8 @@ class PMSApplicableChargeLine(models.Model):
         if self.calculatedby == 'area':
             if self.lease_line_id:
                 area = self.lease_line_id.unit_no.area
-                amount = self.lease_line_id.unit_no.min_rate
-                self.total_amount = (area * amount)
+                self.total_amount = (area * self.amount)
         if self.calculatedby == 'meter_unit':
             if self.lease_line_id:
-                amount = self.lease_line_id.unit_no.min_rate
-                self.total_amount = self.amount * amount
+                amount = self.amount
+                self.total_amount = amount * 170

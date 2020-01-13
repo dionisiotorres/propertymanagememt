@@ -6,9 +6,11 @@ from odoo.addons.property_management_system.models import api_rauth_config
 class PMSRentCharge(models.Model):
     _name = 'pms.rent_schedule'
     _description = 'Rent Schedule'
+    _inherit = ['mail.thread']
 
+    name = fields.Char("Name")
     property_id = fields.Many2one("pms.properties",
-                                  "Property ID",
+                                  "Property",
                                   track_visibility=True,
                                   required=True)
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
@@ -36,13 +38,17 @@ class PMSRentCharge(models.Model):
     extend_count = fields.Integer("Extend Times", store=True)
     extend_to = fields.Date('Extend To')
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
-                                         'Lease Agreement',
+                                         'Shop',
                                          track_visibility=True)
+    lease_no = fields.Char("Lease", track_visibility=True)
     unit_no = fields.Many2one("pms.space.unit",
                               "Space Unit",
                               track_visibility=True)
 
-    # paid = fields.Boolean("")
+    state = fields.Selection([('draft', "Draft"), ('confrimed', "Confirmed"),
+                              ('invoiced', "Invoiced")],
+                             "Status",
+                             default="draft")
 
 
 class PMSPropertyType(models.Model):

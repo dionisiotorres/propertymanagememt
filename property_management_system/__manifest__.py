@@ -64,6 +64,7 @@
         'views/pms_applicable_charge_type.xml',
         'views/pms_applicable_space_type_view.xml',
         'views/pms_utility_monthly_view.xml',
+        'views/pms_rent_schedule.xml',
     ],
     'installable':
     True,

@@ -164,6 +164,17 @@
                   </group>
                 </page>
                 <page string="Rent Configruation">
+                  <field name="appilication_type">
+                    <tree editable="bottom">
+                      <field name="application_id" options="{'no_quick_create':True}"/>
+                      <field name="charge_type"/>
+                      <field name="calculatedby"/>
+                      <field name="amount" />
+                      <field name="total_amount"/>
+                    </tree>
+                  </field>
+                </page>
+                <page string="Rent Schedule">
                   <field name = "lease_rent_config_id">
                     <tree editable="buttom">
                       <field name="lease_agreement_line_id"/>

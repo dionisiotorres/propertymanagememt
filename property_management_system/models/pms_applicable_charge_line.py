@@ -28,6 +28,7 @@ class PMSApplicableChargeLine(models.Model):
     total_amount = fields.Float("Total", compute="compute_total_amount")
     active = fields.Boolean(default=True)
     lease_line_id = fields.Many2one("pms.lease_agreement.line", "Lease Items")
+    lease_id = fields.Many2one("pms.lease_agreement", "Lease")
 
     @api.one
     @api.depends('charge_type', 'calculatedby', 'amount')

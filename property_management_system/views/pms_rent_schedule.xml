@@ -1,0 +1,85 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_rent_schedule_form">
+      <field name="name">Rent Schedule Form</field>
+      <field name="model">pms.rent_schedule</field>
+      <field name="arch" type="xml">
+        <form>
+            <header>
+                <field name="state" widget="statusbar" statusbar_visible="draft,confrimed,invoiced"/>
+            </header>
+          <sheet>
+            <group>
+              <group>
+                <field name="property_id"/>
+                <field name="unit_no"/>
+                <field name="lease_no"/>
+                <field name="lease_agreement_id" string="Shop"/>
+              </group>
+              <group>    
+                <field name="charge_type"/>        
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <!-- <field name="extend_to"/> -->
+                <field name="amount"/>
+              </group>
+            </group>
+          </sheet>
+          <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers"/>
+              <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_rent_schedule_tree">
+      <field name="name">Rent Schedule list</field>
+      <field name="model">pms.rent_schedule</field>
+      <field name="arch" type="xml">
+        <tree>
+            <field name="property_id"/>
+            <field name="lease_agreement_id" string="Shop"/>
+            <field name="lease_no"/>
+            <field name="unit_no"/>
+            <field name="charge_type"/>
+            <field name="start_date"/>
+            <field name="end_date"/>
+            <!-- <field name="extend_to"/> -->
+            <field name="amount"/>
+            <field name="state"/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_rent_schedule_filter">
+      <field name="name">Rent Schedule list</field>
+      <field name="model">pms.rent_schedule</field>
+      <field name="arch" type="xml">
+        <search>
+            <field name="lease_agreement_id"/>
+            <field name="unit_no"/>
+            <field name="charge_type"/>
+            <group expand="0" string="Group By">
+                <filter string="Lease" name="lease_agreement_id" domain="[]" context="{'group_by':'lease_agreement_id'}"/>
+                <filter string="Unit" name="unit_no" domain="[]" context="{'group_by':'unit_no'}"/>
+                <filter string="Charge" name="charge_type" domain="[]" context="{'group_by':'charge_type'}"/>
+                <filter string="Month" name="start_date" domain="[]" context="{'group_by':'start_date:month'}"/>
+                <filter string="Year" name="start_date" domain="[]" context="{'group_by':'start_date:year'}"/>
+            </group>
+        </search>
+      </field>
+    </record>
+     <record id="action_rent_schedule_all" model="ir.actions.act_window">
+       <field name="name">Rent Schedule</field>
+       <field name="res_model">pms.rent_schedule</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_rent_schedule_tree"/>
+       <field name="context">{}</field>
+    </record> 
+    <menuitem  id="rent_schedule_menu_root" 
+      name="Rent Schedule Detail" 
+      parent="lease_management_menu_sub" 
+      action="action_rent_schedule_all"
+      sequence="2"/>
+  </data>
+</odoo>

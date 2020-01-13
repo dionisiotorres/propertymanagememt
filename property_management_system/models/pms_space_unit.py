@@ -99,7 +99,7 @@ class PMSSpaceUnit(models.Model):
                                      "pms_unit_facility_rel",
                                      "unit_id",
                                      "facilities_id",
-                                     "Facility Lines",
+                                     "Facilitines",
                                      track_visibility=True)
     rent_record = fields.Many2many("pms.rent_record",
                                    "pms_unit_record_rel",

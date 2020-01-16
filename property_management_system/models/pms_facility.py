@@ -128,15 +128,15 @@ class PMSFacilities(models.Model):
         if lmrdate:
             values['lmr_date'] = lmrdate
         id = super(PMSFacilities, self).create(values)
-        if id:
-            # property_obj = self.env['pms.properties'].browse(
-            #     values['property_id'])
-            # integ_obj = self.env['pms.api.integration']
-            # api_type_obj = self.env['pms.api.type'].search([
-            #     ('name', '=', "SpaceUnitFacility")
-            # ])
-            # datas = api_rauth_config.APIData(id, values, property_obj,
-            #                                  integ_obj, api_type_obj)
+        # if id:
+        # property_obj = self.env['pms.properties'].browse(
+        #     values['property_id'])
+        # integ_obj = self.env['pms.api.integration']
+        # api_type_obj = self.env['pms.api.type'].search([
+        #     ('name', '=', "SpaceUnitFacility")
+        # ])
+        # datas = api_rauth_config.APIData(id, values, property_obj,
+        #                                  integ_obj, api_type_obj)
         return id
 
     @api.multi

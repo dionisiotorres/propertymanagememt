@@ -12,16 +12,18 @@
               </button>
             </div>
             <div class="oe_title">
-                <label for="name" string="Description"/>
+                <label for="name" string="Charge Type"/>
                 <h1>
-                    <field name="name" placeholder="Description"/>
+                    <field name="name" placeholder="Charge Type"/>
                 </h1>
             </div>
             <group>
                 <group>
-                    <field name="charge_type"/>
-                    <field name="calculatedby"/>
-                    <!-- <field name='tax'/> -->
+                    <field name="charge_type_id"/>
+                    <field name="calculation_method_id"/>
+                    <field name='is_apply_tax'/>
+                    <field name='tax'/>
+                    <field name="ordinal_no"/>
                 </group>
                 <group>
                 </group>
@@ -37,8 +39,11 @@
         <tree>
           <!-- <field name="code"/> -->
           <field name="name"/>
-          <field name="charge_type"/>
-          <field name="calculatedby"/>
+          <field name="charge_type_id"/>
+          <field name="calculation_method_id"/>
+          <field name='is_apply_tax'/>
+          <field name='tax'/>
+          <field name="ordinal_no"/>
         </tree>
       </field>
     </record>

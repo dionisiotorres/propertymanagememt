@@ -111,9 +111,11 @@ class PMSUtilitySourceType(models.Model):
 class PMSUtilitySupplyType(models.Model):
     _name = "pms.utility.supply.type"
     _description = "Utility Supply Types"
+    _order = 'ordinal_no,name'
 
     name = fields.Char("Utility Name", required=True, track_visibility=True)
     code = fields.Char("Utility Code", required=True, track_visibility=True)
+    ordinal_no = fields.Integer("Ordinal No")
     active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
@@ -301,25 +303,25 @@ class PMSTerms(models.Model):
         super(PMSTerms, self).toggle_active()
 
 
-class PMSBank(models.Model):
-    _name = 'pms.bank'
-    _description = "Bank"
+# class PMSBank(models.Model):
+#     _name = 'pms.bank'
+#     _description = "Bank"
 
-    country = fields.Many2one("pms.country",
-                              "Country Name",
-                              track_visibility=True)
-    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
-    state_id = fields.Many2one("pms.state",
-                               "State Name",
-                               track_visibility=True)
-    name = fields.Char("Name", track_visibility=True)
-    bic = fields.Char("Bank Identifier Code", track_visibility=True)
-    phone = fields.Char("Phone", track_visibility=True)
-    email = fields.Char("Email", track_visibility=True)
-    no = fields.Char("No", track_visibility=True)
-    street = fields.Char("Street", track_visibility=True)
-    zip_code = fields.Char("Zip", track_visibility=True)
-    active = fields.Char(default=True, track_visibility=True)
+#     country = fields.Many2one("pms.country",
+#                               "Country Name",
+#                               track_visibility=True)
+#     city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
+#     state_id = fields.Many2one("pms.state",
+#                                "State Name",
+#                                track_visibility=True)
+#     name = fields.Char("Name", track_visibility=True)
+#     bic = fields.Char("Bank Identifier Code", track_visibility=True)
+#     phone = fields.Char("Phone", track_visibility=True)
+#     email = fields.Char("Email", track_visibility=True)
+#     no = fields.Char("No", track_visibility=True)
+#     street = fields.Char("Street", track_visibility=True)
+#     zip_code = fields.Char("Zip", track_visibility=True)
+#     active = fields.Char(default=True, track_visibility=True)
 
 
 class Bank(models.Model):

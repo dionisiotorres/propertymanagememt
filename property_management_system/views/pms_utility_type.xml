@@ -75,8 +75,7 @@
             </h1>
           </div>
           <group>
-            <group>
-                <!-- <field name="property_id"/> -->
+            <group> 
                 <field name="code" placeholder="Code"/>
                 <field name="utility_type_id" placeholder="GEM"/>
             </group>

@@ -26,7 +26,7 @@ class PMSInvoicewizard(models.TransientModel):
         return years.year
 
     inv_create_type = fields.Selection([('MONTHLY', "MONTHLY"),
-                                        ('QUORTLY', "QUORTLY")],
+                                        ('QUORTERLY', "QUORTERLY")],
                                        string="Create Type",
                                        default="MONTHLY")
 
@@ -52,7 +52,8 @@ class PMSInvoicewizard(models.TransientModel):
         default=default_year)
     inv_quorter = fields.Selection([('1ST-QUORTER', '1ST-QUORTER'),
                                     ('2ND-QUORTER', '2ND-QUORTER'),
-                                    ('3RD-QUORTER', '3RD-QUORTER')],
+                                    ('3RD-QUORTER', '3RD-QUORTER'),
+                                    ('4TH-QUORTER', '4TH-QUORTER')],
                                    string="Quorter",
                                    default='1ST-QUORTER')
 

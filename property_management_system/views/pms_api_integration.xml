@@ -12,23 +12,30 @@
               </button>
             </div>
             <div class="oe_title">
-            <label for="name" string="Name"/>
+            <label for="name"/>
             <h1>
-                <field name="name" placeholder="Name..."/>
+                <field name="name" placeholder="API Provider..."/>
             </h1>
           </div>
           <group>
             <group>
-                <field name="url"/>
-                <field name="get_api"/>
-                <field name="post_api"/>
-                <field name="access_token"/>
-                <field name="client_id"/>
-                <field name="client_secret"/>
-                <field name="api_type"/>
-                <field name="property_id"/>
+                <field name="base_url" placeholder='https://google.com'/>
+                <field name="auth_url" placeholder='https://google.com/connect/token/connect/token'/>
+                <field name="username"/>
+                <field name="password"/>
             </group>
           </group>
+          <notebook>
+            <page string="Operations" >
+              <field name="api_integration_line">
+                <tree editable="bottom">
+                  <field name="name"/>
+                  <field name="http_method_type"/>
+                  <field name="api_url" placeholder='api/resouce/methodname'/>
+                </tree>
+              </field>                     
+            </page>
+          </notebook>
           </sheet>
         </form>
       </field>
@@ -39,12 +46,10 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <field name="url"/>
-          <field name="get_api"/>
-          <field name="post_api"/>
-          <field name="access_token"/>
-          <field name="api_type"/>
-          <field name="property_id"/>
+          <field name="base_url"/>
+          <field name="auth_url"/>
+          <field name="username"/>
+          <field name="password"/>
         </tree>
       </field>
     </record>
@@ -54,8 +59,8 @@
       <field name="arch" type="xml">
         <search>
           <field name="name"/>
-          <field name="api_type"/>
-          <field name="property_id"/>
+          <field name="base_url"/>
+          <field name="auth_url"/>
         </search>
       </field>
     </record>

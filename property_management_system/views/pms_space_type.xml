@@ -19,9 +19,7 @@
           </div>
           <group>
             <group>
-              <!-- <field name="property_id"/> -->
-              <!-- <field name="chargeable"/>
-              <field name="divisible"/>  -->
+              <field name="ordinal_no"/>
             </group>
             <group>
             </group>
@@ -35,6 +33,7 @@
       <field name="model">pms.space.type</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="ordinal_no"/>
           <field name="name"/>
           <!-- <field name="property_id"/> -->
           <!-- <field name="chargeable"/>

@@ -9,20 +9,48 @@ class PMSApiIntegration(models.Model):
     _description = "Api Integration"
     _orders = 'id, name'
 
-    name = fields.Char("Name", track_visibility=True)
-    url = fields.Char("URL", track_visibility=True)
-    get_api = fields.Char("GET API", track_visibility=True)
-    post_api = fields.Char('POST API', track_visibility=True)
-    access_token = fields.Char("Access Token", track_visibility=True)
-    client_id = fields.Char("Client ID", track_visibility=True)
-    client_secret = fields.Char("Client Secret", track_visibility=True)
-    api_type = fields.Many2one("pms.api.type",
-                               "API Type",
-                               track_visibility=True)
-    property_id = fields.Many2one("pms.properties",
-                                  "Property",
-                                  track_visibility=True)
+    name = fields.Char("API Provider")
+    # url = fields.Char("URL", track_visibility=True)
+    base_url = fields.Char("Base Url",
+                           help='Base Url is use to get and send data.')
+    # get_api = fields.Char("GET API", track_visibility=True)
+    # post_api = fields.Char('POST API', track_visibility=True)
+    auth_url = fields.Char(
+        'Authentication Url',
+        help='Authentication Url is used to get access token.')
+    # access_token = fields.Char("Access Token", track_visibility=True)
+    # client_id = fields.Char("Client ID", track_visibility=True)
+    # client_secret = fields.Char("Client Secret", track_visibility=True)
+    username = fields.Char("Username")
+    password = fields.Char("Password")
+    api_integration_line = fields.One2many("pms.api.integration.line",
+                                           'api_integration_id', "API Lines")
+    # api_type = fields.Many2one("pms.api.type",
+    #                            "API Type",
+    #                            track_visibility=True)
+    # property_id = fields.Many2one("pms.properties",
+    #                               "Property",
+    #                               track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
+
+
+class PMSApiIntegrationLine(models.Model):
+    _name = 'pms.api.integration.line'
+    _description = "Api Integration Line"
+    _orders = 'id, name'
+
+    name = fields.Char("Name")
+    http_method_type = fields.Selection(
+        [('get', 'GET'), ('post', 'POST'), ('put', 'PUT'), ('patch', 'PATCH'),
+         ('delete', 'DELETE')],
+        string="HTTP Method",
+        default='get',
+        help='Request Method for Integration System.')
+    api_url = fields.Char(
+        "API Url",
+        help='url is a specific path to get data with the related method.')
+    active = fields.Boolean("Active")
+    api_integration_id = fields.Many2one('pms.api.integration', "API Provider")
 
     @api.multi
     def generate_api_data(self, values):
@@ -60,16 +88,3 @@ class PMSApiIntegration(models.Model):
                 'cache-control': "no-cache"
             }
             return {'url': get_api or url_get, 'data': data, 'header': headers}
-
-    # @api.multi
-    # def send_api_text_file(self):
-    #     integrat_ids = self.search([('active', '=', True)])
-    #     if
-
-
-class PMSApiType(models.Model):
-    _name = 'pms.api.type'
-    _description = "API Type"
-    _orders = 'id, name'
-
-    name = fields.Char("Name", track_visibility=True)

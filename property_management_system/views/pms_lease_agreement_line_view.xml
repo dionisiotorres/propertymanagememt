@@ -63,10 +63,10 @@
                       <page string="Lease Units Charge" >
                         <field name="appilication_type">
                           <tree editable="buttom">
-                            <field name="application_id"/>
-                            <field name="charge_type"/>
-                            <field name="calculatedby"/>
-                            <field name="amount" />
+                            <field name="applicable_charge_id"/>
+                            <field name="charge_type_id"/>
+                            <field name="calculation_method_id"/>
+                            <field name="rate" />
                             <field name="total_amount"/>
                           </tree>
                         </field> 

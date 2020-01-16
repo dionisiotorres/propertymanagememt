@@ -6,14 +6,20 @@ class PMSApplicableChargeType(models.Model):
     _description = "Applicable Charge Type"
     _inherit = ['mail.thread']
 
-    name = fields.Char("Description", required=True, track_visibility=True)
-    charge_type = fields.Many2one("pms.charge_types",
-                                  required=True,
-                                  track_visibility=True)
-    calculatedby = fields.Selection([('percent', 'Percentage'), ('fix', 'Fix'),
-                                     ('area', 'Area'),
-                                     ('meter_unit', 'Meter Unit')],
-                                    "Calculated By",
-                                    track_visibility=True)
-    tax = fields.Float("Tax")
+    name = fields.Char("Charge Type", required=True, track_visibility=True)
+    charge_type_id = fields.Many2one("pms.charge_types",
+                                     'Main Charge Type',
+                                     required=True,
+                                     track_visibility=True)
+    calculation_method_id = fields.Many2one('pms.calculation.method',
+                                            "Calculation Method",
+                                            track_visibility=True,
+                                            required=True,
+                                            store=True)
+    is_apply_tax = fields.Boolean('Apply Tax', track_visibility=True)
+    tax = fields.Float("Tax", track_visibility=True)
+    ordinal_no = fields.Integer("Ordinal No",
+                                help='To display order as prefer.',
+                                required=True,
+                                track_visibility=True)
     active = fields.Boolean(default=True)

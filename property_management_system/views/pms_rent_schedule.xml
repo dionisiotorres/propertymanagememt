@@ -81,5 +81,10 @@
       parent="lease_management_menu_sub" 
       action="action_rent_schedule_all"
       sequence="2"/>
+    <menuitem  id="generate_invoice_menu_root" 
+      name="Generate Invoices" 
+      parent="lease_management_menu_sub"
+      action="action_invoice_wiz"
+      sequence="3"/>
   </data>
 </odoo>

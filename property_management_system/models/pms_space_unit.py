@@ -235,14 +235,14 @@ class PMSSpaceUnit(models.Model):
 
         id = None
         id = super(PMSSpaceUnit, self).create(values)
-        if id:
-            property_obj = self.env['pms.properties'].browse(
-                values['property_id'])
-            integ_obj = self.env['pms.api.integration']
-            api_type_obj = self.env['pms.api.type'].search([('name', '=',
-                                                             "SpaceUnit")])
-            datas = api_rauth_config.APIData(id, values, property_obj,
-                                             integ_obj, api_type_obj)
+        # if id:
+        #     property_obj = self.env['pms.properties'].browse(
+        #         values['property_id'])
+        #     integ_obj = self.env['pms.api.integration']
+        #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
+        #                                                      "SpaceUnit")])
+        #     datas = api_rauth_config.APIData(id, values, property_obj,
+        #                                      integ_obj, api_type_obj)
         #     if values['facility_line']:
         #         for fl in values['facility_line'][0][2]:
         #             facility_id = self.env['pms.facilities'].browse(fl)

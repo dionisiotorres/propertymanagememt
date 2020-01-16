@@ -70,7 +70,7 @@ class PMSLeaseAgreement(models.Model):
         "Company",
         default=lambda self: self.env.user.company_id.id, track_visibility=True)
     lease_rent_config_id = fields.One2many("pms.rent_schedule", "lease_agreement_id", "Rental Details", track_visibility=True)
-    appilication_type = fields.One2many('pms.application.charge.line', 'lease_id', "Charge Types")
+    appilication_type = fields.One2many('pms.lease.unit.charge.type.line', 'lease_id', "Charge Types")
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -571,7 +571,7 @@ class PMSLeaseAgreement(models.Model):
                             'id': ctype.id,
                             'application_id': ctype.application_id.id,
                             'charge_type': ctype.charge_type.id,
-                            'calculatedby': ctype.calculatedby,
+                            'calcuation_method': ctype.calcuation_method.id,
                             'amount': ctype.amount,
                             'total_amount': ctype.total_amount})
                         appli_ids.append(app_id.id)
@@ -779,7 +779,7 @@ class PMSLeaseAgreementLine(models.Model):
     invoice_count = fields.Integer(default=0, track_visibility=True)
     extend_start = fields.Date("Extend Start", store=True, track_visibility=True)
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
-    appilication_type = fields.One2many('pms.application.charge.line','lease_line_id',"Charge Types")
+    appilication_type = fields.One2many('pms.lease.unit.charge.type.line','lease_line_id',"Charge Types")
     company_tanent_id = fields.Many2one("res.partner", "Shop", related="lease_agreement_id.company_tanent_id")
 
     @api.one
@@ -794,13 +794,6 @@ class PMSLeaseAgreementLine(models.Model):
             self.name = self.unit_no.name
         else:
             self.name = 'New'
-
-    # @api.one
-    # @api.depends('rent', 'area')
-    # def get_total_rent(self):
-    #     total = 0
-    #     total = self.area * self.rent
-    #     self.rent_total = total
 
     @api.multi
     def action_view_invoice(self):
@@ -863,10 +856,10 @@ class PMSLeaseAgreementLine(models.Model):
                             account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
-                        if l.charge_type.calculatedby == 'area':
+                        if l.charge_type.calcuation_method.name == 'area':
                             area = 1
                             rent = l.amount
-                        elif l.charge_type.calculatedby == 'meter_unit':
+                        elif l.charge_type.calcuation_method.name == 'meter_unit':
                             area = 1
                             rent = l.amount
                         else:
@@ -901,10 +894,10 @@ class PMSLeaseAgreementLine(models.Model):
                             account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
                         taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
                         unit = self.lease_agreement_id.lease_no
-                        if l.charge_type.calculatedby == 'area':
+                        if l.charge_type.calcuation_method.name == 'area':
                             area = 1
                             rent = l.amount
-                        elif l.charge_type.calculatedby == 'meter_unit':
+                        elif l.charge_type.calcuation_method.name == 'meter_unit':
                             area = 1
                             rent = l.amount
                         else:
@@ -966,8 +959,10 @@ class PMSLeaseAgreementLine(models.Model):
 class PMSChargeTypes(models.Model):
     _name = 'pms.charge_types'
     _description = "Charge Types"
+    _order = 'ordinal_no,name'
 
-    name = fields.Char("Description", required=True, track_visibility=True)
+    name = fields.Char("Name", required=True, track_visibility=True)
+    ordinal_no = fields.Integer("Ordinal No", required=True)
     active = fields.Boolean(default=True, track_visibility=True)
     
     @api.multi
@@ -978,24 +973,24 @@ class PMSChargeTypes(models.Model):
         super(PMSChargeTypes, self).toggle_active()
 
 
-class PMSChargeFormula(models.Model):
-    _name = 'pms.charge.formula'
-    _description = "Charge Formulas"
+# class PMSChargeFormula(models.Model):
+#     _name = 'pms.charge.formula'
+#     _description = "Charge Formulas"
 
-    name = fields.Char("Description", required=True, track_visibility=True)
-    code = fields.Char("Code", required=True, track_visibility=True)
-    active = fields.Boolean(default=True, track_visibility=True)
-    _sql_constraints = [
-        ('code_unique', 'unique(code)',
-         'Please add other CODE that is exiting in the database.')
-    ]
+#     name = fields.Char("Description", required=True, track_visibility=True)
+#     code = fields.Char("Code", required=True, track_visibility=True)
+#     active = fields.Boolean(default=True, track_visibility=True)
+#     _sql_constraints = [
+#         ('code_unique', 'unique(code)',
+#          'Please add other CODE that is exiting in the database.')
+#     ]
 
-    @api.multi
-    def toggle_active(self):
-        for la in self:
-            if not la.active:
-                la.active = self.active
-        super(PMSChargeFormula, self).toggle_active()
+#     @api.multi
+#     def toggle_active(self):
+#         for la in self:
+#             if not la.active:
+#                 la.active = self.active
+#         super(PMSChargeFormula, self).toggle_active()
 
 
 class PMSTradeCategory(models.Model):

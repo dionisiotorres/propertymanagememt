@@ -19,8 +19,6 @@ access_pms_app_space_type,pms.applicable.space.type,model_pms_applicable_space_t
 access_pms_app_space_type_manager,pms.applicable.space.type,model_pms_applicable_space_type,group_property_manager,1,1,1,1
 access_pms_display_type,pms.display.type,model_pms_display_type,group_property_user,1,1,1,1
 access_pms_display_type_manager,pms.display.type,model_pms_display_type,group_property_manager,1,1,1,1
-access_pms_bank,pms.bank,model_pms_bank,group_property_user,1,1,1,1
-access_pms_bank_manager,pms.bank,model_pms_bank,group_property_manager,1,1,1,1
 access_pms_city,pms.city,model_pms_city,group_property_user,1,1,1,1
 access_pms_city_manager,pms.city,model_pms_city,group_property_manager,1,1,1,1
 access_pms_state,pms.state,model_pms_state,group_property_user,1,1,1,1
@@ -63,7 +61,6 @@ access_pms_facility_lines,pms.facility.lines,model_pms_facility_lines,group_prop
 access_pms_facility_lines_manager,pms.facility.lines,model_pms_facility_lines,group_property_manager,1,1,1,1
 access_pms_lease_agreement_line,pms.lease_agreement.line,model_pms_lease_agreement_line,group_property_user,1,1,1,0
 access_pms_lease_agreement_line_manager,pms.lease_agreement.line,model_pms_lease_agreement_line,group_property_manager,1,1,1,0
-access_pms_charge_formula,pms.charge.formula,model_pms_charge_formula,group_property_user,1,1,1,1
 access_pms_department,pms.department,model_pms_department,group_property_user,1,1,1,1
 access_pms_space_unit_management,pms.space.unit.management,model_pms_space_unit_management,group_property_user,1,1,1,1
 access_pms_rent_schedule,pms.rent_schedule,model_pms_rent_schedule,group_property_user,1,1,1,1
@@ -74,11 +71,13 @@ access_pms_rent_record,pms.rent_record,model_pms_rent_record,group_property_user
 access_pms_rent_record_manager,pms.rent_record,model_pms_rent_record,group_property_manager,1,1,1,1
 access_pms_api_integration,pms.api.integration,model_pms_api_integration,group_property_user,1,1,1,0
 access_pms_api_integration_manager,pms.api.integration,model_pms_api_integration,group_property_manager,1,1,1,0
-access_pms_api_type,pms.api.type,model_pms_api_type,group_property_user,1,1,1,0
-access_pms_api_type_manager,pms.api.type,model_pms_api_type,group_property_manager,1,1,1,0
 access_pos_daily_sale,pos.daily.sale,model_pos_daily_sale,group_property_user,1,1,1,0
 access_pos_daily_sale_manager,pos.daily.sale,model_pos_daily_sale,group_property_manager,1,1,1,0
-access_pms_app_charge_line,pms.application.charge.line,model_pms_application_charge_line,group_property_user,1,1,1,0
-access_pos_app_charge_line_manager,pms.application.charge.line,model_pms_application_charge_line,group_property_manager,1,1,1,1
+access_pms_lease_charge_type,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_user,1,1,1,0
+access_pos_lease_charge_type_manager,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_manager,1,1,1,1
 access_pms_utility_monthly,pms.utility.monthly,model_pms_utility_monthly,group_property_user,1,1,1,0
 access_pms_utility_monthly_manager,pms.utility.monthly,model_pms_utility_monthly,group_property_manager,1,1,1,1
+access_pms_utility_monthly,pms.calculation.method,model_pms_calculation_method,group_property_user,1,1,1,0
+access_pms_utility_monthly_manager,pms.calculation.method,model_pms_calculation_method,group_property_manager,1,1,1,1
+access_pms_api_inte_line,pms.api.integration.line,model_pms_api_integration_line,group_property_user,1,1,1,0
+access_pms_api_inte_line_manager,pms.api.integration.line,model_pms_api_integration_line,group_property_manager,1,1,1,1

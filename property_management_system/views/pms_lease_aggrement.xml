@@ -115,10 +115,10 @@
                           <page string="Lease Units Charge">
                             <field name="appilication_type">
                               <tree editable="bottom">
-                                <field name="application_id" options="{'no_quick_create':True}"/>
-                                <field name="charge_type"/>
-                                <field name="calculatedby"/>
-                                <field name="amount" />
+                                <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
+                                <field name="charge_type_id"/>
+                                <field name="calculation_method_id"/>
+                                <field name="rate" />
                                 <field name="total_amount"/>
                               </tree>
                             </field> 
@@ -163,13 +163,14 @@
                     </group>
                   </group>
                 </page>
-                <page string="Rent Configruation">
+                <page string="Charge Configruation">
                   <field name="appilication_type">
                     <tree editable="bottom">
-                      <field name="application_id" options="{'no_quick_create':True}"/>
-                      <field name="charge_type"/>
-                      <field name="calculatedby"/>
-                      <field name="amount" />
+                      <field name="unit_no"/>
+                      <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
+                      <field name="charge_type_id"/>
+                      <field name="calculation_method_id"/>
+                      <field name="rate" />
                       <field name="total_amount"/>
                     </tree>
                   </field>
@@ -429,14 +430,14 @@
               </button>
             </div>
             <div class="oe_title">
-                <label for="name" string="Description"/>
+                <label for="name" string="Name"/>
                 <h1>
-                    <field name="name" placeholder="Description"/>
+                    <field name="name" placeholder="Name"/>
                 </h1>
             </div>
             <group>
                 <group>
-                    <!-- <field name="code"/>  -->
+                    <field name="ordinal_no"/> 
                 </group>
                 <group>
                 </group>
@@ -450,8 +451,8 @@
       <field name="model">pms.charge_types</field>
       <field name="arch" type="xml">
         <tree>
-          <!-- <field name="code"/> -->
           <field name="name"/>
+          <field name="ordinal_no"/>
         </tree>
       </field>
     </record>

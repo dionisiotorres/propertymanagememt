@@ -1,10 +1,7 @@
-id,name,active
-charge_type_1,Rental,TRUE
-charge_type_2,Service,TRUE
-charge_type_3,Maintaine,TRUE
-charge_type_4,Deposit,TRUE
-charge_type_5,Electricity Meter charge,TRUE
-charge_type_6,Penalty Fees,TRUE
-charge_type_7,Water Meter Fees,TRUE
-charge_type_8,Gas Meter Fees,TRUE
-charge_type_9,Promotion,TRUE
+id,name,ordinal_no,active
+charge_type_1,Rental,1,TRUE
+charge_type_2,Service,2,TRUE
+charge_type_3,CAM,3,TRUE
+charge_type_4,Utility,4,TRUE
+charge_type_5,Insurance Meter charge,5,TRUE
+charge_type_6,CRE Tax,6,TRUE

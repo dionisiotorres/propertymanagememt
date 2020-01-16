@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.74',
+    '1.0.75',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
         'security/property_security.xml',
@@ -29,7 +29,7 @@
         'data/res.country.state.csv',
         'data/pms.city.csv',
         'data/pms.township.csv',
-        'data/pms.space.type.csv',
+        # 'data/pms.space.type.csv',
         'data/pms.calculation.method.csv',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',

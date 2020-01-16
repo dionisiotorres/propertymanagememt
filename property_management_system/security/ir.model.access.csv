@@ -73,11 +73,11 @@ access_pms_api_integration,pms.api.integration,model_pms_api_integration,group_p
 access_pms_api_integration_manager,pms.api.integration,model_pms_api_integration,group_property_manager,1,1,1,0
 access_pos_daily_sale,pos.daily.sale,model_pos_daily_sale,group_property_user,1,1,1,0
 access_pos_daily_sale_manager,pos.daily.sale,model_pos_daily_sale,group_property_manager,1,1,1,0
-access_pms_lease_charge_type,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_user,1,1,1,0
-access_pos_lease_charge_type_manager,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_manager,1,1,1,1
+access_lease_charge_type,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_user,1,1,1,0
+access_lease_charge_type_manager,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_manager,1,1,1,1
 access_pms_utility_monthly,pms.utility.monthly,model_pms_utility_monthly,group_property_user,1,1,1,0
 access_pms_utility_monthly_manager,pms.utility.monthly,model_pms_utility_monthly,group_property_manager,1,1,1,1
-access_pms_utility_monthly,pms.calculation.method,model_pms_calculation_method,group_property_user,1,1,1,0
-access_pms_utility_monthly_manager,pms.calculation.method,model_pms_calculation_method,group_property_manager,1,1,1,1
+access_pms_calcualte_method,pms.calculation.method,model_pms_calculation_method,group_property_user,1,1,1,0
+access_pms_calcualte_method_manager,pms.calculation.method,model_pms_calculation_method,group_property_manager,1,1,1,1
 access_pms_api_inte_line,pms.api.integration.line,model_pms_api_integration_line,group_property_user,1,1,1,0
 access_pms_api_inte_line_manager,pms.api.integration.line,model_pms_api_integration_line,group_property_manager,1,1,1,1

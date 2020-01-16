@@ -18,8 +18,5 @@ class PMSApplicableChargeType(models.Model):
                                             store=True)
     is_apply_tax = fields.Boolean('Apply Tax', track_visibility=True)
     tax = fields.Float("Tax", track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No",
-                                help='To display order as prefer.',
-                                required=True,
-                                track_visibility=True)
+    # ordinal_no = fields.Integer("Ordinal No", store=True, required=True)
     active = fields.Boolean(default=True)

@@ -155,10 +155,10 @@ class PMSFacilitiesline(models.Model):
     facility_id = fields.Many2one("pms.facilities",
                                   "Facilities",
                                   track_visibility=True)
-    supplier_type_id = fields.Many2one('pms.utilities.source.type',
-                                       "Utilities Source Type",
-                                       required=True,
-                                       track_visibility=True)
+    source_type_id = fields.Many2one('pms.utilities.source.type',
+                                     "Utilities Source Type",
+                                     required=True,
+                                     track_visibility=True)
     # install_date = fields.Date("Install Date", track_visibility=True)
     lmr_date = fields.Date("Last Reading Date", track_visibility=True)
     lmr_value = fields.Integer("Last Reading Date", track_visibility=True)
@@ -172,8 +172,8 @@ class PMSFacilitiesline(models.Model):
                                   store=True,
                                   track_visibility=True)
 
-    @api.onchange('supplier_type_id')
-    def onchange_supplier_type_id(self):
+    @api.onchange('source_type_id')
+    def onchange_source_type_id(self):
         uti_ids = lst = []
         domain = {}
         if self.facility_id.utilities_type_id:
@@ -183,7 +183,7 @@ class PMSFacilitiesline(models.Model):
             ])
             for uti in utilities_ids:
                 uti_ids.append(uti.id)
-            domain = {'supplier_type_id': [('id', 'in', uti_ids)]}
+            domain = {'source_type_id': [('id', 'in', uti_ids)]}
         return {'domain': domain}
 
     # @api.model

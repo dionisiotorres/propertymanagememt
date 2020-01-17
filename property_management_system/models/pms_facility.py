@@ -65,7 +65,7 @@ class PMSFacilities(models.Model):
     #         ])
     #         for loop in utilities_ids:
     #             parent_id.append(loop.id)
-    #         domain = {'supplier_type_id': [('id', 'in', parent_id)]}
+    #         domain = {'source_type_id': [('id', 'in', parent_id)]}
     #     return {'domain': domain}
 
     @api.multi
@@ -103,9 +103,9 @@ class PMSFacilities(models.Model):
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
-                    ldata.append(line[2]['supplier_type_id'])
+                    ldata.append(line[2]['source_type_id'])
                     utiliy_id = self.env['pms.utilities.source.type'].browse(
-                        line[2]['supplier_type_id'])
+                        line[2]['source_type_id'])
                     if emetertype:
                         emetertype += " | " + str(utiliy_id.code)
                         lmrvalue += " | " + str(line[2]['lmr_value'])
@@ -126,7 +126,7 @@ class PMSFacilities(models.Model):
                         for fid in fac_ids:
                             if fid.facilities_line:
                                 for fl in fid.facilities_line:
-                                    if fl.supplier_type_id.id in ldata:
+                                    if fl.source_type_id.id in ldata:
                                         raise UserError(
                                             _("Plese can not set duplicate supply sourec type."
                                               ))
@@ -162,11 +162,11 @@ class PMSFacilities(models.Model):
                         if not lmrvalue:
                             lmrvalue = str(fids.start_reading_value)
                     if line[2] != False:
-                        if 'supplier_type_id' in line[2]:
-                            ldata.append(line[2]['supplier_type_id'])
+                        if 'source_type_id' in line[2]:
+                            ldata.append(line[2]['source_type_id'])
                             utiliy_id = self.env[
                                 'pms.utilities.source.type'].browse(
-                                    line[2]['supplier_type_id'])
+                                    line[2]['source_type_id'])
                         if emetertype:
                             emetertype += " | " + str(utiliy_id.code)
                         # if lmrvalue:
@@ -196,7 +196,7 @@ class PMSFacilities(models.Model):
                             for fid in fac_ids:
                                 if fid.facilities_line:
                                     for fl in fid.facilities_line:
-                                        if fl.supplier_type_id.id in ldata:
+                                        if fl.source_type_id.id in ldata:
                                             raise UserError(
                                                 _("Plese can not set duplicate supply sourec type."
                                                   ))

@@ -35,7 +35,7 @@
                <field name="facilities_line" context="{'property_id': property_id}">
                 <tree editable="buttom" options="{'no_quick_create':True}">
                   <field name="property_id" invisible='1'/>
-                  <field name="supplier_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
+                  <field name="source_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="lmr_date"/>
                   <field name="lmr_value"/>
                   <field name="end_date"/>

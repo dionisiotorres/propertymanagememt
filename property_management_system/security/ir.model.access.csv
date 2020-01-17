@@ -49,10 +49,10 @@ access_res_country_state_all,res.country.state,base.model_res_country_state,grou
 access_res_country_state_mamager,res.country.state,base.model_res_country_state,group_property_manager,1,1,1,1
 access_pms_township_all,pms.township,model_pms_township,group_property_user,1,1,1,1
 access_pms_township_mamager,pms.township,model_pms_township,group_property_manager,1,1,1,1
-access_pms_uitility_source_type,pms.utility.source.type,model_pms_utility_source_type,group_property_user,1,1,1,1
-access_pms_uitility_source_type_manager,pms.utility.source.type,model_pms_utility_source_type,group_property_manager,1,1,1,1
-access_pms_utility_supply_type,pms.utility.supply.type,model_pms_utility_supply_type,group_property_user,1,1,1,1
-access_pms_utility_supply_type_manager,pms.utility.supply.type,model_pms_utility_supply_type,group_property_manager,1,1,1,1
+access_pms_uitility_source_type,pms.utilities.source.type,model_pms_utilities_source_type,group_property_user,1,1,1,1
+access_pms_uitility_source_type_manager,pms.utilities.source.type,model_pms_utilities_source_type,group_property_manager,1,1,1,1
+access_pms_utilities_supply_type,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_user,1,1,1,1
+access_pms_utilities_supply_type_manager,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_manager,1,1,1,1
 access_pms_equipment_type,pms.equipment.type,model_pms_equipment_type,group_property_user,1,1,1,1
 access_pms_equipment_type_manager,pms.equipment.type,model_pms_equipment_type,group_property_manager,1,1,1,1
 access_pms_equipment,pms.equipment,model_pms_equipment,group_property_user,1,1,1,1
@@ -75,8 +75,8 @@ access_pos_daily_sale,pos.daily.sale,model_pos_daily_sale,group_property_user,1,
 access_pos_daily_sale_manager,pos.daily.sale,model_pos_daily_sale,group_property_manager,1,1,1,0
 access_lease_charge_type,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_user,1,1,1,0
 access_lease_charge_type_manager,pms.lease.unit.charge.type.line,model_pms_lease_unit_charge_type_line,group_property_manager,1,1,1,1
-access_pms_utility_monthly,pms.utility.monthly,model_pms_utility_monthly,group_property_user,1,1,1,0
-access_pms_utility_monthly_manager,pms.utility.monthly,model_pms_utility_monthly,group_property_manager,1,1,1,1
+access_pms_utilities_monthly,pms.utilities.monthly,model_pms_utilities_monthly,group_property_user,1,1,1,0
+access_pms_utilities_monthly_manager,pms.utilities.monthly,model_pms_utilities_monthly,group_property_manager,1,1,1,1
 access_pms_calcualte_method,pms.calculation.method,model_pms_calculation_method,group_property_user,1,1,1,0
 access_pms_calcualte_method_manager,pms.calculation.method,model_pms_calculation_method,group_property_manager,1,1,1,1
 access_pms_api_inte_line,pms.api.integration.line,model_pms_api_integration_line,group_property_user,1,1,1,0

@@ -8,26 +8,29 @@ class PMSFacilities(models.Model):
     _name = 'pms.facilities'
     _description = "Facilities"
 
-    name = fields.Char(default="New",
-                       related='meter_no.name',
+    name = fields.Char(default="Utilities No",
+                       related='utilities_no.name',
                        readonly=True,
                        store=True,
                        required=True,
                        track_visibility=True)
-    utility_type_id = fields.Many2one('pms.utility.supply.type',
-                                      "Utility Supply Type",
-                                      required=True,
-                                      track_visibility=True)
-    meter_no = fields.Many2one("pms.equipment",
-                               "Meter No",
-                               required=True,
-                               track_visibility=True)
+    utilities_type_id = fields.Many2one('pms.utilities.supply.type',
+                                        "Utilities Supply Type",
+                                        required=True,
+                                        track_visibility=True)
+    utilities_no = fields.Many2one("pms.equipment",
+                                   "Utilities No",
+                                   required=True,
+                                   track_visibility=True)
     interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
                                        ('mobile', 'Mobile')],
-                                      "Interface Type",
+                                      "Data Interface Type",
                                       track_visibility=True)
     remark = fields.Text("Remark", track_visibility=True)
-    status = fields.Boolean("Status", default=True, track_visibility=True)
+    status = fields.Boolean("Status",
+                            default=True,
+                            track_visibility=True,
+                            help='Current Status of utilities.')
     facilities_line = fields.One2many("pms.facility.lines",
                                       "facility_id",
                                       "Facility Lines",
@@ -37,24 +40,28 @@ class PMSFacilities(models.Model):
                                   required=True,
                                   track_visibility=True)
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
-    install_date = fields.Date("Install Date", track_visibility=True)
-    e_meter_type = fields.Char("E Meter Type", track_visibility=True)
-    lmr_date = fields.Date("LMR Date")
-    lmr_value = fields.Char("LMR Value")
+    install_date = fields.Date("Facility Install Date",
+                               track_visibility=True,
+                               help='The date of Facility installation date.')
+    e_meter_type = fields.Char("E Meter Type",
+                               track_visibility=True,
+                               help='Type of Electric Meters')
+    lmr_date = fields.Date("LMR Date", help='Last Month Reading Date.')
+    lmr_value = fields.Char("LMR Value", help='Last Month Reading Value.')
 
     # _sql_constraints = [('name_unique', 'unique(name)',
     #                      'Your name is exiting in the database.')]
 
-    # @api.onchange('utility_type_id')
-    # def onchange_utility_type_id(self):
+    # @api.onchange('utilities_type_id')
+    # def onchange_utilities_type_id(self):
     #     parent_id = []
     #     domain = {}
-    #     utility_id = None
-    #     if self.utility_type_id != None:
-    #         utility_ids = self.env['pms.utility.source.type'].search([
-    #             ('utility_type_id', '=', self.utility_type_id.id)
+    #     utilities_id = None
+    #     if self.utilities_type_id != None:
+    #         utilities_ids = self.env['pms.utilities.source.type'].search([
+    #             ('utilities_type_id', '=', self.utilities_type_id.id)
     #         ])
-    #         for loop in utility_ids:
+    #         for loop in utilities_ids:
     #             parent_id.append(loop.id)
     #         domain = {'supplier_type_id': [('id', 'in', parent_id)]}
     #     return {'domain': domain}
@@ -95,7 +102,7 @@ class PMSFacilities(models.Model):
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
                     ldata.append(line[2]['supplier_type_id'])
-                    utiliy_id = self.env['pms.utility.source.type'].browse(
+                    utiliy_id = self.env['pms.utilities.source.type'].browse(
                         line[2]['supplier_type_id'])
                     if emetertype:
                         emetertype += " | " + str(utiliy_id.code)
@@ -111,8 +118,8 @@ class PMSFacilities(models.Model):
                         _("Plese can not set duplicate supply sourec type."))
                 else:
 
-                    fac_ids = self.search([('meter_no', '=',
-                                            values['meter_no'])])
+                    fac_ids = self.search([('utilities_no', '=',
+                                            values['utilities_no'])])
                     if fac_ids:
                         for fid in fac_ids:
                             if fid.facilities_line:
@@ -156,7 +163,7 @@ class PMSFacilities(models.Model):
                         if 'supplier_type_id' in line[2]:
                             ldata.append(line[2]['supplier_type_id'])
                             utiliy_id = self.env[
-                                'pms.utility.source.type'].browse(
+                                'pms.utilities.source.type'].browse(
                                     line[2]['supplier_type_id'])
                         if emetertype:
                             emetertype += " | " + str(utiliy_id.code)
@@ -180,9 +187,9 @@ class PMSFacilities(models.Model):
                     raise UserError(
                         _("Plese can not set duplicate supply sourec type."))
                 else:
-                    if 'meter_no' in values:
-                        fac_ids = self.search([('meter_no', '=',
-                                                values['meter_no'])])
+                    if 'utilities_no' in values:
+                        fac_ids = self.search([('utilities_no', '=',
+                                                values['utilities_no'])])
                         if fac_ids:
                             for fid in fac_ids:
                                 if fid.facilities_line:

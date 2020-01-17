@@ -11,9 +11,9 @@ class PMSFloor(models.Model):
     _description = "PMS Floor"
     _order = "code,name"
 
-    name = fields.Char("Description", required=True, track_visibility=True)
+    name = fields.Char("Floor", required=True, track_visibility=True)
     code = fields.Char("Floor Code", required=True, track_visibility=True)
-    floor_code_ref = fields.Char("Floor Ref Code", track_visibility=True)
+    floor_code_ref = fields.Char("Reference Code", track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
     property_id = fields.Many2one("pms.properties",

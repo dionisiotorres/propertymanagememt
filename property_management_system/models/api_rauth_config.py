@@ -138,8 +138,8 @@ class APIData:
                 facility.StartDate = str(
                     self.model_id.facilities_line.start_date)
                 facility.EndDate = str(self.model_id.facilities_line.end_date)
-                facility.UtilityMeterNo = self.model_id.meter_no.name
-                facility.UtilityType = self.model_id.utility_type_id.code
+                facility.UtilitiesMeterNo = self.model_id.utilities_no.name
+                facility.UtilitiesType = self.model_id.utilities_type_id.code
                 facility.LastReadingOn = str(
                     self.model_id.facilities_line.start_date)
                 facility.LastReadingValue = self.model_id.facilities_line.start_reading_value
@@ -310,8 +310,8 @@ class SpaceUnitFacility:
     SpaceUnitFacilityID = None
     StartDate = None
     EndDate = None
-    UtilityMeterNo = None
-    UtilityType = None
+    UtilitiesMeterNo = None
+    UtilitiesType = None
     LastReadingOn = None
     LastReadingValue = None
     LastReadingNOC = None

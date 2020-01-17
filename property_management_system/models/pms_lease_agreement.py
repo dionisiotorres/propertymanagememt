@@ -567,7 +567,7 @@ class PMSLeaseAgreement(models.Model):
                             end_date = les.end_date +relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
                     appli_ids = []
                     for ctype in les.appilication_type:
-                        app_id = self.env['pms.application.charge.line'].create({
+                        app_id = self.env['pms.applicable.charge.line'].create({
                             'id': ctype.id,
                             'applicable_charge_id': ctype.applicable_charge_id.id,
                             'charge_type': ctype.charge_type.id,
@@ -961,7 +961,7 @@ class PMSChargeTypes(models.Model):
     _description = "Charge Types"
     _order = 'ordinal_no,name'
 
-    name = fields.Char("Name", required=True, track_visibility=True)
+    name = fields.Char("Charge Type", required=True, track_visibility=True)
     ordinal_no = fields.Integer("Ordinal No", required=True)
     active = fields.Boolean(default=True, track_visibility=True)
     

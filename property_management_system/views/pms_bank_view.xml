@@ -84,6 +84,6 @@
       name="Bank" 
       parent="property_management_menu_sub"
       action="base.action_res_bank_form"
-      sequence="99"/>
+      sequence="2"/>
   </data>
 </odoo>

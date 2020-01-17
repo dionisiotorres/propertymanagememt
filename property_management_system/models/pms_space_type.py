@@ -6,5 +6,13 @@ class PMSSpaceType(models.Model):
     _description = 'Space Type'
     _order = 'ordinal_no,name'
 
-    name = fields.Char("Name", required=True, track_visibility=True)
-    ordinal_no = fields.Integer("Order No", required=True)
+    name = fields.Char("Space Type", required=True, track_visibility=True)
+    ordinal_no = fields.Integer("Ordinal No", required=True)
+    active = fields.Boolean(default=True)
+
+    @api.multi
+    def toggle_active(self):
+        for pt in self:
+            if not pt.active:
+                pt.active = self.active
+        super(PMSSpaceType, self).toggle_active()

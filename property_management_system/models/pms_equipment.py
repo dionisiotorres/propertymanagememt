@@ -10,28 +10,39 @@ class PMSEquipment(models.Model):
                                         string="Equipment Type",
                                         track_visibility=True,
                                         required=True)
-    name = fields.Char("Serial No", required=True, track_visibility=True)
-    model = fields.Char("Model", required=True, track_visibility=True)
-    manufacutrue = fields.Char("Manufacture", track_visibility=True)
-    ref_code = fields.Char("RefCode", track_visibility=True)
+    name = fields.Char("Serial No",
+                       required=True,
+                       track_visibility=True,
+                       help='Serial No of Equipment')
+    model = fields.Char("Model",
+                        required=True,
+                        track_visibility=True,
+                        help='Model of Equipment.')
+    manufacturer = fields.Char("Manufacturer", track_visibility=True)
+    ref_code = fields.Char("Reference Code", track_visibility=True)
     # active = fields.Boolean(default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   required=True,
                                   track_visibility=True)
-    digit = fields.Integer("Digit", track_visibility=True)
+    digit = fields.Integer(
+        "Digit",
+        track_visibility=True,
+        help='The maximun capicity to display on equipment screen(esp. meter)')
     count_facility = fields.Integer("Count Unit",
                                     compute="_get_count_facility")
-    roll_over_type = fields.Selection([('normal', 'Normal'),
-                                       ('kwtomw', 'KW to MW')],
-                                      "Rollover Type")
+    roll_over_type = fields.Selection(
+        [('normal', 'Normal'), ('kwtomw', 'KW to MW')],
+        "Rollover Type",
+        help='Which method will be use if equipment roll over.')
+
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
 
     @api.multi
     def _get_count_facility(self):
         count = 0
-        unit_ids = self.env['pms.facilities'].search([('meter_no', '=',
+        unit_ids = self.env['pms.facilities'].search([('utilities_no', '=',
                                                        self.id),
                                                       ('status', '=', True)])
         for unit in unit_ids:
@@ -40,7 +51,7 @@ class PMSEquipment(models.Model):
     @api.multi
     def action_facilities(self):
         facility_ids = self.env['pms.facilities'].search([
-            ('meter_no', '=', self.id), ('status', '=', True)
+            ('utilities_no', '=', self.id), ('status', '=', True)
         ])
 
         action = self.env.ref(
@@ -62,6 +73,8 @@ class PMSEquipmentType(models.Model):
 
     name = fields.Char("Equipment Type", required=True, track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-
+    ordinal_no = fields.Integer("Ordinal No",
+                                required=True,
+                                help='To display order as prefer.')
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]

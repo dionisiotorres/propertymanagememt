@@ -63,6 +63,6 @@
       name="Currency" 
       parent="property_management_menu_sub"
       action="base.action_currency_all_form"
-      sequence="100"/>
+      sequence="3"/>
   </data>
 </odoo>

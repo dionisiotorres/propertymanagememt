@@ -15,12 +15,12 @@
               </button>
             </div>
             <div class="oe_title">
-            <label for="name" string="Description"/>
+            <label for="name" string="Floor"/>
             <h1>
-                <field name="name" placeholder="Description"/>
+                <field name="name" placeholder="Floor"/>
             </h1>
             <h4>
-              <field name="code"  placeholder="Code"/> 
+              <field name="code"  placeholder="Floor Code"/> 
             </h4>
           </div>
             <group>
@@ -28,7 +28,7 @@
                 <field name="property_id"/>
               </group>
               <group>
-                <field name="floor_code_ref" string="Reference Code"/>
+                <field name="floor_code_ref"/>
               </group>
             </group>
           </sheet>
@@ -46,7 +46,7 @@
         <tree>
           <field name="property_id"/>
           <field name="code"/>
-          <field name="floor_code_ref" string="Reference Code"/>
+          <field name="floor_code_ref"/>
           <field name="name"/>
           <field name="active"/>
         </tree>
@@ -60,7 +60,7 @@
             <field name="id"/>
             <field name="name"/>
             <field name="code"/>
-            <field name="floor_code_ref" string="Reference Code"/>
+            <field name="floor_code_ref"/>
           <field name="active"/>   
             <templates>
                 <t t-name="kanban-box">

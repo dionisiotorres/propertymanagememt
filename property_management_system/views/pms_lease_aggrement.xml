@@ -353,7 +353,7 @@
       name="Trade Category" 
       parent="lease_management_menu_config" 
       action="action_trade_category_all"
-      sequence="10"/>
+      sequence="199"/>
      <record model="ir.ui.view" id="view_sub_trade_category_form">
       <field name="name">Sub Trade Category Form</field>
       <field name="model">pms.sub_trade_category</field>
@@ -416,7 +416,7 @@
       name="Sub Trade Category" 
       parent="lease_management_menu_config" 
       action="action_sub_trade_category_all"
-      sequence="12"/>
+      sequence="200"/>
 
     <record model="ir.ui.view" id="view_charge_type_form">
       <field name="name">Charge Type Form</field>
@@ -430,9 +430,9 @@
               </button>
             </div>
             <div class="oe_title">
-                <label for="name" string="Name"/>
+                <label for="name" string="Charge Type"/>
                 <h1>
-                    <field name="name" placeholder="Name"/>
+                    <field name="name" placeholder="Charge Type"/>
                 </h1>
             </div>
             <group>

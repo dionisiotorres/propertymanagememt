@@ -49,17 +49,17 @@
                   <page string="Facilities" >
                     <field name="facility_line" widget="many2many">
                       <tree>
-                        <field name="utility_type_id" options="{'no_create_edit': True}"/>
+                        <!-- <field name="utilities_type_id" options="{'no_create_edit': True}"/> -->
                         <field name="interface_type" options="{'no_create_edit': True}"/>
-                        <field name="meter_no" options="{'no_create_edit': True}"/>
+                        <field name="utilities_no" options="{'no_create_edit': True}"/>
                         <field name="status" options="{'no_create_edit': True}"/>
                       </tree>
                       <!-- <field name="facility_line" options="{'no_create_edit': True}" widget="kanban">                -->
                         <!-- <kanban>
                         <field name="id"/>
-                        <field name="utility_type_id"/> 
+                        <field name="utilities_type_id"/> 
                         <field name="interface_type"/>
-                        <field name="meter_no" />
+                        <field name="utilities_no" />
                         <field name="status"/>
                         <templates>
                             <t t-name="kanban-box">
@@ -68,9 +68,9 @@
                                       <img alt="image"  t-att-src='_s + "/property_management_system/static/src/image/cpaild-maint_man.jpg"'/>
                                     </div>
                                     <div class="oe_kanban_details">                                     
-                                        <div t-if="record.utility_type_id.raw_value">Utility Supply Type: <field name="utility_type_id"/></div>
+                                        <div t-if="record.utilities_type_id.raw_value">Utilities Supply Type: <field name="utilities_type_id"/></div>
                                         <div t-if="record.interface_type.raw_value">Interface Type:<field name="interface_type"/></div>
-                                        <div t-if="record.meter_no.raw_value">Meter No:<field name="meter_no"/></div>
+                                        <div t-if="record.utilities_no.raw_value">Meter No:<field name="utilities_no"/></div>
                                         <div class="text-success float-right mb4" t-if="record.status.raw_value"><i class="fa fa-circle" role="img" aria-label="status" title="Status"></i></div>
                                         <div class="text-danger float-right mb4" t-if="!record.status.raw_value"><i class="fa fa-circle" role="img" aria-label="Other" title="Other"></i></div>
                                     </div>

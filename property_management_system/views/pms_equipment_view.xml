@@ -25,7 +25,7 @@
                 <field name="roll_over_type"/>
             </group>
             <group>
-                <field name="manufacutrue" string="Manufactrue"/>
+                <field name="manufacturer"/>
                 <field name="digit"/>
                 <field name="ref_code"/>
             </group>
@@ -43,7 +43,7 @@
             <field name="name"/>
             <field name="model"/>
             <field name="roll_over_type"/>
-            <field name="manufacutrue"/>
+            <field name="manufacturer"/>
             <field name="digit"/>
             <field name="ref_code"/>
         </tree>
@@ -57,7 +57,7 @@
             <field name="equipment_type_id"/>
             <field name="name"/>
             <field name="model"/>
-            <field name="manufacutrue"/>
+            <field name="manufacturer"/>
             <field name="roll_over_type"/>
             <field name="ref_code"/>
             <group expand="0" string="Group By">

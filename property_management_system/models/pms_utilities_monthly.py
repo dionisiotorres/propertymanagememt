@@ -2,8 +2,8 @@
 from odoo import models, fields, api, tools
 
 
-class UtilityMonthly(models.Model):
-    _name = "pms.utility.monthly"
+class utilitiesMonthly(models.Model):
+    _name = "pms.utilities.monthly"
     _description = "Utiltiy Monthly"
 
     name = fields.Char("Shop")
@@ -14,12 +14,12 @@ class UtilityMonthly(models.Model):
     billingperiod = fields.Char("Billing Period")
     transaction_type = fields.Char("Type")
     restapicode = fields.Char("RESTApiCode")
-    meter_no = fields.Char("Meter No")
+    utilities_no = fields.Char("Utilities No")
     end_value = fields.Float("End Value")
     start_value = fields.Float("Start Value")
     mobilemac_address = fields.Char("Mobile Mac Address")
     lastbillingvalue = fields.Float("Last Reading Value")
-    utility_type = fields.Char("Utility Type")
+    utilities_type = fields.Char("utilities Type")
     status = fields.Selection([('unsubmit', "Umsubmit"), ('submit', 'Submit'),
                                ('confirm', 'Comfirm'), ('export', 'Export')],
                               "Status")

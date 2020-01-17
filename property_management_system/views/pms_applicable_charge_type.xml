@@ -1,7 +1,7 @@
 <odoo>
   <data>
     <record model="ir.ui.view" id="view_appli_charge_type_form">
-      <field name="name">Application Charge Type Form</field>
+      <field name="name">Applicable Charge Type Form</field>
       <field name="model">pms.applicable.charge.type</field>
       <field name="arch" type="xml">
         <form>
@@ -33,7 +33,7 @@
       </field>
     </record>
     <record model="ir.ui.view" id="view_appli_charge_type_tree">
-      <field name="name">Application Charge Type list</field>
+      <field name="name">Applicable Charge Type list</field>
       <field name="model">pms.applicable.charge.type</field>
       <field name="arch" type="xml">
         <tree>
@@ -48,7 +48,7 @@
       </field>
     </record>
      <record model="ir.ui.view" id="view_appli_charge_type_filter">
-      <field name="name">Application Charge Type list</field>
+      <field name="name">Applicable Charge Type list</field>
       <field name="model">pms.applicable.charge.type</field>
       <field name="arch" type="xml">
         <search>
@@ -57,14 +57,14 @@
       </field>
     </record>
      <record id="action_appli_charge_type_all" model="ir.actions.act_window">
-       <field name="name">Application Charge Types</field>
+       <field name="name">Applicable Charge Types</field>
        <field name="res_model">pms.applicable.charge.type</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_appli_charge_type_tree"/> 
     </record> 
     <menuitem  id="appli_charge_type_menu_sub" 
-      name="Application Charge Type" 
+      name="Applicable Charge Type" 
       parent="lease_management_menu_config" 
       action="action_appli_charge_type_all"
       sequence="10"/>

@@ -78,16 +78,20 @@ class PMSPropertyType(models.Model):
         super(PMSPropertyType, self).toggle_active()
 
 
-class PMSUtilitySourceType(models.Model):
-    _name = "pms.utility.source.type"
-    _description = "Utility Source Types"
+class PMSUtilitiesSourceType(models.Model):
+    _name = "pms.utilities.source.type"
+    _description = "Utilities Source Types"
 
-    name = fields.Char("Description", required=True, track_visibility=True)
-    code = fields.Char("Code", required=True, track_visibility=True)
-    utility_type_id = fields.Many2one('pms.utility.supply.type',
-                                      "Utility Supply Type",
-                                      required=True,
-                                      track_visibility=True)
+    name = fields.Char("Utilities Source Type",
+                       required=True,
+                       track_visibility=True)
+    code = fields.Char("Utilities Source Code",
+                       required=True,
+                       track_visibility=True)
+    # utilities_type_id = fields.Many2one('pms.utilities.supply.type',
+    #                                     "Utilities Supply Type",
+    #                                     required=True,
+    #                                     track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your name/code is exiting in the database.')]
@@ -105,16 +109,20 @@ class PMSUtilitySourceType(models.Model):
         for st in self:
             if not st.active:
                 st.active = self.active
-        super(PMSSupplierType, self).toggle_active()
+        super(PMSUtilitiesSourceType, self).toggle_active()
 
 
-class PMSUtilitySupplyType(models.Model):
-    _name = "pms.utility.supply.type"
-    _description = "Utility Supply Types"
+class PMSUtilitiesSupplyType(models.Model):
+    _name = "pms.utilities.supply.type"
+    _description = "Utilities Supply Types"
     _order = 'ordinal_no,name'
 
-    name = fields.Char("Utility Name", required=True, track_visibility=True)
-    code = fields.Char("Utility Code", required=True, track_visibility=True)
+    name = fields.Char("Utilities Supply Type",
+                       required=True,
+                       track_visibility=True)
+    code = fields.Char("Utilities Supply Code",
+                       required=True,
+                       track_visibility=True)
     ordinal_no = fields.Integer("Ordinal No")
     active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
@@ -133,7 +141,7 @@ class PMSUtilitySupplyType(models.Model):
         for pt in self:
             if not pt.active:
                 pt.active = self.active
-        super(PMSUtilityType, self).toggle_active()
+        super(PMSUtilitiesSupplyType, self).toggle_active()
 
 
 class PMSFacilitiesline(models.Model):
@@ -147,15 +155,14 @@ class PMSFacilitiesline(models.Model):
     facility_id = fields.Many2one("pms.facilities",
                                   "Facilities",
                                   track_visibility=True)
-    supplier_type_id = fields.Many2one('pms.utility.source.type',
-                                       "Utility Source Type",
+    supplier_type_id = fields.Many2one('pms.utilities.source.type',
+                                       "Utilities Source Type",
                                        required=True,
                                        track_visibility=True)
     # install_date = fields.Date("Install Date", track_visibility=True)
-    start_reading_value = fields.Integer("Last Reading Value",
-                                         track_visibility=True)
+    lmr_date = fields.Date("LMR Date", track_visibility=True)
+    lmr_value = fields.Integer("LMR Value", track_visibility=True)
     # digit = fields.Integer("Digit", track_visibility=True)
-    start_date = fields.Date("Start Date", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
@@ -169,11 +176,12 @@ class PMSFacilitiesline(models.Model):
     def onchange_supplier_type_id(self):
         uti_ids = lst = []
         domain = {}
-        if self.facility_id.utility_type_id:
-            utility_ids = self.env['pms.utility.source.type'].search([
-                ('utility_type_id', '=', self.facility_id.utility_type_id.id)
+        if self.facility_id.utilities_type_id:
+            utilities_ids = self.env['pms.utilities.source.type'].search([
+                ('utilities_type_id', '=',
+                 self.facility_id.utilities_type_id.id)
             ])
-            for uti in utility_ids:
+            for uti in utilities_ids:
                 uti_ids.append(uti.id)
             domain = {'supplier_type_id': [('id', 'in', uti_ids)]}
         return {'domain': domain}
@@ -259,7 +267,7 @@ class PMSDisplayType(models.Model):
 #     _description = 'Meter Type'
 
 #     name = fields.Char("Meter No")
-#     utility_id = fields.Many2one("pms.utility.type", "Utility Type")
+#     utilities_id = fields.Many2one("pms.utilities.type", "utilities Type")
 #     display_type = fields.Many2one('pms.display.type', 'Display Type')
 #     digit = fields.Selection([('3', '3'), ('4', '4'), ('5', '5'), ('6', '6'),
 #                               ('7', '7'), ('8', '8'), ('9', '9')],

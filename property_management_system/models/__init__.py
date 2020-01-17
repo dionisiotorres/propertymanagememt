@@ -15,5 +15,5 @@ from . import pms_space_type
 from . import pms_applicable_space_type
 from . import pms_facility
 from . import pms_equipment
-from . import pms_utility_monthly
+from . import pms_utilities_monthly
 from . import pms_calculation_method

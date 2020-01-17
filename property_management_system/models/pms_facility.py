@@ -114,8 +114,7 @@ class PMSFacilities(models.Model):
 
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
-                    raise UserError(
-                        _("Plese can not set duplicate supply sourec type."))
+                    raise UserError(_("Supply Source Type is same."))
                 else:
 
                     fac_ids = self.search([('utilities_no', '=',

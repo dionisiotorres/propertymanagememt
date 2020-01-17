@@ -40,14 +40,16 @@ class PMSFacilities(models.Model):
                                   required=True,
                                   track_visibility=True)
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
-    install_date = fields.Date("Facility Install Date",
+    install_date = fields.Date("Installation Date",
                                track_visibility=True,
                                help='The date of Facility installation date.')
     e_meter_type = fields.Char("E Meter Type",
                                track_visibility=True,
                                help='Type of Electric Meters')
-    lmr_date = fields.Date("LMR Date", help='Last Month Reading Date.')
-    lmr_value = fields.Char("LMR Value", help='Last Month Reading Value.')
+    lmr_date = fields.Date("Last Reading Date",
+                           help='Last Month Reading Date.')
+    lmr_value = fields.Char("Last Reading Date",
+                            help='Last Month Reading Value.')
 
     # _sql_constraints = [('name_unique', 'unique(name)',
     #                      'Your name is exiting in the database.')]
@@ -106,11 +108,11 @@ class PMSFacilities(models.Model):
                         line[2]['supplier_type_id'])
                     if emetertype:
                         emetertype += " | " + str(utiliy_id.code)
-                        lmrvalue += " | " + str(line[2]['start_reading_value'])
+                        lmrvalue += " | " + str(line[2]['lmr_value'])
                     if not emetertype:
                         emetertype = str(utiliy_id.code)
-                        lmrvalue = str(line[2]['start_reading_value'])
-                        lmrdate = line[2]['start_date']
+                        lmrvalue = str(line[2]['lmr_value'])
+                        lmrdate = line[2]['lmr_date']
 
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:

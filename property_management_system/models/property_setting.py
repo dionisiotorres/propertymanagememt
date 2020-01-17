@@ -88,10 +88,10 @@ class PMSUtilitiesSourceType(models.Model):
     code = fields.Char("Utilities Source Code",
                        required=True,
                        track_visibility=True)
-    # utilities_type_id = fields.Many2one('pms.utilities.supply.type',
-    #                                     "Utilities Supply Type",
-    #                                     required=True,
-    #                                     track_visibility=True)
+    utilities_type_id = fields.Many2one('pms.utilities.supply.type',
+                                        "Utilities Supply Type",
+                                        required=True,
+                                        track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your name/code is exiting in the database.')]
@@ -160,8 +160,8 @@ class PMSFacilitiesline(models.Model):
                                        required=True,
                                        track_visibility=True)
     # install_date = fields.Date("Install Date", track_visibility=True)
-    lmr_date = fields.Date("LMR Date", track_visibility=True)
-    lmr_value = fields.Integer("LMR Value", track_visibility=True)
+    lmr_date = fields.Date("Last Reading Date", track_visibility=True)
+    lmr_value = fields.Integer("Last Reading Date", track_visibility=True)
     # digit = fields.Integer("Digit", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)

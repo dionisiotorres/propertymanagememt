@@ -47,7 +47,7 @@ class PMSFacilities(models.Model):
                                track_visibility=True,
                                help='Type of Electric Meters')
     last_rdate = fields.Date("LMR Date", help='Last Month Reading Date.')
-    lmr_rvalue = fields.Char("LMR Date", help='Last Month Reading Value.')
+    lmr_rvalue = fields.Char("LMR Value", help='Last Month Reading Value.')
 
     # _sql_constraints = [('name_unique', 'unique(name)',
     #                      'Your name is exiting in the database.')]

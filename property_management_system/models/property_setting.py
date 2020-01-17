@@ -161,7 +161,7 @@ class PMSFacilitiesline(models.Model):
                                      track_visibility=True)
     # install_date = fields.Date("Install Date", track_visibility=True)
     lmr_date = fields.Date("Last Reading Date", track_visibility=True)
-    lmr_value = fields.Integer("Last Reading Date", track_visibility=True)
+    lmr_value = fields.Integer("Last Reading Value", track_visibility=True)
     # digit = fields.Integer("Digit", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)

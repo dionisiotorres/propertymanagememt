@@ -40,7 +40,7 @@
       </field>
     </record>
      <record model="ir.ui.view" id="view_pms_property_type_filter">
-      <field name="name">Property Type list</field>
+      <field name="name">Property Type lists</field>
       <field name="model">pms.property.type</field>
       <field name="arch" type="xml">
         <search>
@@ -51,7 +51,7 @@
       </field>
     </record>
     <record id="action_pms_properties_all" model="ir.actions.act_window">
-       <field name="name">Property Type</field>
+       <field name="name">Property Types</field>
        <field name="res_model">pms.property.type</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>

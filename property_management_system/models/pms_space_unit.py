@@ -72,7 +72,7 @@ class PMSSpaceUnit(models.Model):
     #                               "Type",
     #                               track_visibility=True)
     spaceunittype_id = fields.Many2one("pms.applicable.space.type",
-                                       "Type",
+                                       "Unit Type",
                                        track_visibility=True)
     uom = fields.Many2one("uom.uom",
                           "UOM",
@@ -80,12 +80,17 @@ class PMSSpaceUnit(models.Model):
                           store=True,
                           track_visibility=True)
     area = fields.Integer("Area", track_visibility=True)
-    start_date = fields.Date("Start Date", track_visibility=True)
-    end_date = fields.Date("End Date", track_visibility=True)
+    start_date = fields.Date("Start Date",
+                             track_visibility=True,
+                             help='When the unit is able to use.')
+    end_date = fields.Date("End Date",
+                           track_visibility=True,
+                           help='When the unit is unactive.')
     status = fields.Selection([('vacant', 'Vacant'), ('occupied', 'Occupied')],
                               string="Status",
                               default="vacant",
-                              track_visibility=True)
+                              track_visibility=True,
+                              help='Current status of the unit.')
     rate = fields.Float("Rate", track_visibility=True)
     min_rate = fields.Float("Min Rate",
                             digits=dp.get_precision('Min Rate'),

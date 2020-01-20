@@ -10,7 +10,7 @@ class PMSRentCharge(models.Model):
 
     name = fields.Char("Name")
     property_id = fields.Many2one("pms.properties",
-                                  "Property",
+                                  "Property Name",
                                   track_visibility=True,
                                   required=True)
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
@@ -521,7 +521,7 @@ class Partner(models.Model):
                                 track_visibility=True,
                                 domain=[('is_company', '!=', True)])
     company_channel_type = fields.Many2many('pms.company.category',
-                                            string="Type",
+                                            string="CRM Type",
                                             track_visibility=True)
     township = fields.Many2one('pms.township',
                                "Township",

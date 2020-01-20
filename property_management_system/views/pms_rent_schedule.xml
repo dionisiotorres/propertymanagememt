@@ -69,7 +69,7 @@
       </field>
     </record>
      <record id="action_rent_schedule_all" model="ir.actions.act_window">
-       <field name="name">Rent Schedule</field>
+       <field name="name">Rent Schedules</field>
        <field name="res_model">pms.rent_schedule</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>

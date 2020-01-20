@@ -16,12 +16,6 @@ class PMSRentCharge(models.Model):
     lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
                                               track_visibility=True,
                                               string="Lease Agreement Item")
-    # charge_type = fields.Selection(
-    #     [('base', 'Base'), ('base+gto', 'Base + GTO'),
-    #      ('baseorgto', 'Base or GTO')],
-    #     string="Charge Type",
-    #     track_visibility=True,
-    # )
     charge_type = fields.Many2one("pms.applicable.charge.type",
                                   required=True,
                                   readonly=True,
@@ -45,10 +39,29 @@ class PMSRentCharge(models.Model):
                               "Space Unit",
                               track_visibility=True)
 
-    state = fields.Selection([('draft', "Draft"), ('confrimed', "Confirmed"),
-                              ('invoiced', "Invoiced")],
+    state = fields.Selection([('draft', "Draft"), ('generated', "Generated")],
                              "Status",
                              default="draft")
+
+    @api.multi
+    def action_generate_rs(self):
+        val = {}
+        for line in self:
+            val = {
+                'name': line.name,
+                'property_id': line.property_id.id,
+                'lease_agreement_id': line.lease_agreement_id.id,
+                'start_date': line.start_date,
+                'end_date': line.end_date,
+                'amount': line.amount,
+                'charge_type': line.charge_type.id,
+                'lease_no': line.lease_no,
+                'state': line.state,
+                'unit_no': line.unit_no.id,
+            }
+            gen_id = self.env['pms.gen.rent.schedule'].create(val)
+            if gen_id:
+                line.write({'state': 'generated'})
 
 
 class PMSPropertyType(models.Model):
@@ -570,8 +583,55 @@ class Partner(models.Model):
         for partner in self:
             partner.is_company = partner.company_type == 'company'
 
-    # dis_company_type = fields.Boolean("Disable")
-    # department_id = fields.Many2one(
-    #     "pms.department",
-    #     "Department",
-    #     help="Department is set the partner department.")
+
+class PMSGenerateRentSchedule(models.Model):
+    _name = "pms.gen.rent.schedule"
+    _description = "Generate Rent Schedule"
+    _inherit = ['mail.thread']
+
+    name = fields.Char("Name")
+    property_id = fields.Many2one("pms.properties",
+                                  "Property Name",
+                                  track_visibility=True,
+                                  required=True)
+    lease_agreement_line_id = fields.Many2one("pms.lease_agreement.line",
+                                              track_visibility=True,
+                                              string="Lease Agreement Item")
+    charge_type = fields.Many2one("pms.applicable.charge.type",
+                                  required=True,
+                                  readonly=True,
+                                  track_visibility=True)
+    amount = fields.Float(
+        "Amount",
+        track_visibility=True,
+    )
+    start_date = fields.Date(
+        "Start Date",
+        track_visibility=True,
+    )
+    end_date = fields.Date("End Date", track_visibility=True)
+    extend_count = fields.Integer("Extend Times", store=True)
+    extend_to = fields.Date('Extend To')
+    lease_agreement_id = fields.Many2one("pms.lease_agreement",
+                                         'Shop',
+                                         track_visibility=True)
+    lease_no = fields.Char("Lease", track_visibility=True)
+    unit_no = fields.Many2one("pms.space.unit",
+                              "Space Unit",
+                              track_visibility=True)
+
+    state = fields.Selection([('draft', "Draft"), ('confirmed', "Confirmed"),
+                              ('invoiced', "Invoiced")],
+                             "Status",
+                             default="draft")
+
+    @api.multi
+    def action_confirm(self):
+        if self.state == 'draft':
+            self.write({'state': 'confirmed'})
+
+    @api.multi
+    def action_create_invoice(self):
+        for line in self:
+            print(line)
+            

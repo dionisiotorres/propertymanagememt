@@ -23,7 +23,7 @@
                     <field name="calculation_method_id"/>
                     <field name='is_apply_tax'/>
                     <field name='tax'/>
-                    <!-- <field name="ordinal_no"/> -->
+                    <field name="billing_type"/>
                 </group>
                 <group>
                 </group>
@@ -43,7 +43,7 @@
           <field name="calculation_method_id"/>
           <field name='is_apply_tax'/>
           <field name='tax'/>
-          <!-- <field name="ordinal_no"/> -->
+           <field name="billing_type"/>
         </tree>
       </field>
     </record>

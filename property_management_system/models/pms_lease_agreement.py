@@ -125,6 +125,7 @@ class PMSLeaseAgreement(models.Model):
                         date = None
                         start_date = None
                         end_date = None
+                        billing_date = None
                         day = 1
                         while day >= 1:
                             if line.start_date and line.end_date:
@@ -146,6 +147,12 @@ class PMSLeaseAgreement(models.Model):
                                             days=1)
                                         start_date = date + relativedelta(
                                             months=1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -159,6 +166,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -167,7 +175,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             months=1)
                                         end_date = end_date - relativedelta(days=1)
-                                        end_date
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         day = 1
                                         val = {
                                             'property_id': self.property_id.id,
@@ -182,6 +195,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
@@ -195,6 +209,12 @@ class PMSLeaseAgreement(models.Model):
                                             days=1)
                                         start_date = date + relativedelta(
                                             months=1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -208,6 +228,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -216,7 +237,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             months=1)
                                         end_date = end_date - relativedelta(days=1)
-                                        end_date
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         day = 1
                                         val = {
                                             'property_id': self.property_id.id,
@@ -231,6 +257,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
@@ -245,6 +272,12 @@ class PMSLeaseAgreement(models.Model):
                                             days=1)
                                         start_date = date + relativedelta(
                                             months=1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -258,6 +291,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -266,7 +300,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             months=1)
                                         end_date = end_date - relativedelta(days=1)
-                                        end_date
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         day = 1
                                         val = {
                                             'property_id': self.property_id.id,
@@ -281,6 +320,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 else:
@@ -316,6 +356,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             days=last_day - s_day)
                                         start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -329,6 +375,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -342,7 +389,12 @@ class PMSLeaseAgreement(models.Model):
                                             end_date = line.extend_to
                                         if self.state == 'EXTENDED' and end_date > line.extend_to:
                                             end_date = line.extend_to
-                                        
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         day = 1
                                         val = {
                                             'property_id': self.property_id.id,
@@ -357,6 +409,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 elif line.state == 'NEW' and line.end_date <= end_date and line.extend_to >= end_date + relativedelta(days=2):
@@ -369,6 +422,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             days=last_day - s_day)
                                         start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -382,6 +441,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -396,6 +456,12 @@ class PMSLeaseAgreement(models.Model):
                                         if self.state == 'EXTENDED' and end_date > line.extend_to:
                                             end_date = line.extend_to                                    
                                         day = 1
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -409,6 +475,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 elif line.state == 'EXTENDED' and line.extend_to >= end_date + relativedelta(
@@ -422,6 +489,12 @@ class PMSLeaseAgreement(models.Model):
                                         end_date = start_date + relativedelta(
                                             days=last_day - s_day)
                                         start_date = start_date + relativedelta(days=(last_day - s_day) + 1)
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -435,6 +508,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                         day = 1
@@ -449,6 +523,12 @@ class PMSLeaseAgreement(models.Model):
                                         if self.state == 'EXTENDED' and end_date > line.extend_to:
                                             end_date = line.extend_to
                                         day = 1
+                                        if ctype.applicable_charge_id.billing_type == 'monthly':
+                                            billing_date = end_date
+                                        if ctype.applicable_charge_id.billing_type == 'quarterly':
+                                            billing_date = end_date + relativedelta(months=2)
+                                        if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                                            billing_date = end_date + relativedelta(months=5)
                                         val = {
                                             'property_id': self.property_id.id,
                                             'lease_agreement_line_id': line.id,
@@ -462,6 +542,7 @@ class PMSLeaseAgreement(models.Model):
                                             'end_date': end_date,
                                             'extend_count': line.extend_count,
                                             'extend_to': line.extend_to,
+                                            'billing_date': billing_date,
                                         }
                                         self.env['pms.rent_schedule'].create(val)
                                 else:
@@ -766,7 +847,7 @@ class PMSLeaseAgreementLine(models.Model):
 
     rent_schedule_line = fields.One2many('pms.rent_schedule', 'lease_agreement_line_id', "Rent Schedules", track_visibility=True)
     rent_total = fields.Float("Amount(per month)", compute="get_total_rent", store=True, readonly=False, track_visibility=True)
-    area = fields.Integer("Area", related="unit_no.area", track_visibility=True)
+    area = fields.Float("Area", related="unit_no.area", track_visibility=True)
     gto_percentage = fields.Integer("GTO Percent(%)", track_visibility=True)
     maintain_charge = fields.Float("Maintain Charge", store=True, readonly=False)
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),

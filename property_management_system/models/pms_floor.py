@@ -22,13 +22,6 @@ class PMSFloor(models.Model):
                                   required=True,
                                   track_visibility=True)
 
-    _sql_constraints = [
-        ('name_unique', 'unique(name)',
-         'Please add other name that is exiting in the database.'),
-        ('code_unique', 'unique(code)',
-         'Please add other code that is exiting in the database.')
-    ]
-
     @api.multi
     def name_get(self):
         result = []
@@ -93,6 +86,14 @@ class PMSFloor(models.Model):
 
     @api.model
     def create(self, values):
+        floor_id = None
+        floor_id = self.search([('code', '=', values['code']),
+                                ('property_id', '=', values['property_id'])])
+
+        if floor_id:
+            raise UserError(
+                _("Please set another floor code(%s) that exiting in the Mall of %s."
+                  ) % (values['code'], floor_id.property_id.name))
         id = None
         id = super(PMSFloor, self).create(values)
         # if id:
@@ -107,6 +108,23 @@ class PMSFloor(models.Model):
 
     @api.multi
     def write(self, vals):
+        floor_id = None
+        if 'code' in vals and 'property_id' in vals:
+            floor_id = self.search([('code', '=', vals['code']),
+                                    ('property_id', '=', vals['property_id'])])
+
+            if floor_id:
+                raise UserError(
+                    _("Please set another floor code(%s) that exiting in the Mall of %s."
+                      ) % (values['code'], floor_id.property_id.name))
+        if 'code' in vals and 'property_id' not in vals:
+            floor_id = self.search([('code', '=', vals['code']),
+                                    ('property_id', '=', self.property_id.name)
+                                    ])
+            if floor_id:
+                raise UserError(
+                    _("Please set another floor code(%s) that exiting in the Mall of %s."
+                      ) % (vals['code'], floor_id.property_id.name))
         # payload = f_id = payload_name = payload_code = payload_active = data = url = url_save = None
         # headers = {}
         # f_codes = []
@@ -169,12 +187,24 @@ class PMSFloor(models.Model):
 
     @api.multi
     def unlink(self):
-        if self.active == True:
-            unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
-                                                           self.id)])
-            for unit in unit_ids:
-                if unit.active == True:
-                    raise UserError(
-                        _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
-                          ) % (unit.name, self.code, self.name))
+        if len(self) > 1:
+            for line in self:
+                if line.active == True:
+                    unit_ids = self.env['pms.space.unit'].search([
+                        ('floor_id', '=', line.id)
+                    ])
+                    for unit in unit_ids:
+                        if unit.active == True:
+                            raise UserError(
+                                _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
+                                  ) % (unit.name, line.code, line.name))
+        else:
+            if self.active == True:
+                unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
+                                                               self.id)])
+                for unit in unit_ids:
+                    if unit.active == True:
+                        raise UserError(
+                            _("Please Unactive of Space Unit %s with Floor Code(%s) of %s."
+                              ) % (unit.name, self.code, self.name))
         return super(PMSFloor, self).unlink()

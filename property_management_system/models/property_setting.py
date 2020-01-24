@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, tools
+import calendar
+from odoo import models, fields, api, tools, _
 from odoo.addons.property_management_system.models import api_rauth_config
 
 
@@ -42,26 +43,29 @@ class PMSRentCharge(models.Model):
     state = fields.Selection([('draft', "Draft"), ('generated', "Generated")],
                              "Status",
                              default="draft")
+    billing_date = fields.Date(string="Billing Date", required=True)
 
     @api.multi
     def action_generate_rs(self):
         val = {}
         for line in self:
-            val = {
-                'name': line.name,
-                'property_id': line.property_id.id,
-                'lease_agreement_id': line.lease_agreement_id.id,
-                'start_date': line.start_date,
-                'end_date': line.end_date,
-                'amount': line.amount,
-                'charge_type': line.charge_type.id,
-                'lease_no': line.lease_no,
-                'state': line.state,
-                'unit_no': line.unit_no.id,
-            }
-            gen_id = self.env['pms.gen.rent.schedule'].create(val)
-            if gen_id:
-                line.write({'state': 'generated'})
+            if line.state == 'draft':
+                val = {
+                    'name': line.name,
+                    'property_id': line.property_id.id,
+                    'lease_agreement_id': line.lease_agreement_id.id,
+                    'start_date': line.start_date,
+                    'end_date': line.end_date,
+                    'amount': line.amount,
+                    'charge_type': line.charge_type.id,
+                    'lease_no': line.lease_no,
+                    'state': line.state,
+                    'unit_no': line.unit_no.id,
+                    'billing_date':line.billing_date,
+                }
+                gen_id = self.env['pms.gen.rent.schedule'].create(val)
+                if gen_id:
+                    line.write({'state': 'generated'})
 
 
 class PMSPropertyType(models.Model):
@@ -174,7 +178,7 @@ class PMSFacilitiesline(models.Model):
                                      track_visibility=True)
     # install_date = fields.Date("Install Date", track_visibility=True)
     lmr_date = fields.Date("Last Reading Date", track_visibility=True)
-    lmr_value = fields.Integer("Last Reading Value", track_visibility=True)
+    lmr_value = fields.Float("Last Reading Value", track_visibility=True)
     # digit = fields.Integer("Digit", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
@@ -620,18 +624,206 @@ class PMSGenerateRentSchedule(models.Model):
                               "Space Unit",
                               track_visibility=True)
 
-    state = fields.Selection([('draft', "Draft"), ('confirmed', "Confirmed"),
+    state = fields.Selection([('draft', "Draft"), ('submitted', "Submitted"),
+                              ('confirmed', "Confirmed"),
                               ('invoiced', "Invoiced")],
                              "Status",
-                             default="draft")
+                             default="draft", track_visibility=True)
+    billing_date = fields.Date(string="Billing Date", required=True)
 
     @api.multi
     def action_confirm(self):
-        if self.state == 'draft':
-            self.write({'state': 'confirmed'})
+        if len(self) > 1:
+            for line in self:
+                if line.state == 'submitted':
+                    line.write({'state': 'confirmed'})
+        else:
+            if self.state == 'submitted':
+                self.write({'state': 'confirmed'})
+
+    @api.multi
+    def action_submit(self):
+        if len(self) > 1:
+            for line in self:
+                if line.state == 'draft':
+                    line.write({'state': 'submitted'})
+        else:
+            if self.state == 'draft':
+                self.write({'state': 'submitted'})
+
+    @api.multi
+    def action_reject(self):
+        if len(self) > 1:
+            for line in self:
+                if line.state == 'submitted':
+                    line.write({'state': 'draft'})
+        else:
+            if self.state == 'submitted':
+                self.write({'state': 'draft'})
 
     @api.multi
     def action_create_invoice(self):
-        for line in self:
-            print(line)
-            
+        invoice_month = unit =  None
+        for ls in self:
+            invoice_lines = []
+            if ls.state == 'confirmed':
+                invoice_month = str(calendar.month_name[ls.billing_date.month]) + ' - ' + str(ls.billing_date.year)
+                for line in self:
+                    product_name = None
+                    if line.property_id == ls.property_id and line.billing_date == ls.billing_date and line.lease_no == ls.lease_no:
+                        product_name = line.charge_type.name
+                        prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
+                        prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
+                        if not prod_ids:
+                            val = {'name': product_name,
+                                'sale_ok': False,
+                                'is_unit': True}
+                            product_tmp_id = self.env['product.template'].create(val)
+                            product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
+                            if not product_tmp_ids:
+                                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+                            product_id = product_tmp_ids or product_id
+                        else:
+                            product_id = prod_id
+                        account_id = False
+                        account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+                        taxes = product_id.taxes_id.filtered(lambda r: not line.lease_agreement_id.company_id or r.company_id == line.lease_agreement_id.company_id)
+                        unit = line.lease_agreement_id.unit_no
+                        inv_line_id = self.env['account.invoice.line'].create({
+                            'name': _(product_name),
+                            'account_id': account_id,
+                            'price_unit': line.amount,
+                            'quantity': 1,
+                            'uom_id': product_id.uom_id.id,
+                            'product_id': product_id.id,
+                            'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+                        })
+                        invoice_lines.append(inv_line_id.id)
+                        line.write({'state': 'invoiced'})
+                inv_ids = self.env['account.invoice'].create({
+                    'lease_items': ls.name,
+                    'lease_no': ls.lease_agreement_id.lease_no,
+                    'unit_no': unit,
+                    'inv_month': invoice_month,
+                    'partner_id': ls.lease_agreement_id.company_tanent_id.id,
+                    'property_id': ls.lease_agreement_id.property_id.id,
+                    'company_id': ls.lease_agreement_id.company_id.id,
+                    'invoice_line_ids': [(6, 0, invoice_lines)],
+                    })
+            # datas.append(inv_ids.id)
+            # self.invoice_count += 1
+            # inv_ids.action_invoice_open()
+        return True
+
+
+    # def action_invoice(self, vals):
+    #     invoice_month = invoices = None
+    #     sch_ids = start_date = end_date = []
+    #     if vals[0][0] and vals[0][1]:
+    #         invoice_month = str(calendar.month_name[vals[0][0]]) + ' - ' + str(vals[0][1])
+    #     invoices = self.env['account.invoice'].search([('lease_items', '=', self.name), ('inv_month', '=', invoice_month)])
+    #     if invoices:
+    #         raise UserError(_("Already create invoice for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
+    #     else:
+    #         invoice_lines = []
+    #         payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
+    #         product_name = product_id = prod_ids = prod_id = product_tmp_id = None
+    #         for l in self.rent_schedule_line:
+    #             product_name = l.lease_agreement_line_id.unit_no.name
+    #             prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
+    #             prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
+    #             if inv_type == 'MONTHLY' and vals:
+    #                 area = rent = 0
+    #                 if l.start_date.month == vals[0][0] and l.start_date.year == vals[0][1]:
+    #                     if not prod_ids:
+    #                         val = {'name': product_name,
+    #                             'sale_ok': False,
+    #                             'is_unit': True}
+    #                         product_tmp_id = self.env['product.template'].create(val)
+    #                         product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
+    #                         if not product_tmp_ids:
+    #                             product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+    #                         product_id = product_tmp_ids or product_id
+    #                     else:
+    #                         product_id = prod_id
+    #                     account_id = False
+    #                     if product_id.id:
+    #                         account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+    #                     taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
+    #                     unit = self.lease_agreement_id.lease_no
+    #                     if l.charge_type.calcuation_method.name == 'area':
+    #                         area = 1
+    #                         rent = l.amount
+    #                     elif l.charge_type.calcuation_method.name == 'meter_unit':
+    #                         area = 1
+    #                         rent = l.amount
+    #                     else:
+    #                         area = 1
+    #                         rent = l.amount
+    #                     inv_line_id = self.env['account.invoice.line'].create({
+    #                         'name': _(l.charge_type.name),
+    #                         'account_id': account_id,
+    #                         'price_unit': rent,
+    #                         'quantity': area,
+    #                         'uom_id': self.unit_no.uom.id,
+    #                         'product_id': product_id.id,
+    #                         'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+    #                     })
+    #                     invoice_lines.append(inv_line_id.id)
+    #             if inv_type == 'INITIAL_PAYMENT' and vals:
+    #                 area = rent = 0
+    #                 if l.start_date in start_date:
+    #                     if not prod_ids:
+    #                         val = {'name': product_name,
+    #                             'sale_ok': False,
+    #                             'is_unit': True}
+    #                         product_tmp_id = self.env['product.template'].create(val)
+    #                         product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
+    #                         if not product_tmp_ids:
+    #                             product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+    #                         product_id = product_tmp_ids or product_id
+    #                     else:
+    #                         product_id = prod_id
+    #                     account_id = False
+    #                     if product_id.id:
+    #                         account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
+    #                     taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
+    #                     unit = self.lease_agreement_id.lease_no
+    #                     if l.charge_type.calcuation_method.name == 'area':
+    #                         area = 1
+    #                         rent = l.amount
+    #                     elif l.charge_type.calcuation_method.name == 'meter_unit':
+    #                         area = 1
+    #                         rent = l.amount
+    #                     else:
+    #                         area = 1
+    #                         rent = l.amount
+    #                     inv_line_id = self.env['account.invoice.line'].create({
+    #                         'name': _(l.charge_type.name),
+    #                         'account_id': account_id,
+    #                         'price_unit': rent,
+    #                         'quantity': area,
+    #                         'uom_id': self.unit_no.uom.id,
+    #                         'product_id': product_id.id,
+    #                         'invoice_line_tax_ids': [(6, 0, taxes.ids)],
+    #                     })
+    #                     invoice_lines.append(inv_line_id.id)
+    #         if not invoice_lines and vals:
+    #             raise UserError(_("No have Invoice Line for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
+    #         inv_ids = self.env['account.invoice'].create({
+    #             'lease_items':self.name,
+    #             'lease_no': self.lease_agreement_id.lease_no,
+    #             'unit_no': self.lease_agreement_id.unit_no,
+    #             'inv_month': invoice_month,
+    #             'partner_id': self.lease_agreement_id.company_tanent_id.id,
+    #             'property_id': self.lease_agreement_id.property_id.id,
+    #             'company_id': self.lease_agreement_id.company_id.id,
+    #             'payment_term_id': payment_term.id,
+    #             'invoice_line_ids': [(6, 0, invoice_lines)],
+    #             })
+    #         self.invoice_count += 1
+    #         inv_ids.action_invoice_open()
+    #         is_email =  self.env.user.company_id.invoice_is_email
+    #         template_id =self.env.ref('account.email_template_edi_invoice', False)
+    #         composer = self.env['mail.compose.message'].create({'composition_mode': 'comment'})
+    #         return inv_ids

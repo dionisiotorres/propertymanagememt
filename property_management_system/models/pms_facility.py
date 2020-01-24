@@ -97,7 +97,7 @@ class PMSFacilities(models.Model):
     def create(self, values):
         id = None
         ldata = []
-        emetertype = lmrvalue = None
+        emetertype = lmrvalue = lmrdate = None
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
@@ -125,7 +125,7 @@ class PMSFacilities(models.Model):
                                 for fl in fid.facilities_line:
                                     if fl.source_type_id.id in ldata:
                                         raise UserError(
-                                            _("Plese can not set duplicate supply sourec type."
+                                            _("Plese can not set duplicate supply source type."
                                               ))
         if emetertype:
             values['e_meter_type'] = emetertype
@@ -155,9 +155,9 @@ class PMSFacilities(models.Model):
                     if line[2] == False:
                         fids = self.env['pms.facility.lines'].browse(line[1])
                         if lmrvalue:
-                            lmrvalue += " | " + str(fids.start_reading_value)
+                            lmrvalue += " | " + str(fids.lmr_value)
                         if not lmrvalue:
-                            lmrvalue = str(fids.start_reading_value)
+                            lmrvalue = str(fids.lmr_value)
                     if line[2] != False:
                         if 'source_type_id' in line[2]:
                             ldata.append(line[2]['source_type_id'])
@@ -168,23 +168,22 @@ class PMSFacilities(models.Model):
                             emetertype += " | " + str(utiliy_id.code)
                         # if lmrvalue:
                         #     lmrvalue += " | " + str(
-                        #         line[2]['start_reading_value'])
+                        #         line[2]['lmr_value'])
                         if not emetertype:
                             if utiliy_id:
                                 emetertype = str(utiliy_id.code)
-                        if 'start_reading_value' in line[2]:
+                        if 'lmr_value' in line[2]:
                             if lmrvalue:
-                                lmrvalue += " | " + str(
-                                    line[2]['start_reading_value'])
+                                lmrvalue += " | " + str(line[2]['lmr_value'])
                             else:
-                                lmrvalue = str(line[2]['start_reading_value'])
-                        if 'start_date' in line[2]:
-                            lmrdate = line[2]['start_date']
+                                lmrvalue = str(line[2]['lmr_value'])
+                        if 'lmr_date' in line[2]:
+                            lmrdate = line[2]['lmr_date']
 
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
                     raise UserError(
-                        _("Plese can not set duplicate supply sourec type."))
+                        _("Plese can not set duplicate supply Source type."))
                 else:
                     if 'utilities_no' in values:
                         fac_ids = self.search([('utilities_no', '=',
@@ -195,14 +194,14 @@ class PMSFacilities(models.Model):
                                     for fl in fid.facilities_line:
                                         if fl.source_type_id.id in ldata:
                                             raise UserError(
-                                                _("Plese can not set duplicate supply sourec type."
+                                                _("Plese can not set duplicate supply source type."
                                                   ))
         if emetertype:
             values['e_meter_type'] = emetertype
         if lmrvalue:
-            values['lmr_value'] = lmrvalue
+            values['lmr_rvalue'] = lmrvalue
         if lmrdate:
-            values['lmr_date'] = lmrdate
+            values['last_rdate'] = lmrdate
         result = super(PMSFacilities, self).write(values)
 
         return result

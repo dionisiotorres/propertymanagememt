@@ -111,6 +111,7 @@ class PMSLeaseUnitPos(models.Model):
 
 class PMSLeaseInterfaceCode(models.Model):
     _name = "pms.lease.interface.code"
+    _description = "POS Code"
 
     name = fields.Char("Name")
 

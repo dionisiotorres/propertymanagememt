@@ -26,20 +26,20 @@ class PMSLeaseAgreement(models.Model):
     company_vendor_id = fields.Many2one('res.partner',
                                         "Vendor", track_visibility=True,
                                         domain=[('company_channel_type.name', '=',
-                                                 "Vendor")])
+                                                 "POS Vendor")])
     currency_id = fields.Many2one('res.currency', "Currency", related="property_id.currency_id", track_visibility=True)
     pos_submission = fields.Boolean("Pos Submission", track_visibility=True)
-    pos_submission_type = fields.Selection([('fpt', 'FTP'), ('ws', 'WS SOAP'),
-                                            ('rap', 'Restful API'),
-                                            ('manual', 'Manual')],
+    pos_submission_type = fields.Selection([('FTP', 'FTP'), ('WS', 'WS SOAP'),
+                                            ('API', 'Restful API'),
+                                            ('MANUAL', 'Manual')],
                                            "Submission Type",
-                                           default='fpt', track_visibility=True)
-    sale_data_type = fields.Selection([('TRAN', 'Transaction'),
-                                       ('TRANW', 'Transaction /w Item'),
-                                       ('DAILYSALE', 'Daily Sales'),
-                                       ('MONTHLYSALE', 'Monthly Sales')],
+                                           default='FTP', track_visibility=True)
+    sale_data_type = fields.Selection([('POS-01', 'Transaction'),
+                                       ('POS-02', 'Transaction /w Item'),
+                                       ('POS-01D', 'Daily Sales'),
+                                       ('POS-01M', 'Monthly Sales')],
                                       "Sales Data Type",
-                                      default='TRAN', track_visibility=True)
+                                      default='POS-01', track_visibility=True)
     pos_submission_frequency = fields.Selection([('15MINUTE', '15 Minutes'),
                                                  ('DAILY', 'Daily'),
                                                  ('MONTHLY', 'Monthly')],
@@ -97,15 +97,15 @@ class PMSLeaseAgreement(models.Model):
     @api.onchange('start_date')
     def onchange_start_date(self):
         if self.start_date and self.property_id:
-            self.end_date = company = None
-            company = self.property_id
-            if not company.new_lease_term:
+            self.end_date = prop = None
+            prop = self.property_id
+            if not prop.new_lease_term:
                 raise UserError(_("Please set new lease term in Property."))
-            if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
+            if prop.new_lease_term and prop.new_lease_term.lease_period_type == 'month':
                 self.end_date = self.start_date + relativedelta(
-                    months=company.new_lease_term.min_time_period) - relativedelta(days=1)
-            if company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
-                self.end_date = self.start_date+relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)              
+                    months=prop.new_lease_term.min_time_period) - relativedelta(days=1)
+            if prop.new_lease_term and prop.new_lease_term.lease_period_type == 'year':
+                self.end_date = self.start_date+relativedelta(years=prop.new_lease_term.min_time_period)-relativedelta(days=1)              
 
     @api.multi
     def toggle_active(self):
@@ -640,12 +640,12 @@ class PMSLeaseAgreement(models.Model):
                     ('id', '=', l.id)
                 ])
                 for les in lease_line_id:
-                    for company in self.property_id:
-                        if company.new_lease_term and company.new_lease_term.lease_period_type == 'month':
+                    for prop in self.property_id:
+                        if prop.new_lease_term and prop.new_lease_term.lease_period_type == 'month':
                             end_date = les.end_date + relativedelta(
-                                months=company.new_lease_term.min_time_period) - relativedelta(days=1)
-                        elif company.new_lease_term and company.new_lease_term.lease_period_type == 'year':
-                            end_date = les.end_date +relativedelta(years=company.new_lease_term.min_time_period)-relativedelta(days=1)
+                                months=prop.new_lease_term.min_time_period) - relativedelta(days=1)
+                        elif prop.new_lease_term and prop.new_lease_term.lease_period_type == 'year':
+                            end_date = les.end_date +relativedelta(years=prop.new_lease_term.min_time_period)-relativedelta(days=1)
                     appli_ids = []
                     for ctype in les.appilication_type:
                         app_id = self.env['pms.applicable.charge.line'].create({
@@ -748,14 +748,14 @@ class PMSLeaseAgreement(models.Model):
             property_id = self.env['pms.properties'].browse(
                 values['property_id'])
             if property_id:
-                for company in property_id:
-                    if not company.lease_format:
+                for prop in property_id:
+                    if not prop.lease_format:
                         raise UserError(
                             _("Please set Your Lease Format in the property setting."
                               ))
-                    if company.lease_format and company.lease_format.format_line_id:
+                    if prop.lease_format and prop.lease_format.format_line_id:
                         val = []
-                        for ft in company.lease_format.format_line_id:
+                        for ft in prop.lease_format.format_line_id:
                             if ft.value_type == 'dynamic':
                                 if property_id.code and ft.dynamic_value == 'property code':
                                     val.append(property_id.code)
@@ -786,6 +786,8 @@ class PMSLeaseAgreement(models.Model):
                             for l in range(len(val)):
                                 lease_no_pre += str(val[l])
         lease_no = ''
+        if 'company_id' not in values:
+            values['company_id'] = self.env.user.company_id.id
         lease_no += self.env['ir.sequence'].with_context(
             force_company=values['company_id']).next_by_code(
                 'pms.lease_agreement')
@@ -796,6 +798,7 @@ class PMSLeaseAgreement(models.Model):
         # if id and property_id.api_integration == True:
         #     property_obj = self.env['pms.properties'].browse(
         #         values['property_id'])
+    
         #     integ_obj = self.env['pms.api.integration']
         #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
         #                                                      "LeaseAgreement")])
@@ -862,7 +865,8 @@ class PMSLeaseAgreementLine(models.Model):
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
     appilication_type = fields.One2many('pms.lease.unit.charge.type.line','lease_line_id',"Charge Types")
     company_tanent_id = fields.Many2one("res.partner", "Shop", related="lease_agreement_id.company_tanent_id")
-
+    leaseunitpos_line_id = fields.One2many("pms.lease.unit.pos",'leaseagreementitem_id',"Lease Unit POS")
+    
     @api.one
     @api.depends('unit_no', 'lease_no')
     def compute_name(self):
@@ -875,6 +879,15 @@ class PMSLeaseAgreementLine(models.Model):
             self.name = self.unit_no.name
         else:
             self.name = 'New'
+
+    @api.one
+    def get_interfacecode(self,val):
+        posints = []
+        if self.leaseunitpos_line_id:
+            for lp in self.leaseunitpos_line_id:
+                posints.append(lp.posinterfacecode_id.id)
+        return posints or []
+        
 
     @api.multi
     def action_view_invoice(self):

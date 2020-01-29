@@ -123,6 +123,16 @@
                               </tree>
                             </field> 
                           </page>
+                          <page string="Lease Unit POS" >
+                            <field name="leaseunitpos_line_id">
+                              <tree editable="buttom">
+                                <!-- <field name="name"/> -->
+                                <field name="posinterfacecode_id"/>
+                                <field name="useposid"/>
+                                <field name="inactivedate"/>
+                              </tree>
+                            </field> 
+                          </page>
                           <!-- <page string="Rent Schedule lines" >
                              <field name="rent_schedule_line" readonly="1">
                               <tree>

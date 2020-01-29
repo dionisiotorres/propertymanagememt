@@ -64,6 +64,7 @@
         'views/pms_applicable_space_type_view.xml',
         'views/pms_utilities_monthly_view.xml',
         'views/pms_rent_schedule.xml',
+        'views/pms_lease_unit_pos_view.xml',
     ],
     'installable':
     True,

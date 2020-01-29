@@ -71,6 +71,16 @@
                           </tree>
                         </field> 
                       </page>
+                      <page string="Lease Unit POS" >
+                        <field name="leaseunitpos_line_id">
+                          <tree editable="buttom">
+                            <!-- <field name="name"/> -->
+                            <field name="posinterfacecode_id"/>
+                            <field name="useposid"/>
+                            <field name="inactivedate"/>
+                          </tree>
+                        </field> 
+                      </page>
                       <!-- <page string="Rent Schedule lines" >
                           <field name="rent_schedule_line" readonly="1">
                             <tree>
@@ -133,10 +143,10 @@
        <field name="view_id" ref="view_lease_aggrement_line_tree"/>
        <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record> 
-    <!-- <menuitem  id="lease_agreement_line_menu" 
+    <menuitem  id="lease_agreement_line_menu" 
       name="Lease Agreement Detail" 
       parent="lease_management_menu_sub" 
       action="action_lease_aggrement_detail_all"
-      sequence="2"/> -->
+      sequence="2"/>
   </data>
 </odoo>

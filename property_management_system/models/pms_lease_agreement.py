@@ -58,7 +58,7 @@ class PMSLeaseAgreement(models.Model):
     active = fields.Boolean(default=True, track_visibility=True)
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
-                                           "Lease Agreement Items", track_visibility=True)
+                                           "Lease Agreement Units", track_visibility=True)
     lease_no = fields.Char("Lease No", default="New", store=True, track_visibility=True)
     old_lease_no = fields.Char("Old Lease No", default="", store=True, track_visibility=True)
     extend_count = fields.Integer("Extend Times", store=True, track_visibility=True)
@@ -836,31 +836,14 @@ class PMSLeaseAgreementLine(models.Model):
     start_date = fields.Date(string="Start Date", default=get_start_date, readonly=False, store=True, track_visibility=True)
     end_date = fields.Date(string="End Date",default=get_end_date, readonly=False,  store=True, track_visibility=True)
     extend_to = fields.Date("Extend End", track_visibility=True)
-    rent = fields.Float(string="Rent", related="unit_no.rate", store=True, track_visibility=True)
-    company_tanent_id = fields.Many2one(
-        'res.company',
-        "Shop", track_visibility=True,
-    )
-    pos_id = fields.Char("POS ID", track_visibility=True)
     remark = fields.Text("Remark", track_visibility=True)
-    rental_charge_type = fields.Selection([('base', 'Base'),
-                                           ('base+gto', 'Base + GTO'),
-                                           ('baseorgto', 'Base or GTO')], default='base',
-                                          string="Rental Charge Type", track_visibility=True)
-
     rent_schedule_line = fields.One2many('pms.rent_schedule', 'lease_agreement_line_id', "Rent Schedules", track_visibility=True)
-    rent_total = fields.Float("Amount(per month)", compute="get_total_rent", store=True, readonly=False, track_visibility=True)
-    area = fields.Float("Area", related="unit_no.area", track_visibility=True)
-    gto_percentage = fields.Integer("GTO Percent(%)", track_visibility=True)
-    maintain_charge = fields.Float("Maintain Charge", store=True, readonly=False)
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
                               ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
                               ('TERMINATED', 'Terminated'),
                               ('EXPIRED', "Expired")],
                              related="lease_agreement_id.state", string='Status', readonly=True, copy=False, store=True, default='BOOKING', track_visibility=True)
-
-    invoice_count = fields.Integer(default=0, track_visibility=True)
     extend_start = fields.Date("Extend Start", store=True, track_visibility=True)
     extend_count = fields.Integer("Extend Times", related="lease_agreement_id.extend_count", store=True, track_visibility=True)
     appilication_type = fields.One2many('pms.lease.unit.charge.type.line','lease_line_id',"Charge Types")
@@ -1020,7 +1003,7 @@ class PMSLeaseAgreementLine(models.Model):
                 'payment_term_id': payment_term.id,
                 'invoice_line_ids': [(6, 0, invoice_lines)],
                 })
-            self.invoice_count += 1
+            # self.invoice_count += 1
             inv_ids.action_invoice_open()
             is_email =  self.env.user.company_id.invoice_is_email
             template_id =self.env.ref('account.email_template_edi_invoice', False)

@@ -20,7 +20,7 @@ class PMSApplicableChargeType(models.Model):
     tax = fields.Float("Tax", track_visibility=True)
     billing_type = fields.Selection([('monthly', 'Monthly'),
                                      ('quarterly', 'Quarterly'),
-                                     ('semi-annually', 'Semi-Annualy')],
+                                     ('semi-annually', 'Semi-Annually')],
                                     "Billing Type",
                                     required=True,
                                     default='monthly',

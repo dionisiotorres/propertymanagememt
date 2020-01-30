@@ -17,6 +17,7 @@ class PMSLeaseUnitPos(models.Model):
                                           required=True)
     spaceunit_id = fields.Char("SpaceUnitID")
     useposid = fields.Boolean("UsePosID")
+    posidisactive = fields.Boolean("PosIdIsActive")
     inactivedate = fields.Date("InactiveDate")
     active = fields.Boolean("Active", default=True)
 

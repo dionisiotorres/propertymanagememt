@@ -44,10 +44,15 @@ class PMSFacilities(models.Model):
                                track_visibility=True,
                                help='The date of Facility installation date.')
     e_meter_type = fields.Char("E Meter Type",
+                               compute="compute_meters",
                                track_visibility=True,
                                help='Type of Electric Meters')
-    last_rdate = fields.Date("LMR Date", help='Last Month Reading Date.')
-    lmr_rvalue = fields.Char("LMR Value", help='Last Month Reading Value.')
+    last_rdate = fields.Date("LMR Date",
+                             compute="compute_meters",
+                             help='Last Month Reading Date.')
+    lmr_rvalue = fields.Char("LMR Value",
+                             compute="compute_meters",
+                             help='Last Month Reading Value.')
 
     # _sql_constraints = [('name_unique', 'unique(name)',
     #                      'Your name is exiting in the database.')]
@@ -93,6 +98,33 @@ class PMSFacilities(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    @api.one
+    @api.depends('facilities_line.source_type_id', 'facilities_line.lmr_value',
+                 'facilities_line.lmr_date')
+    def compute_meters(self):
+        ldata = []
+        emetertype = lmrvalue = lmrdate = None
+        if self.facilities_line:
+            if len(self.facilities_line) > 0:
+                for line in self.facilities_line:
+                    if line.end_date == False:
+                        ldata.append(line.source_type_id)
+                    utiliy_id = self.env['pms.utilities.source.type'].browse(
+                        line.source_type_id.id)
+                    if emetertype:
+                        emetertype += " | " + str(utiliy_id.code)
+                        lmrvalue += " | " + str(line.lmr_value)
+                    if not emetertype:
+                        emetertype = str(utiliy_id.code)
+                        lmrvalue = str(line.lmr_value)
+                        lmrdate = line.lmr_date
+        if emetertype:
+            self.e_meter_type = emetertype
+        if lmrvalue:
+            self.lmr_rvalue = lmrvalue
+        if lmrdate:
+            self.last_rdate = lmrdate
+
     @api.model
     def create(self, values):
         id = None
@@ -101,22 +133,21 @@ class PMSFacilities(models.Model):
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
-                    ldata.append(line[2]['source_type_id'])
-                    utiliy_id = self.env['pms.utilities.source.type'].browse(
-                        line[2]['source_type_id'])
-                    if emetertype:
-                        emetertype += " | " + str(utiliy_id.code)
-                        lmrvalue += " | " + str(line[2]['lmr_value'])
-                    if not emetertype:
-                        emetertype = str(utiliy_id.code)
-                        lmrvalue = str(line[2]['lmr_value'])
-                        lmrdate = line[2]['lmr_date']
-
+                    if line[2]['end_date'] == False:
+                        ldata.append(line[2]['source_type_id'])
+                    # utiliy_id = self.env['pms.utilities.source.type'].browse(
+                    #     line[2]['source_type_id'])
+                    # if emetertype:
+                    #     emetertype += " | " + str(utiliy_id.code)
+                    #     lmrvalue += " | " + str(line[2]['lmr_value'])
+                    # if not emetertype:
+                    #     emetertype = str(utiliy_id.code)
+                    #     lmrvalue = str(line[2]['lmr_value'])
+                    #     lmrdate = line[2]['lmr_date']
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
-                    raise UserError(_("Supply Source Type is same."))
+                    raise UserError(_("Utiliteis Source Type is same."))
                 else:
-
                     fac_ids = self.search([('utilities_no', '=',
                                             values['utilities_no'])])
                     if fac_ids:
@@ -127,12 +158,6 @@ class PMSFacilities(models.Model):
                                         raise UserError(
                                             _("Plese can not set duplicate supply source type."
                                               ))
-        if emetertype:
-            values['e_meter_type'] = emetertype
-        if lmrvalue:
-            values['lmr_value'] = lmrvalue
-        if lmrdate:
-            values['lmr_date'] = lmrdate
         id = super(PMSFacilities, self).create(values)
         # if id:
         # property_obj = self.env['pms.properties'].browse(
@@ -152,56 +177,30 @@ class PMSFacilities(models.Model):
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
-                    if line[2] == False:
-                        fids = self.env['pms.facility.lines'].browse(line[1])
-                        if lmrvalue:
-                            lmrvalue += " | " + str(fids.lmr_value)
-                        if not lmrvalue:
-                            lmrvalue = str(fids.lmr_value)
                     if line[2] != False:
                         if 'source_type_id' in line[2]:
                             ldata.append(line[2]['source_type_id'])
-                            utiliy_id = self.env[
-                                'pms.utilities.source.type'].browse(
-                                    line[2]['source_type_id'])
-                        if emetertype:
-                            emetertype += " | " + str(utiliy_id.code)
-                        # if lmrvalue:
-                        #     lmrvalue += " | " + str(
-                        #         line[2]['lmr_value'])
-                        if not emetertype:
-                            if utiliy_id:
-                                emetertype = str(utiliy_id.code)
-                        if 'lmr_value' in line[2]:
-                            if lmrvalue:
-                                lmrvalue += " | " + str(line[2]['lmr_value'])
-                            else:
-                                lmrvalue = str(line[2]['lmr_value'])
-                        if 'lmr_date' in line[2]:
-                            lmrdate = line[2]['lmr_date']
-
+                        if self.facilities_line:
+                            for fac in self.facilities_line:
+                                ldata.append(fac.source_type_id.id)
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
                     raise UserError(
-                        _("Plese can not set duplicate supply Source type."))
+                        _("Plese can not set duplicate Supply Source type."))
                 else:
+                    meter_no = None
                     if 'utilities_no' in values:
-                        fac_ids = self.search([('utilities_no', '=',
-                                                values['utilities_no'])])
-                        if fac_ids:
-                            for fid in fac_ids:
-                                if fid.facilities_line:
-                                    for fl in fid.facilities_line:
-                                        if fl.source_type_id.id in ldata:
-                                            raise UserError(
-                                                _("Plese can not set duplicate supply source type."
-                                                  ))
-        if emetertype:
-            values['e_meter_type'] = emetertype
-        if lmrvalue:
-            values['lmr_rvalue'] = lmrvalue
-        if lmrdate:
-            values['last_rdate'] = lmrdate
+                        meter_no = values['utilities_no']
+                    else:
+                        meter_no = self.utilities_no.id
+                    fac_ids = self.search([('utilities_no', '=', meter_no)])
+                    if fac_ids:
+                        for fid in fac_ids:
+                            if fid.facilities_line:
+                                for fl in fid.facilities_line:
+                                    if fl.source_type_id.id in ldata:
+                                        raise UserError(
+                                            _("Plese can not set duplicate Supply source type."
+                                              ))
         result = super(PMSFacilities, self).write(values)
-
         return result

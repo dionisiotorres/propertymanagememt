@@ -55,31 +55,28 @@
                   <field name="end_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
                   <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
-                  <!-- <field name="lease_no_pre"/> -->
-                  <!-- <field name="rental_charge_type"/> -->
-                  <!-- <field name="old_end_date" /> -->
                   <field name="is_terminate" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}"/>
                   <field name="terminate_period" attrs="{'invisible': [('is_terminate','=',False)]}"/>
               </group>
             </group>
             <notebook>
-                <page string="Lease Units">
-                    <field name="lease_agreement_line" attrs="{'readonly': [('state','in', ['TERMINATED'])]}" context="{'start_date': start_date,'end_date':end_date}">
+                <page string="Lease Agreement Units">
+                    <field name="lease_agreement_line" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"  context="{'start_date': start_date,'end_date':end_date}">
                     <form>
                       <header>
                         <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
-                        <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/>
+                        <!-- <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
                         <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
                       </header>
                       <sheet>
-                      <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
+                      <!-- <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
                         <button name="action_view_invoice" type="object"
                             class="oe_stat_button"
                             icon="fa-pencil-square-o"
                             string="Invoice">
                             <field name="invoice_count"/>
                         </button>
-                      </div>
+                      </div> -->
                       <group>
                         <group>
                           <field name="lease_agreement_id" invisible="1"/>
@@ -90,30 +87,11 @@
                           <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                           <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                           <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                          <!-- <field name="pos_id"/> -->
                         </group>
                       </group>
-                      <!-- <group name="rent_detail" string="Rent Charge Detail">
-                        <group>
-                            <field name="rental_charge_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                            <field name="area" />
-                          </group>
-                          <group>                          
-                            <field name="gto_percentage" attrs="{'invisible': [('rental_charge_type','not in', ['base+gto','baseorgto'])]}"/>
-                            <field name="rent"/>
-                            <field name="rent_total" readonly="1"/>
-                          </group>
-                      </group>
-                       <group name="maintenance" string="Maintenance">
-                          <group>
-                            <field name="maintain_charge" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                          </group>
-                          <group>                          
-                          </group>
-                      </group> -->
                       <notebook>
-                          <page string="Lease Units Charge">
-                            <field name="appilication_type">
+                          <page string="Lease Unit Charge" >
+                            <field name="appilication_type" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
                               <tree editable="bottom">
                                 <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
                                 <field name="charge_type_id"/>
@@ -124,41 +102,27 @@
                             </field> 
                           </page>
                           <page string="Lease Unit POS" >
-                            <field name="leaseunitpos_line_id">
+                            <field name="leaseunitpos_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
                               <tree editable="buttom">
-                                <!-- <field name="name"/> -->
                                 <field name="posinterfacecode_id"/>
                                 <field name="useposid"/>
                                 <field name="inactivedate"/>
                               </tree>
                             </field> 
                           </page>
-                          <!-- <page string="Rent Schedule lines" >
-                             <field name="rent_schedule_line" readonly="1">
-                              <tree>
-                                <field name="charge_type"/>
-                                <field name="start_date"/>
-                                <field name="end_date"/>
-                                <field name="gto_amount" string="Amount"/>
-                                
-                              </tree>
-                             </field> 
-                          </page> -->
                       </notebook>
                       </sheet>
                     </form>
-                      <tree>
+                      <tree attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
                         <field name="unit_no"/>
                         <field name="start_date" />
                         <field name="end_date" />
                         <field name="extend_to" string="Extend To"/>
-                        <!-- <field name="pos_id" />
-                        <field name="rental_charge_type"/> -->
                         <field name="remark" />
                       </tree>
                     </field>
                 </page>
-                <page name="POS Configuration" string="POS Configuration">
+                <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                   <group>
                     <group colspan="2">
                       <field name="pos_submission" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
@@ -173,8 +137,8 @@
                     </group>
                   </group>
                 </page>
-                <page string="Charge Configruation">
-                  <field name="appilication_type">
+                <page string="Charge Configuration">
+                  <field name="appilication_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                     <tree editable="bottom">
                       <field name="unit_no"/>
                       <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
@@ -185,8 +149,8 @@
                     </tree>
                   </field>
                 </page>
-                <page string="Rent Schedule">
-                  <field name = "lease_rent_config_id">
+                <page string="Rent Schedule" >
+                  <field name = "lease_rent_config_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                     <tree editable="buttom">
                       <field name="lease_agreement_line_id"/>
                       <field name="charge_type"/>

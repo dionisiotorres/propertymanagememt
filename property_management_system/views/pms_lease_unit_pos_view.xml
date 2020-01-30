@@ -19,15 +19,14 @@
           </div>
           <group>
             <group>
-              <!-- <field name="leaseagreementitem_id"/>
-              <field name="spaceunit_id"/> -->
               <field name="posinterfacecode_id"/>
               <field name="useposid"/>
-              <field name="inactivedate"/>
+              <field name="posidisactive"/>
             </group>
             <group>
               <field name="appaccesskey"/>
               <field name="appsecretaccesskey"/>
+               <field name='inactivedate'/>
             </group>
           </group>
           </sheet>
@@ -40,9 +39,8 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-          <!-- <field name="leaseagreementitem_id"/>
-          <field name="spaceunit_id"/> -->
           <field name="posinterfacecode_id"/>
+          <field name='posidisactive'/>
           <field name="useposid"/>
           <field name="inactivedate"/>
           <field name="appaccesskey"/>
@@ -56,23 +54,41 @@
       <field name="arch" type="xml">
         <search>
           <field name="name"/>
-          <!-- <field name="leaseagreementitem_id"/>
-          <field name="spaceunit_id"/> -->
-          <!-- <field name="posinterfacecode"/> -->
         </search>
       </field>
     </record>
-     <record id="action_lease_unit_pos_all" model="ir.actions.act_window">
+    <record id="action_lease_unit_pos_all" model="ir.actions.act_window">
        <field name="name">Lease Unit POS</field>
        <field name="res_model">pms.lease.unit.pos</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_lease_unit_pos_tree"/> 
     </record>
+  <record model="ir.ui.view" id="view_pos_interface_code_tree">
+      <field name="name">POS Interface Code list</field>
+      <field name="model">pms.lease.interface.code</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+    <record id="action_pos_interface_code_all" model="ir.actions.act_window">
+       <field name="name">POS Interface Code</field>
+       <field name="res_model">pms.lease.interface.code</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_pos_interface_code_tree"/> 
+    </record>
     <menuitem  id="lease_unit_pos_menu_root" 
         name="Lease Unit POS" 
         parent="lease_management_menu_sub" 
         action="action_lease_unit_pos_all"
         sequence="100"/>
+    <menuitem  id="pos_interface_code_menu_root" 
+        name="POS Interface Code" 
+        parent="lease_management_menu_sub" 
+        action="action_pos_interface_code_all"
+        sequence="200"/>
   </data> 
 </odoo>

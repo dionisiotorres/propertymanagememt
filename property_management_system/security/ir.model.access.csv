@@ -85,3 +85,5 @@ access_pms_lease_unit_pos,pms.lease.unit.pos,model_pms_lease_unit_pos,group_prop
 access_pms_lease_unit_pos_manager,pms.lease.unit.pos,model_pms_lease_unit_pos,group_property_manager,1,1,1,1
 access_pms_lease_interface_code,pms.lease.interface.code,model_pms_lease_interface_code,group_property_user,1,1,1,1
 access_pms_lease_interface_code_manager,pms.lease.interface.code,model_pms_lease_interface_code,group_property_manager,1,1,1,1
+access_pms_unit_charge_line,pms.unit.charge.line,model_pms_unit_charge_line,group_property_user,1,1,1,1
+access_pms_unit_charge_line_manager,pms.unit.charge.line,model_pms_unit_charge_line,group_property_manager,1,1,1,1

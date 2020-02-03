@@ -26,8 +26,21 @@
                     <field name="billing_type"/>
                 </group>
                 <group>
+                  <field name='is_formula_meter'/>
+                  <field name="fix_meter_rate" attrs="{'invisible':[('is_formula_meter','!=',False)]}"/>
                 </group>
             </group>
+            <notebook attrs="{'invisible':[('is_formula_meter','!=',True)]}">
+              <page string="Unit Charges">
+                <field name="unit_charge_line">
+                  <tree editable="bottom">
+                    <field name="from_unit"/>
+                    <field name="to_unit"/>
+                    <field name="rate"/>
+                  </tree>
+                </field>
+              </page>
+            </notebook>
           </sheet>
         </form>
       </field>

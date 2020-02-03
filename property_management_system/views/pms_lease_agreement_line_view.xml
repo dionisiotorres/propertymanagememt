@@ -45,6 +45,8 @@
                             <field name="applicable_charge_id"/>
                             <field name="charge_type_id"/>
                             <field name="calculation_method_id"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
                             <field name="rate" />
                             <field name="total_amount"/>
                           </tree>

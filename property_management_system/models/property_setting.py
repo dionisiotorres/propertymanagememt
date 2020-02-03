@@ -49,14 +49,35 @@ class PMSRentCharge(models.Model):
     def action_generate_rs(self):
         val = {}
         for line in self:
+            total_amount = 0
             if line.state == 'draft':
+                for charge in line.charge_type:
+                    if charge.calculation_method_id.name == 'Percentage':
+                        for pos in line.lease_agreement_line_id:
+                            if pos.leaseunitpos_line_id:
+                                for posline in pos.leaseunitpos_line_id:
+                                    pos_id = self.env['pos.daily.sale'].search([('posinterfacecode', '=', posline.posinterfacecode.name),('pos_receipt_date','>=',line.start_date),('pos_receipt_date','<=',line.end_date)])
+                                    if pos_id:
+                                        for daily in pos_id:
+                                            total_amount += daily.manual_net_sales
+                    if charge.calculation_method_id.name == 'MeterUnit':
+                        meter_amount = 0
+                        for lease in line.lease_agreement_line_id:
+                            if lease.unit_no.facility_line:
+                                for facility in lease.unit_no.facility_line:
+                                    if facility:
+                                        for facline in facility.facilities_line:
+                                            filter_month = str(line.end_date.year) + ('0' + str(line.end_date.month)) if len(str(line.end_date.month)) <= 1 else str(line.end_date.month)
+                                            monthly_id = self.env['pms.utilities.monthly'].search([('utilities_source_type', '=', facline.source_type_id.code), ('utilities_no', '>=', facility.utilities_no.name), ('utilities_supply_type', '<=', facility.utilities_type_id.code),('billingperiod','=',filter_month)])
+                                            meter_amount += monthly_id.end_value - monthly_id.start_value
+                        total_amount = meter_amount * charge.rate
                 val = {
                     'name': line.name,
                     'property_id': line.property_id.id,
                     'lease_agreement_id': line.lease_agreement_id.id,
                     'start_date': line.start_date,
                     'end_date': line.end_date,
-                    'amount': line.amount,
+                    'amount': total_amount,
                     'charge_type': line.charge_type.id,
                     'lease_no': line.lease_no,
                     'state': line.state,

@@ -21,16 +21,18 @@
                 <group>
                     <field name="charge_type_id"/>
                     <field name="calculation_method_id"/>
+                    <field name="source_type_id" attrs="{'invisible':[('is_meter','!=',True)]}"/>
+                    <field name='use_formula' attrs="{'invisible':[('is_meter','!=',True)]}"/>
+                    <field name="rate" attrs="{'invisible':[('is_meter','!=',True)]}"/>
+                </group>
+                <group>
                     <field name='is_apply_tax'/>
                     <field name='tax'/>
                     <field name="billing_type"/>
-                </group>
-                <group>
-                  <field name='is_formula_meter'/>
-                  <field name="fix_meter_rate" attrs="{'invisible':[('is_formula_meter','!=',False)]}"/>
+                    <field name='is_meter' invisible='1'/>
                 </group>
             </group>
-            <notebook attrs="{'invisible':[('is_formula_meter','!=',True)]}">
+            <notebook attrs="{'invisible':[('use_formula','!=',True)]}">
               <page string="Unit Charges">
                 <field name="unit_charge_line">
                   <tree editable="bottom">
@@ -56,7 +58,7 @@
           <field name="calculation_method_id"/>
           <field name='is_apply_tax'/>
           <field name='tax'/>
-           <field name="billing_type"/>
+          <field name="billing_type"/>
         </tree>
       </field>
     </record>

@@ -40,7 +40,7 @@
                     </group>
                     <notebook>
                       <page string="Lease Unit Charge" >
-                        <field name="appilication_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                        <field name="applicable_type_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                           <tree editable="buttom">
                             <field name="applicable_charge_id"/>
                             <field name="charge_type_id"/>

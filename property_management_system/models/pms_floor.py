@@ -96,14 +96,16 @@ class PMSFloor(models.Model):
                   ) % (values['code'], floor_id.property_id.name))
         id = None
         id = super(PMSFloor, self).create(values)
-        # if id:
-        #     property_obj = self.env['pms.properties'].browse(
-        #         values['property_id'])
-        #     integ_obj = self.env['pms.api.integration']
-        #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
-        #                                                      "Floor")])
-        #     datas = api_rauth_config.APIData(id, values, property_obj,
-        #                                      integ_obj, api_type_obj)
+        if id:
+            property_obj = self.env['pms.properties']
+            property_id = property_obj.browse(values['property_id'])
+            if property_id.api_integration == True:
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "Floor")
+                ])
+                datas = api_rauth_config.APIData(id, values, property_id,
+                                                 integ_obj, api_line_ids)
         return id
 
     @api.multi

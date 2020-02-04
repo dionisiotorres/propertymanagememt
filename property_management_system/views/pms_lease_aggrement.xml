@@ -91,7 +91,7 @@
                       </group>
                       <notebook>
                           <page string="Lease Unit Charge" >
-                            <field name="appilication_type" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}" context="{'active_id': active_id}">
+                            <field name="applicable_type_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}" context="{'active_id': active_id}">
                               <tree editable="bottom">
                                 <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
                                 <field name="charge_type_id"/>
@@ -140,7 +140,7 @@
                   </group>
                 </page>
                 <page string="Charge Configuration">
-                  <field name="appilication_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                  <field name="applicable_type_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                     <tree editable="bottom">
                       <field name="unit_no"/>
                       <field name="applicable_charge_id" options="{'no_quick_create':True}"/>

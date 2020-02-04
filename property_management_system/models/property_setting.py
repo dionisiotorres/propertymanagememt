@@ -48,18 +48,23 @@ class PMSRentCharge(models.Model):
     @api.multi
     def action_generate_rs(self):
         val = {}
+        charge_rents = None
         for line in self:
-            total_amount = 0
+            total_amount = net_amount = percent_amount = 0
             if line.state == 'draft':
                 for charge in line.charge_type:
                     if charge.calculation_method_id.name == 'Percentage':
                         for pos in line.lease_agreement_line_id:
-                            if pos.leaseunitpos_line_id:
+                            if pos.leaseunitpos_line_id and charge.charge_type_id.name == 'Rental':
                                 for posline in pos.leaseunitpos_line_id:
-                                    pos_id = self.env['pos.daily.sale'].search([('posinterfacecode', '=', posline.posinterfacecode.name),('pos_receipt_date','>=',line.start_date),('pos_receipt_date','<=',line.end_date)])
+                                    pos_id = self.env['pos.daily.sale'].search([('pos_interface_code', '=', posline.posinterfacecode_id.name), ('pos_receipt_date', '>=', line.start_date), ('pos_receipt_date', '<=', line.end_date)])
                                     if pos_id:
                                         for daily in pos_id:
-                                            total_amount += daily.manual_net_sales
+                                            net_amount += daily.manual_net_sales
+                                charge_rents = pos.applicable_type_line_id.filtered(lambda c:c.charge_type_id == charge.charge_type_id and c.start_date <= line.start_date and c.end_date >= line.end_date)
+                                for ct in charge_rents:
+                                    percent_amount = ct.rate
+                        total_amount = (net_amount * percent_amount)/100
                     if charge.calculation_method_id.name == 'MeterUnit':
                         meter_amount = 0
                         for lease in line.lease_agreement_line_id:
@@ -67,10 +72,17 @@ class PMSRentCharge(models.Model):
                                 for facility in lease.unit_no.facility_line:
                                     if facility:
                                         for facline in facility.facilities_line:
-                                            filter_month = str(line.end_date.year) + ('0' + str(line.end_date.month)) if len(str(line.end_date.month)) <= 1 else str(line.end_date.month)
-                                            monthly_id = self.env['pms.utilities.monthly'].search([('utilities_source_type', '=', facline.source_type_id.code), ('utilities_no', '>=', facility.utilities_no.name), ('utilities_supply_type', '<=', facility.utilities_type_id.code),('billingperiod','=',filter_month)])
-                                            meter_amount += monthly_id.end_value - monthly_id.start_value
-                        total_amount = meter_amount * charge.rate
+                                            filter_month = str(line.start_date.year) + ('0' + str(line.start_date.month)) if len(str(line.start_date.month)) <= 1 else str(line.start_date.month)
+                                            monthly_id = self.env['pms.utilities.monthly'].search([('utilities_source_type', '=', charge.source_type_id.code), ('utilities_no', '=', facility.utilities_no.name), ('utilities_supply_type', '=', facility.utilities_type_id.code), ('billingperiod', '=', filter_month)])
+                                            if monthly_id:
+                                                meter_amount += monthly_id.end_value - monthly_id.start_value
+                        if charge.use_formula == False:
+                            total_amount = meter_amount * charge.rate
+                        else:
+                            if self.unit_charge_line:
+                                for ucl in self.unit_charge_line:
+                                    if meter_amount > ucl.from_unt and meter_amount < ucl.to_unit:
+                                        total_amount = meter_amount * charge.rate
                 val = {
                     'name': line.name,
                     'property_id': line.property_id.id,

@@ -29,8 +29,22 @@ class PMSApplicableChargeType(models.Model):
     unit_charge_line = fields.One2many("pms.unit.charge.line",
                                        "applicable_charge_id",
                                        "Unit Charge Line")
-    is_formula_meter = fields.Boolean("Use Formula Meter")
-    fix_meter_rate = fields.Float("Fix Meter Rate")
+    use_formula = fields.Boolean("Use Formula")
+    rate = fields.Float("Rate")
+    source_type_id = fields.Many2one("pms.utilities.source.type",
+                                     "Source Type")
+    is_meter = fields.Boolean("IsMeter",
+                              default=False,
+                              compute="compute_ismeter")
+
+    @api.one
+    @api.depends('calculation_method_id')
+    def compute_ismeter(self):
+        if self.calculation_method_id:
+            if self.calculation_method_id.name == 'MeterUnit':
+                self.is_meter = True
+            else:
+                self.is_meter = False
 
 
 class PMSUnitChargeLine(models.Model):

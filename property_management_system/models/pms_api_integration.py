@@ -49,31 +49,31 @@ class PMSApiIntegrationLine(models.Model):
     api_url = fields.Char(
         "API Url",
         help='url is a specific path to get data with the related method.')
-    active = fields.Boolean("Active")
+    active = fields.Boolean("Active", default=True)
     api_integration_id = fields.Many2one('pms.api.integration', "API Provider")
 
     @api.multi
     def generate_api_data(self, values):
         payload = payload_name = payload_code = payload_active = url = get_api = url_get = data = url_save = None
         headers = {}
-        CLIENT_ID = self.client_id
-        CLIENT_SECRET = self.client_secret
-        access_token = self.access_token
-        url = self.url
+        CLIENT_ID = self.api_integration_id.username
+        CLIENT_SECRET = self.api_integration_id.password
+        access_token = self.api_integration_id.auth_url
+        url = self.api_integration_id.base_url
         authon = api_rauth_config.Auth2Client(url, CLIENT_ID, CLIENT_SECRET,
                                               access_token)
         print(authon)
-        if self.get_api:
-            get_api = url + self.get_api
+        if self.api_url and self.http_method_type == 'get':
+            api_url = url + '/' + self.api_url
             with requests.Session() as s:
                 s.auth = OAuth2BearerToken(authon.access_token)
-                r = s.get(get_api)
+                r = s.get(api_url)
                 r.raise_for_status()
                 data = r.json()
-        if authon.access_token:
-            # url_get = url + self.get_api
-            if self.post_api:
-                url_get = url + self.post_api
+        if authon.access_token and self.http_method_type == 'post':
+            # url_get = url + self.api_url
+            if self.api_url:
+                api_url = url + '/' + self.api_url
             host = url.split("//")[1]
             headers = {
                 'Content-Type': "application/json",
@@ -87,4 +87,4 @@ class PMSApiIntegrationLine(models.Model):
                 'Connection': "keep-alive",
                 'cache-control': "no-cache"
             }
-            return {'url': get_api or url_get, 'data': data, 'header': headers}
+            return {'url': api_url, 'data': data, 'header': headers}

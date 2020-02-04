@@ -28,9 +28,9 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
                                            track_visibility=True)
     charge_type_id = fields.Many2one(
         "pms.charge_types",
+        'Main Charge Type',
         related="applicable_charge_id.charge_type_id",
         required=True,
-        readonly=True,
         track_visibility=True)
     calculation_method_id = fields.Many2one(
         'pms.calculation.method',
@@ -56,8 +56,7 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
             self.unit_no = self.lease_line_id.unit_no.id
 
     @api.one
-    @api.depends('applicable_charge_id', 'charge_type_id',
-                 'calculation_method_id', 'rate')
+    @api.depends('applicable_charge_id', 'calculation_method_id', 'rate')
     def compute_total_amount(self):
         if self.calculation_method_id.name == 'Fix':
             self.total_amount = self.rate
@@ -70,8 +69,8 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
                 self.total_amount = (area * self.rate)
         if self.calculation_method_id.name == 'MeterUnit':
             if self.lease_line_id and self.applicable_charge_id:
-                if self.applicable_charge_id.is_formula_meter == True:
+                if self.applicable_charge_id.use_formula == True:
                     self.rate = 0
                     self.total_amount = 0
                 else:
-                    self.rate = self.applicable_charge_id.fix_meter_rate
+                    self.rate = self.applicable_charge_id.rate

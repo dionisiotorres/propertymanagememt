@@ -55,7 +55,7 @@ class PMSRentCharge(models.Model):
             if line.state == 'draft':
                 cct_name = ccm_name = None
                 for charge in line.charge_type:
-                    net_amount = percent_amount = 0
+                    net_amount = 0
                     cct_name = charge.charge_type_id.name
                     ccm_name = charge.calculation_method_id.name
                     for lagl in line.lease_agreement_line_id:
@@ -65,18 +65,19 @@ class PMSRentCharge(models.Model):
                             lpl_ids = lagl.leaseunitpos_line_id
                             laptl_ids = lagl.applicable_type_line_id
                             pct_name = pcm_name = None
-                            for apl in lpl_ids:
+                            for apl in laptl_ids:
                                 pct_name = apl.charge_type_id.name
                                 pcm_name = apl.calculation_method_id.name
                                 apc_id = apl.applicable_charge_id
                                 st_name = apc_id.source_type_id.name
-                                cst_name = charge.source_type_id
+                                cst_name = charge.source_type_id.name
                                 meter_amount = 0
                                 if ccm_name == 'Fix':
                                     if cct_name == 'Rental':
                                         dpos_obj = self.env['pos.daily.sale']
                                         if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
                                             total_rate = apl.rate
+                                if ccm_name == 'MeterUnit':
                                     if cct_name == 'Utilities':
                                         if lagl.unit_no.facility_line:
                                             luf_lines = lagl.unit_no.facility_line
@@ -101,7 +102,8 @@ class PMSRentCharge(models.Model):
                                     if cct_name == 'Rental':
                                         total_rate = unit_no.area * apl.rate
                                 if ccm_name == 'Percentage':
-                                    if cct_name == 'Rental':
+                                    percent_amount = 0
+                                    if cct_name == 'Rental' and pcm_name == ccm_name:
                                         for lid in lpl_ids:
                                             pos_id = dpos_obj.search([('pos_interface_code', '=', lid.posinterfacecode_id.name), ('pos_receipt_date', '>=', line.start_date), ('pos_receipt_date', '<=', line.end_date)])
                                             if pos_id:

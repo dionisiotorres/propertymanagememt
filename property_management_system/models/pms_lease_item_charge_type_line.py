@@ -9,18 +9,13 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
 
     @api.model
     def _get_start_date(self):
-        active_id = self.env.context.get('active_id')
-        if active_id:
-            lease_id = self.env['pms.lease_agreement.line'].browse(active_id)
-            for l in lease_id:
-                return l.start_date
+        start_date = self.env.context.get('start_date')
+        return start_date
 
     @api.model
     def _get_end_date(self):
-        active_id = self.env.context.get('active_id')
-        if active_id:
-            lease_id = self.env['pms.lease_agreement.line'].browse(active_id)
-            return lease_id.end_date
+        end_date = self.env.context.get('end_date')
+        return end_date
 
     applicable_charge_id = fields.Many2one("pms.applicable.charge.type",
                                            "Charge Name",

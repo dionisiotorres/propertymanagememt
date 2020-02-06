@@ -15,8 +15,8 @@
                 <field name="utilities_no"/>
               </group>
               <group>
-                <field name="end_value"/>
                 <field name="start_value"/>
+                <field name="end_value"/>
                 <field name="start_reading_date"/>
                 <field name="end_reading_date"/>
               </group>
@@ -35,8 +35,8 @@
           <field name="utilities_supply_type" />
           <field name="utilities_source_type"/>
           <field name="utilities_no"/>
-          <field name="end_value"/>
           <field name="start_value"/>
+          <field name="end_value"/>
           <field name="start_reading_date"/>
           <field name="end_reading_date"/>
         </tree>

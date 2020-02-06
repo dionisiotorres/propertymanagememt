@@ -23,7 +23,7 @@
                     <field name="calculation_method_id"/>
                     <field name="source_type_id" attrs="{'invisible':[('is_meter','!=',True)]}"/>
                     <field name='use_formula' attrs="{'invisible':[('is_meter','!=',True)]}"/>
-                    <field name="rate" attrs="{'invisible':[('is_meter','!=',True)]}"/>
+                    <field name="rate" attrs="{'invisible':['|',('is_meter','!=',True), ('use_formula','=',True)]}"/>
                 </group>
                 <group>
                     <field name='is_apply_tax'/>
@@ -71,7 +71,7 @@
         </search>
       </field>
     </record>
-     <record id="action_appli_charge_type_all" model="ir.actions.act_window">
+    <record id="action_appli_charge_type_all" model="ir.actions.act_window">
        <field name="name">Applicable Charge Types</field>
        <field name="res_model">pms.applicable.charge.type</field>
        <field name="view_type">form</field>

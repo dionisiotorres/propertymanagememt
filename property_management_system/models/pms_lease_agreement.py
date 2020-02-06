@@ -120,7 +120,7 @@ class PMSLeaseAgreement(models.Model):
             for line in self.lease_agreement_line:
                 for unit in line.unit_no:
                     unit.write({'status': 'occupied'})
-                for ctype in line.appilication_type:
+                for ctype in line.applicable_type_line_id:
                     if self.property_id.rentschedule_type == 'prorated':
                         date = None
                         start_date = None
@@ -647,7 +647,7 @@ class PMSLeaseAgreement(models.Model):
                         elif prop.new_lease_term and prop.new_lease_term.lease_period_type == 'year':
                             end_date = les.end_date +relativedelta(years=prop.new_lease_term.min_time_period)-relativedelta(days=1)
                     appli_ids = []
-                    for ctype in les.appilication_type:
+                    for ctype in les.applicable_type_line_id:
                         app_id = self.env['pms.applicable.charge.line'].create({
                             'id': ctype.id,
                             'applicable_charge_id': ctype.applicable_charge_id.id,
@@ -665,7 +665,7 @@ class PMSLeaseAgreement(models.Model):
                         'company_tanent_id': les.company_tanent_id.id,
                         'pos_id': les.pos_id,
                         'remark': les.remark,
-                        'appilication_type': [(6, 0, appli_ids)],
+                        'applicable_type_line_id': [(6, 0, appli_ids)],
                     }
                     line_id = self.env['pms.lease_agreement.line'].create(
                         value)

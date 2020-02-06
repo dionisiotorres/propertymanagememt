@@ -214,10 +214,14 @@ class APIData:
                         payload = lease.__dict__
                     datapayload = json.dumps([payload])
                     print(datapayload)
-                    requests.request("POST",
-                                     url_save,
-                                     data=json.dumps([payload]),
-                                     headers=headers)
+                    r = requests.request("POST",
+                                         url_save,
+                                         data=json.dumps([payload]),
+                                         headers=headers)
+                    if r.status_code == '200':
+                        return True
+                    else:
+                        return False
 
 
 class Auth2Client:

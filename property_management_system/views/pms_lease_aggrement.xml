@@ -92,6 +92,21 @@
                       <notebook>
                           <page string="Lease Unit Charge" >
                             <field name="applicable_type_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}" context="{'active_id': active_id}">
+                              <form>
+                                <group>
+                                    <group>
+                                      <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
+                                      <field name="charge_type_id"/>
+                                      <field name="calculation_method_id"/>
+                                    </group>
+                                    <group>
+                                      <field name="start_date"/>
+                                      <field name="end_date"/>
+                                      <field name="rate" />
+                                      <field name="total_amount"/>
+                                    </group>
+                                  </group>
+                                </form>
                               <tree editable="bottom">
                                 <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
                                 <field name="charge_type_id"/>
@@ -105,7 +120,7 @@
                           </page>
                           <page string="Lease Unit POS" >
                             <field name="leaseunitpos_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
-                              <tree editable="buttom">
+                              <tree editable="bottom">
                                 <field name="posinterfacecode_id"/>
                                 <field name="useposid"/>
                                 <field name="inactivedate"/>
@@ -140,12 +155,31 @@
                   </group>
                 </page>
                 <page string="Charge Configuration">
-                  <field name="applicable_type_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                  <field name="applicable_type_line_id" 
+                  readonly="1"
+                  >
+                    <form>
+                      <group>
+                        <group>
+                          <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
+                          <field name="charge_type_id"/>
+                          <field name="calculation_method_id"/>
+                        </group>
+                        <group>
+                          <field name="start_date"/>
+                          <field name="end_date"/>
+                          <field name="rate" />
+                          <field name="total_amount"/>
+                        </group>
+                      </group>
+                    </form>
                     <tree editable="bottom">
                       <field name="unit_no"/>
                       <field name="applicable_charge_id" options="{'no_quick_create':True}"/>
                       <field name="charge_type_id"/>
                       <field name="calculation_method_id"/>
+                      <field name="start_date"/>
+                      <field name="end_date"/>
                       <field name="rate" />
                       <field name="total_amount"/>
                     </tree>

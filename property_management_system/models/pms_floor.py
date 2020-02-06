@@ -117,7 +117,7 @@ class PMSFloor(models.Model):
 
             if floor_id:
                 raise UserError(
-                    _("Please set another floor code(%s) that exiting in the Mall of %s."
+                    _("Please set another floor code(%s) that exiting in the Mall of 5%s."
                       ) % (values['code'], floor_id.property_id.name))
         if 'code' in vals and 'property_id' not in vals:
             floor_id = self.search([('code', '=', vals['code']),
@@ -127,64 +127,17 @@ class PMSFloor(models.Model):
                 raise UserError(
                     _("Please set another floor code(%s) that exiting in the Mall of %s."
                       ) % (vals['code'], floor_id.property_id.name))
-        # payload = f_id = payload_name = payload_code = payload_active = data = url = url_save = None
-        # headers = {}
-        # f_codes = []
-        # api_type = self.env['pms.api.type'].search([('name', '=', "Floor")])
-        # api_integ_id = self.env['pms.api.integration'].search([('property_id', '=', self.property_id.id), ('api_type', '=', api_type.name)])
-        # if api_integ_id and self.property_id.api_integration == True:
-        #     url = api_integ_id.url
-        #     get_api = url + api_integ_id.get_api
-        #     CLIENT_ID = api_integ_id.client_id
-        #     CLIENT_SECRET = api_integ_id.client_secret
-        #     access_token = api_integ_id.access_token
-        #     authon = api_rauth_config.Auth2Client(url, CLIENT_ID, CLIENT_SECRET, access_token)
-        #     url_save = api_integ_id.url  + api_integ_id.post_api
-        #     with requests.Session() as s:
-        #         s.auth = OAuth2BearerToken(authon.access_token)
-        #         r = s.get(get_api)
-        #         r.raise_for_status()
-        #         data = r.json()
-        #     for floor in data:
-        #         f_codes.append(floor['floorCode'])
-        #         if floor['floorCode'] == self.code and self.name == floor['floorDesc']:
-        #             f_id = floor['floorID']
-        #     if 'name' in vals and authon.access_token:
-        #         payload_name = str(vals['name'])
-        #     if 'code' in vals and authon.access_token:
-        #         if vals['code'] in f_codes:
-        #             raise UserError(_("Floor Code %s is exiting in Database, Please set other Code." % (vals['code'])))
-        #         else:
-        #             payload_code = str(vals['code'])
-        #     if 'active' in vals and authon.access_token:
-        #         if vals['active'] == True:
-        #             payload_active = 'true'
-        #         else:
-        #             payload_active = 'false'
-        #     if self.active == True:
-        #         payload_active = 'true'
-        #     else:
-        #         payload_active = 'false'
-        #     modify_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-        #     payload = str('{\r\n        \"floorID\":"') + (f_id if f_id else "") + str('",\r\n        \"floorCode\":') + '"' + (payload_code if payload_code else self.code) + '"' + str(',\r\n        \"floorDesc\":') + '"' + (payload_name if payload_name else self.name) + '"' + str(',\r\n        \"displayOrdinal\": null,\r\n       \"remark\": null,\r\n        \"active\":') + payload_active + str('\r\n    }')
-        #     host = url.split("//")[1]
-        #     headers = {
-        #         'Content-Type': "application/json",
-        #         'Authorization': "Bearer " + authon.access_token,
-        #         'User-Agent': "PostmanRuntime/7.15.2",
-        #         'Accept': "*/*",
-        #         'Cache-Control': "no-cache",
-        #         'Host': host,
-        #         'Accept-Encoding': "gzip, deflate",
-        #         'Content-Length': "172",
-        #         'Connection': "keep-alive",
-        #         'cache-control': "no-cache"
-        #     }
         id = None
         id = super(PMSFloor, self).write(vals)
-        # if id and self.property_id.api_integration == True:
-        #     requests.request(
-        #     "POST", url_save, data=payload0, headers=headers)
+        if id and self.property_id.api_integration == True:
+            property_obj = self.env['pms.properties']
+            property_id = property_obj.browse(self.property_id)
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "Floor")
+            ])
+            datas = api_rauth_config.APIData(id, vals, property_id, integ_obj,
+                                             api_line_ids)
         return id
 
     @api.multi

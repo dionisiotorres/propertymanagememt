@@ -48,60 +48,73 @@ class PMSRentCharge(models.Model):
     @api.multi
     def action_generate_rs(self):
         val = {}
-        charge_rents = None
         for line in self:
             total_amount = 0
+            lsd_year = line.start_date.year
+            lsd_month = line.start_date.month
             if line.state == 'draft':
+                cct_name = ccm_name = None
                 for charge in line.charge_type:
                     net_amount = percent_amount = 0
+                    cct_name = charge.charge_type_id.name
+                    ccm_name = charge.calculation_method_id.name
                     for lagl in line.lease_agreement_line_id:
                         total_rate = total_unit = 0
-                        if lagl.leaseunitpos_line_id and charge.charge_type_id.name == 'Rental':
-                            if charge.calculation_method_id.name == 'Fix':
-                                for apl in lagl.applicable_type_line_id:
-                                    if apl.charge_type_id.name == charge.charge_type_id.name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and apl.calculation_method_id.name == charge.calculation_method_id.name:
-                                        total_rate = apl.rate
-                            if charge.calculation_method_id.name == 'Percentage':
-                                for posline in lagl.leaseunitpos_line_id:
-                                    pos_id = self.env['pos.daily.sale'].search([('pos_interface_code', '=', posline.posinterfacecode_id.name), ('pos_receipt_date', '>=', line.start_date), ('pos_receipt_date', '<=', line.end_date)])
-                                    if pos_id:
-                                        for daily in pos_id:
-                                            net_amount += daily.manual_net_sales
-                                # charge_rents = pos.applicable_type_line_id.filtered(lambda c:c.charge_type_id.name == charge.charge_type_id.name and c.start_date <= line.start_date and c.end_date >= line.end_date and c.calculation_method_id.name == charge.calculation_method_id.name)
-                                for app in lagl.applicable_type_line_id:
-                                    if app.charge_type_id.name == charge.charge_type_id.name and app.start_date <= line.start_date and app.end_date >= line.end_date and app.calculation_method_id.name == charge.calculation_method_id.name:
-                                        percent_amount = app.rate
-                                # for ct in charge_rents:
-                                #     if ct.calculation_method_id.name == 'Percentage':
-                                total_rate = (net_amount * percent_amount)/100
-                        if lagl.leaseunitpos_line_id and charge.charge_type_id.name == 'Utilities':
-                            if charge.calculation_method_id.name == 'MeterUnit':
+                        laptl_ids = None
+                        if lagl.leaseunitpos_line_id:
+                            lpl_ids = lagl.leaseunitpos_line_id
+                            laptl_ids = lagl.applicable_type_line_id
+                            pct_name = pcm_name = None
+                            for apl in lpl_ids:
+                                pct_name = apl.charge_type_id.name
+                                pcm_name = apl.calculation_method_id.name
+                                apc_id = apl.applicable_charge_id
+                                st_name = apc_id.source_type_id.name
+                                cst_name = charge.source_type_id
                                 meter_amount = 0
-                                if lagl.unit_no.facility_line:
-                                    for facility in lagl.unit_no.facility_line:
-                                        if facility:
-                                            for facline in facility.facilities_line:
-                                                filter_month = str(line.start_date.year) + (('0' + str(line.start_date.month)) if len(str(line.start_date.month)) <= 1 else str(line.start_date.month))
-                                                monthly_id = self.env['pms.utilities.monthly'].search([('utilities_source_type', '=', charge.source_type_id.code), ('utilities_no', '=', facility.utilities_no.name), ('utilities_supply_type', '=', facility.utilities_type_id.code), ('billingperiod', '=', filter_month)])
-                                                if monthly_id:
-                                                    meter_amount = monthly_id.end_value - monthly_id.start_value
-                                
-                                for apl in lagl.applicable_type_line_id:
-                                    if apl.applicable_charge_id.source_type_id.name == charge.source_type_id.name and apl.charge_type_id.name == charge.charge_type_id.name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and apl.calculation_method_id.name == charge.calculation_method_id.name:
-                                        if charge.use_formula == False:
-                                            amount = apl.rate
-                                            total_unit = meter_amount * amount
-                                        else:
-                                            if self.unit_charge_line:
-                                                for ucl in self.unit_charge_line:
-                                                    if meter_amount > ucl.from_unt and meter_amount < ucl.to_unit:
-                                                        total_unit = meter_amount * apl.rate
-                        if total_rate and not total_unit:
-                            total_amount = total_rate
-                        elif total_unit and not total_rate:
-                            total_amount = total_unit
-                        else:
-                            total_amount = total_amount
+                                if ccm_name == 'Fix':
+                                    if cct_name == 'Rental':
+                                        dpos_obj = self.env['pos.daily.sale']
+                                        if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
+                                            total_rate = apl.rate
+                                    if cct_name == 'Utilities':
+                                        if lagl.unit_no.facility_line:
+                                            luf_lines = lagl.unit_no.facility_line
+                                            for fl in luf_lines:
+                                                if fl.facilities_line:
+                                                    umon_obj = self.env['pms.utilities.monthly']
+                                                    filter_month = str(lsd_year) + (('0' + str(lsd_month)) if len(str(lsd_month)) <= 1 else str(lsd_month))
+                                                    monthly_id = umon_obj.search([('utilities_source_type', '=', charge.source_type_id.code), ('utilities_no', '=', fl.utilities_no.name), ('utilities_supply_type', '=', fl.utilities_type_id.code), ('billingperiod', '=', filter_month)])
+                                                    if monthly_id:
+                                                        meter_amount = monthly_id.end_value - monthly_id.start_value
+                                        if st_name == cst_name and pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
+                                            if charge.use_formula == False:
+                                                amount = apl.rate
+                                                total_unit = meter_amount * amount
+                                            else:
+                                                if self.unit_charge_line:
+                                                    uc_lines = self.unit_charge_line
+                                                    for ucl in uc_lines:
+                                                        if meter_amount > ucl.from_unt and meter_amount < ucl.to_unit:
+                                                            total_unit = meter_amount * apl.rate
+                                if ccm_name == 'Area':
+                                    if cct_name == 'Rental':
+                                        total_rate = unit_no.area * apl.rate
+                                if ccm_name == 'Percentage':
+                                    if cct_name == 'Rental':
+                                        for lid in lpl_ids:
+                                            pos_id = dpos_obj.search([('pos_interface_code', '=', lid.posinterfacecode_id.name), ('pos_receipt_date', '>=', line.start_date), ('pos_receipt_date', '<=', line.end_date)])
+                                            if pos_id:
+                                                for daily in pos_id:
+                                                    net_amount += daily.manual_net_sales
+                                        percent_amount = apl.rate
+                                        total_rate = (net_amount * percent_amount)/100       
+                            if total_rate and not total_unit:
+                                total_amount = total_rate
+                            elif total_unit and not total_rate:
+                                total_amount = total_unit
+                            else:
+                                total_amount = total_amount
                 val = {
                     'name': line.name,
                     'property_id': line.property_id.id,
@@ -117,7 +130,7 @@ class PMSRentCharge(models.Model):
                 }
                 gen_id = self.env['pms.gen.rent.schedule'].create(val)
                 if gen_id:
-                    line.write({'state': 'generated'})
+                    line.write({'state': 'generated', 'amount': total_amount})
 
 
 class PMSPropertyType(models.Model):
@@ -763,21 +776,20 @@ class PMSGenerateRentSchedule(models.Model):
                     'company_id': ls.lease_agreement_id.company_id.id,
                     'invoice_line_ids': [(6, 0, invoice_lines)],
                     })
-        print (self)
-        return True
-    
-    @api.multi
-    def action_view_invoice(self):
-        invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_agreement_id.lease_no)])
-        action = self.env.ref('account.action_invoice_tree1').read()[0]
-        if len(invoices) > 2:
-            action['domain'] = [('id', 'in', invoices[1])]
-        elif len(invoices) == 2:
-            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
-            action['res_id'] = invoices[1].id
-        else:
-            action = {'type': 'ir.actions.act_window_close'}
-        return action
+        return self.env.ref('account.action_invoice_tree1').read()[0]
+
+    # @api.multi
+    # def action_view_invoice(self):
+    #     invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_agreement_id.lease_no)])
+    #     action = self.env.ref('account.action_invoice_tree1').read()[0]
+    #     if len(invoices) > 2:
+    #         action['domain'] = [('id', 'in', invoices[1])]
+    #     elif len(invoices) == 2:
+    #         action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+    #         action['res_id'] = invoices[1].id
+    #     else:
+    #         action = {'type': 'ir.actions.act_window_close'}
+    #     return action
     # def action_invoice(self, vals):
     #     invoice_month = invoices = None
     #     sch_ids = start_date = end_date = []

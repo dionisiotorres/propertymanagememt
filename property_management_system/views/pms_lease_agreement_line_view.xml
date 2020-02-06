@@ -30,11 +30,10 @@
                         <field name="company_tanent_id"/>
                     </group>
                     <group>
-                        <!-- <field name="rent"/> -->
                         <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="extend_start" string="Extend From" attrs="{'invisible': [('extend_start','=',False)]}"/>
-                        <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
+                        <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','=', 'BOOKING')]}"/>
                         <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                     </group>
                     </group>
@@ -55,23 +54,12 @@
                       <page string="Lease Unit POS" >
                         <field name="leaseunitpos_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                           <tree editable="buttom">
-                            <!-- <field name="name"/> -->
                             <field name="posinterfacecode_id"/>
                             <field name="useposid"/>
                             <field name="inactivedate"/>
                           </tree>
                         </field> 
                       </page>
-                      <!-- <page string="Rent Schedule lines" >
-                          <field name="rent_schedule_line" readonly="1">
-                            <tree>
-                              <field name="charge_type"/>
-                              <field name="start_date"/>
-                              <field name="end_date"/>
-                              <field name="gto_amount" string="Amount"/>
-                            </tree>
-                          </field> 
-                      </page> -->
                     </notebook>
                 </sheet>
                  <div class="oe_chatter">
@@ -116,7 +104,6 @@
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_lease_aggrement_line_tree"/>
-       <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record> 
     <menuitem  id="lease_agreement_line_menu" 
       name="Lease Agreement Detail" 

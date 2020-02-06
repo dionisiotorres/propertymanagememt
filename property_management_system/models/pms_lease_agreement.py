@@ -71,6 +71,8 @@ class PMSLeaseAgreement(models.Model):
         default=lambda self: self.env.user.company_id.id, track_visibility=True)
     lease_rent_config_id = fields.One2many("pms.rent_schedule", "lease_agreement_id", "Rental Details", track_visibility=True)
     applicable_type_line_id = fields.One2many('pms.lease.unit.charge.type.line', 'lease_id', "Charge Types")
+    booking_date = fields.Date("Booking Date")
+    booking_expdate = fields.Date("Booking ExpDate")
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -849,7 +851,6 @@ class PMSLeaseAgreementLine(models.Model):
     applicable_type_line_id = fields.One2many('pms.lease.unit.charge.type.line','lease_line_id',"Charge Types")
     company_tanent_id = fields.Many2one("res.partner", "Shop", related="lease_agreement_id.company_tanent_id")
     leaseunitpos_line_id = fields.One2many("pms.lease.unit.pos",'leaseagreementitem_id',"Lease Unit POS")
-    
     @api.one
     @api.depends('unit_no', 'lease_no')
     def compute_name(self):

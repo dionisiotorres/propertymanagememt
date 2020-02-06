@@ -28,9 +28,7 @@
                   <field name="property_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="floor_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="spaceunittype_id"/>
-                  <field name="uom"/>
-<!--                   <field name="booking_date"/>
-                  <field name="booking_expired_date" string="Booking Expired"/> -->
+                  <field name="uom"/>                  
                   <field name="remark"/>
                 </group>
                 <group> 
@@ -126,8 +124,6 @@
           <field name="uom"/>   
           <field name="start_date"/> 
           <field name="end_date"/>
-<!--           <field name="booking_date"/>
-          <field name="booking_expired_date" string="Booking Expired"/> -->
           <field name="status"/>
           <field name="active"/> 
         </tree>
@@ -143,8 +139,6 @@
             <field name="property_id"/>
             <field name="floor_id"/>    
             <field name="start_date"/>
-            <field name="booking_date"/>
-            <field name="booking_expired_date"/>
             <field name="status"/>   
             <templates>
                 <t t-name="kanban-box">

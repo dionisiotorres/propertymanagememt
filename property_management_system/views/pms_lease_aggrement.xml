@@ -51,7 +51,9 @@
                 <field name="old_lease_no" readonly="1" attrs="{'invisible': ['|',('old_lease_no','=',''),('old_lease_no','=', 'New')]}"/>
               </group>
               <group>
-                <field name="start_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
+                  <field name="booking_date"/>
+                  <field name="booking_expdate"/>
+                  <field name="start_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
                   <field name="end_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
                   <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
@@ -80,13 +82,13 @@
                       <group>
                         <group>
                           <field name="lease_agreement_id" invisible="1"/>
-                          <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>  
-                          <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                          <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         </group>
                         <group>
                           <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                           <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                          <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
+                          <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','in', ['BOOKING'])]}"/>
+                          <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         </group>
                       </group>
                       <notebook>
@@ -215,6 +217,8 @@
           <field name="unit_no"/>
           <field name="lease_no"/>
           <field name="old_lease_no"/>
+          <field name="booking_date"/>
+          <field name="booking_expdate"/>
           <field name="start_date" />
           <field name="end_date" />
           <field name="state"/>
@@ -273,7 +277,6 @@
           <field name="old_lease_no"/>
           <field name="property_id"/>
           <field name="company_tanent_id"/>
-          <!-- <field name="state"/> -->
           <group expand="0" name="group_by" string="Group By">
             <filter name="Status" string="Status" domain="[]" context="{'group_by' : 'state'}" />
             <filter name="group_property_id" string="Property" icon="terp-partner" context="{'group_by':'property_id'}"/>

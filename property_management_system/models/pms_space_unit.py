@@ -114,8 +114,6 @@ class PMSSpaceUnit(models.Model):
     #                                "Add Records",
     #                                track_visibility=True)
     active = fields.Boolean("Active", default=True)
-    booking_date = fields.Date("Booking Date")
-    booking_expired_date = fields.Date("Booking Expired Date")
 
     @api.multi
     @api.onchange('end_date')
@@ -147,12 +145,13 @@ class PMSSpaceUnit(models.Model):
                     if fid.value_type == 'fix':
                         if self.unit_no or self.floor_id:
                             val.append(fid.fix_value)
-                    # if fid.value_type == 'digit':
-                    #     if self.unit_no and len(
-                    #             self.unit_no) > fid.digit_value:
-                    #         raise UserError(
-                    #             _("Please Unit Length less than your format digit."
-                    #               ))
+                    if fid.value_type == 'digit':
+                        if self.unit_no and len(
+                                self.unit_no) > fid.digit_value:
+                            raise UserError(
+                                _("Unit code(%s)'s length is %s that's length greater than digit %s of the format in the Property Setting."
+                                  ) % (self.unit_no, len(
+                                      self.unit_no), fid.digit_value))
                     if fid.value_type == 'datetime':
                         val.append(fid.datetime_value)
                 space = []
@@ -166,15 +165,17 @@ class PMSSpaceUnit(models.Model):
                         self.name += str(self.unit_no)
 
             else:
-                raise UserError(_("Please setup your unit format in Property"))
+                raise UserError(
+                    _("Unit Format is not exit in the Property Setting."))
         length = 0
         if self.name:
             length = len(self.name)
-        # if self.property_id.unit_code_len:
-        #     if length > self.property_id.unit_code_len:
-        #         raise UserError(
-        #             _("Please set your code length less than %s." %
-        #               (self.property_id.unit_code_len)))
+        if self.property_id.unit_code_len:
+            if length > self.property_id.unit_code_len:
+                raise UserError(
+                    _("Unit(%s)'s length is %s. That's length is less than or equal %s."
+                      % (self.name, len(
+                          self.name), self.property_id.unit_code_len)))
 
     # @api.multi
     # @api.onchange('name')
@@ -198,13 +199,16 @@ class PMSSpaceUnit(models.Model):
 
     @api.model
     def create(self, values):
+        unit = ''
         floor_id = self.env['pms.floor'].search([('id', '=',
                                                   values['floor_id'])])
         property_id = floor_id.property_id
         if values['property_id'] != property_id.id:
+            property_code = self.env['pms.properties'].browse(
+                values['property_id'])
             raise UserError(
-                _('Please set floor in  %s property.') % values['property_id'])
-        unit = ''
+                _('Floor %s is not exit in the %s Property.') %
+                (floor_id.code, property_code.code))
         if property_id.unit_format:
             for line in property_id.unit_format.format_line_id:
                 if line.value_type == 'dynamic':

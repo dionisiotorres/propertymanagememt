@@ -67,5 +67,9 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
                 if self.applicable_charge_id.use_formula == True:
                     self.rate = 0
                     self.total_amount = 0
-                else:
+                elif self.applicable_charge_id.use_formula != True and self.rate == 0:
                     self.rate = self.applicable_charge_id.rate
+                    self.total_amount = self.rate
+                else:
+                    self.rate = self.rate
+                    self.total_amount = self.rate

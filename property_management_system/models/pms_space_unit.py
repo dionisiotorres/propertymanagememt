@@ -211,7 +211,7 @@ class PMSSpaceUnit(models.Model):
                     if line.dynamic_value == 'floor ref code':
                         unit += str(floor_id.floor_code_ref)
                     if line.dynamic_value == 'floor code':
-                        unit += str(floor_id.floor_code)
+                        unit += str(floor_id.code)
                 if line.value_type == 'fix':
                     unit += str(line.fix_value)
                 if line.value_type == 'digit':

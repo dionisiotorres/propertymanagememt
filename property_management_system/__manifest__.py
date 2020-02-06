@@ -13,17 +13,19 @@
     'category':
     'base',
     'version':
-    '1.1.8',
+    '1.1.10',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
     'data': [
         'security/property_security.xml',
         'security/ir.model.access.csv',
+        'data/pms_generate_rs_data.xml',
         'data/pms.company.category.csv',
         'data/ir_sequence_data.xml',
         'data/pms_lease_schedular_data.xml',
         'data/pos_run_schedule_data_view.xml',
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
+        'wizard/pms_generate_rent_schedule_view.xml',
         'data/pms.utilities.supply.type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
@@ -62,6 +64,7 @@
         'views/pms_applicable_space_type_view.xml',
         'views/pms_utilities_monthly_view.xml',
         'views/pms_rent_schedule.xml',
+        'views/pms_lease_unit_pos_view.xml',
     ],
     'installable':
     True,

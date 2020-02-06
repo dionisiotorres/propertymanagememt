@@ -4,221 +4,224 @@ import datetime
 from odoo.addons.property_management_system.rauth import OAuth2Service
 from odoo import tools, _
 from odoo import models, api
-
 # from rauth import OAuth2Service
 
 
 class APIData:
-    def __init__(self, model_id, values, property_obj, integ_obj,
-                 api_type_obj):
+    def __init__(self, model_id, values, property_id, integ_obj, api_line_ids):
         self.values = values
         self.model_id = model_id
-        self.property_obj = property_obj
+        self.property_id = property_id
         self.integ_obj = integ_obj
-        self.api_type_obj = api_type_obj
+        self.api_line_ids = api_line_ids
         return self.get_data()
 
     def get_data(self):
-        property_id = self.values['property_id']
-        property_ids = self.property_obj
+        property_ids = self.property_id
         integ_obj = self.integ_obj
-        api_type_obj = self.api_type_obj
-        api_integ_id = integ_obj.search([
-            ('property_id', '=', self.values['property_id']),
-            ('api_type', '=', api_type_obj['name'])
-        ])
+        api_line_ids = self.api_line_ids
         api_integ = []
         headers = {}
         payload_code = payload_name = modify_date = None
         payload = None
-        if api_integ_id and property_ids.api_integration == True:
-            api_integ = api_integ_id.generate_api_data({
-                'id': api_integ_id.id,
-                'data': self.values
-            })
-            headers = api_integ['header']
-            url_save = api_integ_id.url + api_integ_id.post_api
-            if api_type_obj['name'] == 'Floor':
-                payload_code = str(self.values['code'])
-                payload_name = str(self.values['name'])
-                modify_date = datetime.datetime.now().strftime(
-                    '%Y-%m-%d %H:%M:%S.%f')
-                if self.values['active'] == True:
-                    payload_active = 'true'
-                else:
-                    payload_active = 'false'
-                data_batch = BatchInfo()
-                data_batch.AppCode = "FI"
-                data_batch.BatchCode = "2019121798381"
-                data_batch.PropertyCode = property_ids.code
-                data_batch.InterfaceCode = ""
-                floor = Floor()
-                floor.BatchInfo = data_batch.__dict__
-                floor.FloorID = "1"
-                floor.FloorCode = payload_code
-                floor.FloorDesc = payload_name
-                floor.ModifiedDate = modify_date
-                floor.ExtDataSourceID = "ZPMS"
-                floor.Remark = ''
-                floor.ExtFloorID = self.model_id.id
-                payload = floor.__dict__
-            if api_type_obj['name'] == 'CRMAccount':
-                # payload_code = str(self.values['code'])
-                # payload_name = str(self.values['name'])
-                modify_date = datetime.datetime.now().strftime(
-                    '%Y-%m-%d %H:%M:%S.%f')
-                if self.values['active'] == True:
-                    payload_active = 'true'
-                else:
-                    payload_active = 'false'
-                data_batch = BatchInfo("PEMS", property_ids.code,
-                                       "2019121798380", "")
-                CRM = CRMAccount("", payload_code, payload_name, "", '', "",
-                                 self.model_id.id, modify_date, data_batch)
-                payload = [{CRM}]
-            if api_type_obj['name'] == 'SpaceUnit':
-                payload_name = str(self.model_id.name)
-                payload_area = str(self.values['area'])
-                start_date = str(self.values['start_date'])
-                end_date = str(self.values['end_date'])
-                floor_code = str(self.model_id.floor_code)
-                payload_uom = str(self.model_id.uom)
-                payload_remark = str(self.values['remark'])
-                floor_id = str(self.model_id.floor_id.id)
-                modify_date = datetime.datetime.now().strftime('%Y-%m-%d')
-                # if self.values['active'] == True:
-                #     payload_active = 'true'
-                # else:
-                #     payload_active = 'false'
-                data_batch = BatchInfo()
-                data_batch.AppCode = "SPI"
-                data_batch.BatchCode = "201912179810983"
-                data_batch.PropertyCode = property_ids.code
-                data_batch.InterfaceCode = ""
-                spaceunit = SpaceUnit()
-                spaceunit.PropertyCode = property_ids.code
-                spaceunit.FloorID = floor_id
-                # spaceunit.PropertyCode = property_ids.code
-                spaceunit.SpaceUnitNo = payload_name
-                spaceunit.FloorCode = floor_code
-                spaceunit.DisplayOrdinal = ''
-                spaceunit.StartDate = start_date
-                # spaceunit.EndDate = end_date
-                spaceunit.EndDate = ''
-                spaceunit.Area = payload_area
-                spaceunit.SpaceUnitID = ''
-                # spaceunit.UM = payload_uom
-                spaceunit.UM = ''
-                # spaceunit.Remark = payload_remark
-                spaceunit.Remark = ''
-                spaceunit.ExtDataSourceID = 'ZPMS'
-                spaceunit.ExtSpaceUnitID = str(self.model_id.id)
-                # spaceunit.ModifiedDate = modify_date
-                spaceunit.ModifiedDate = modify_date
-                spaceunit.Status = '1'
-                spaceunit.BatchInfo = data_batch.__dict__
-                payload = spaceunit.__dict__
-            if api_type_obj['name'] == 'SpaceUnitFacility':
-                # payload_code = str(self.values['code'])
-                # payload_name = str(self.values['name'])
-                modify_date = datetime.datetime.now().strftime('%Y-%m-%d')
-                # if self.values['active'] == True:
-                #     payload_active = 'true'
-                # else:
-                #     payload_active = 'false'
-                data_batch = BatchInfo()
-                data_batch.AppCode = "SPUFI"
-                data_batch.BatchCode = "2019121709888"
-                data_batch.PropertyCode = property_ids.code
-                data_batch.InterfaceCode = ""
-                facility = SpaceUnitFacility()
-                # facility.SpaceUnitID = self
-                facility.SpaceUnitID = '41'
-                facility.SpaceUnitFacilityID = None
-                facility.StartDate = str(
-                    self.model_id.facilities_line.start_date)
-                facility.EndDate = str(self.model_id.facilities_line.end_date)
-                facility.UtilitiesMeterNo = self.model_id.utilities_no.name
-                facility.UtilitiesType = self.model_id.utilities_type_id.code
-                facility.LastReadingOn = str(
-                    self.model_id.facilities_line.start_date)
-                facility.LastReadingValue = self.model_id.facilities_line.start_reading_value
-                facility.LastReadingNOC = 0
-                facility.LastReadingNOH = 0
-                facility.EMeterType = ''
-                facility.Remark = None
-                facility.IsNew = True
-                facility.UpdateMethod = None
-                facility.Digit = self.model_id.facilities_line.digit
-                facility.Indicator = None
-                facility.CanChangeMeterNo = False
-                facility.ExtDataSourceID = 'ZPMS'
-                facility.ExtSpaceUnitFacilityID = str(self.model_id.id)
-                facility.ModifiedDate = modify_date
-                facility.BatchInfo = data_batch.__dict__
-                payload = facility.__dict__
-            if api_type_obj['name'] == 'LeaseAgreement':
-                # payload_code = str(self.values['code'])
-                # payload_name = str(self.values['name'])
-                modify_date = datetime.datetime.now().strftime(
-                    '%Y-%m-%d %H:%M:%S.%f')
-                if self.values['active'] == True:
-                    payload_active = 'true'
-                else:
-                    payload_active = 'false'
-                data_batch = BatchInfo()
-                data_batch.AppCode = "LGI"
-                data_batch.BatchCode = "20191217983089"
-                data_batch.PropertyCode = property_ids.code
-                data_batch.InterfaceCode = ""
-                lease = LeaseAgreement()
-                lease.LeaseAgreementID = self.model_id.id
-                lease.CrmAccountID = ''
-                lease.PosVendorID = ''
-                lease.PropertyID = property_ids.id
-                lease.PosIDs = ''
-                lease.LeaseStartDate = self.model_id.start_date
-                lease.LeaseEndDate = self.model_id.end_date
-                lease.ExtendedTo = self.model_id.extend_date
-                # lease.OldEndDate = ''
-                # lease.RevisedEndDate = ''
-                lease.Remark = ''
-                lease.EnforceGPFlag = ''
-                lease.ResetGPFlag = ''
-                lease.SetResetOn = ''
-                lease.LeaseStatus = ''
-                lease.ResetDate = ''
-                lease.ExternalLeaseNo = ''
-                lease.LeaseAggrementCode = ''
-                lease.PosInterfaceCode = ''
-                lease.AppAccessKey = ''
-                lease.AppSecretAccessKey = ''
-                lease.DefaultLocalCurrency = ''
-                lease.PropertyName = property_ids.name
-                lease.PropertyCode = property_ids.code
-                lease.ShopName = self.model_id.company_tanent_id.name
-                lease.VendorName = self.model_id.company_vendor_id.name
-                lease.PosSubmissionFrequency = ''
-                lease.LeaseStatusDesc = ''
-                lease.SpaceUnitNo = self.model_id.unit_no
-                lease.AppAccessKeyStatus = ''
-                lease.DebugMode = ''
-                lease.ExtDataSourceID = 'ZPMS'
-                lease.ModifiedDate = modify_date
-                lease.ExtLeaseAgreementID = str(self.model_id.id)
-                lease.PosSubmissionType = ''
-                lease.SalesDataType = ''
-                lease.PosSubmissionTypeDesc = ''
-                lease.SalesDataTypeDesc = ''
-                lease.SubmissionLink = ''
-                lease.BatchInfo = data_batch.__dict__
-                payload = lease.__dict__
-            datapayload = json.dumps([payload])
-            print(datapayload)
-            requests.request("POST",
-                             url_save,
-                             data=json.dumps([payload]),
-                             headers=headers)
+        if api_line_ids:
+            for line in api_line_ids:
+                url_save = line.api_integration_id.base_url + '/' + line.api_url
+                if line.http_method_type == 'post':
+                    api_integ = line.generate_api_data({
+                        'id': line.id,
+                        'data': self.values
+                    })
+                    headers = api_integ['header']
+                    if line.name == 'Floor':
+                        payload_code = str(self.values['code'])
+                        payload_name = str(self.values['name'])
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d %H:%M:%S.%f')
+                        if self.values['active'] == True:
+                            payload_active = 'true'
+                        else:
+                            payload_active = 'false'
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "FI"
+                        data_batch.BatchCode = "2019121798381"
+                        data_batch.PropertyCode = 'JNC' if property_ids.code else JNC
+                        data_batch.InterfaceCode = ""
+                        floor = Floor()
+                        floor.BatchInfo = data_batch.__dict__
+                        floor.FloorID = "1"
+                        floor.FloorCode = payload_code
+                        floor.FloorDesc = payload_name
+                        floor.ModifiedDate = modify_date
+                        floor.ExtDataSourceID = "ZPMS"
+                        floor.Remark = ''
+                        floor.ExtFloorID = self.model_id.id
+                        payload = floor.__dict__
+                    if line.name == 'CRMAccount':
+                        # payload_code = str(self.values['code'])
+                        # payload_name = str(self.values['name'])
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d %H:%M:%S.%f')
+                        if self.values['active'] == True:
+                            payload_active = 'true'
+                        else:
+                            payload_active = 'false'
+                        data_batch = BatchInfo("PEMS", property_ids.code,
+                                               "2019121798380", "")
+                        CRM = CRMAccount("", payload_code, payload_name, "",
+                                         '', "", self.model_id.id, modify_date,
+                                         data_batch)
+                        payload = [{CRM}]
+                    if line.name == 'SpaceUnit':
+                        payload_name = str(self.model_id.name)
+                        payload_area = str(self.values['area'])
+                        start_date = str(self.values['start_date'])
+                        end_date = str(self.values['end_date'])
+                        floor_code = str(self.model_id.floor_code)
+                        payload_uom = str(self.model_id.uom)
+                        payload_remark = str(self.values['remark'])
+                        floor_id = str(self.model_id.floor_id.id)
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d')
+                        # if self.values['active'] == True:
+                        #     payload_active = 'true'
+                        # else:
+                        #     payload_active = 'false'
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "SPI"
+                        data_batch.BatchCode = "201912179810983"
+                        data_batch.PropertyCode = property_ids.code
+                        data_batch.InterfaceCode = ""
+                        spaceunit = SpaceUnit()
+                        spaceunit.PropertyCode = property_ids.code
+                        spaceunit.FloorID = floor_id
+                        # spaceunit.PropertyCode = property_ids.code
+                        spaceunit.SpaceUnitNo = payload_name
+                        spaceunit.FloorCode = floor_code
+                        spaceunit.DisplayOrdinal = ''
+                        spaceunit.StartDate = start_date
+                        # spaceunit.EndDate = end_date
+                        spaceunit.EndDate = ''
+                        spaceunit.Area = payload_area
+                        spaceunit.SpaceUnitID = ''
+                        # spaceunit.UM = payload_uom
+                        spaceunit.UM = ''
+                        # spaceunit.Remark = payload_remark
+                        spaceunit.Remark = ''
+                        spaceunit.ExtDataSourceID = 'ZPMS'
+                        spaceunit.ExtSpaceUnitID = str(self.model_id.id)
+                        # spaceunit.ModifiedDate = modify_date
+                        spaceunit.ModifiedDate = modify_date
+                        spaceunit.Status = '1'
+                        spaceunit.BatchInfo = data_batch.__dict__
+                        payload = spaceunit.__dict__
+                    if line.name == 'SpaceUnitFacility':
+                        # payload_code = str(self.values['code'])
+                        # payload_name = str(self.values['name'])
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d')
+                        # if self.values['active'] == True:
+                        #     payload_active = 'true'
+                        # else:
+                        #     payload_active = 'false'
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "SPUFI"
+                        data_batch.BatchCode = "2019121709888"
+                        data_batch.PropertyCode = property_ids.code
+                        data_batch.InterfaceCode = ""
+                        facility = SpaceUnitFacility()
+                        # facility.SpaceUnitID = self
+                        facility.SpaceUnitID = '41'
+                        facility.SpaceUnitFacilityID = None
+                        facility.StartDate = str(
+                            self.model_id.facilities_line.start_date)
+                        facility.EndDate = str(
+                            self.model_id.facilities_line.end_date)
+                        facility.UtilitiesMeterNo = self.model_id.utilities_no.name
+                        facility.UtilitiesType = self.model_id.utilities_type_id.code
+                        facility.LastReadingOn = str(
+                            self.model_id.facilities_line.start_date)
+                        facility.LastReadingValue = self.model_id.facilities_line.start_reading_value
+                        facility.LastReadingNOC = 0
+                        facility.LastReadingNOH = 0
+                        facility.EMeterType = ''
+                        facility.Remark = None
+                        facility.IsNew = True
+                        facility.UpdateMethod = None
+                        facility.Digit = self.model_id.facilities_line.digit
+                        facility.Indicator = None
+                        facility.CanChangeMeterNo = False
+                        facility.ExtDataSourceID = 'ZPMS'
+                        facility.ExtSpaceUnitFacilityID = str(self.model_id.id)
+                        facility.ModifiedDate = modify_date
+                        facility.BatchInfo = data_batch.__dict__
+                        payload = facility.__dict__
+                    if line.name == 'LeaseAgreement':
+                        # payload_code = str(self.values['code'])
+                        # payload_name = str(self.values['name'])
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d %H:%M:%S.%f')
+                        if self.values['active'] == True:
+                            payload_active = 'true'
+                        else:
+                            payload_active = 'false'
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "LGI"
+                        data_batch.BatchCode = "20191217983089"
+                        data_batch.PropertyCode = property_ids.code
+                        data_batch.InterfaceCode = ""
+                        lease = LeaseAgreement()
+                        lease.LeaseAgreementID = self.model_id.id
+                        lease.CrmAccountID = ''
+                        lease.PosVendorID = ''
+                        lease.PropertyID = property_ids.id
+                        lease.PosIDs = ''
+                        lease.LeaseStartDate = self.model_id.start_date
+                        lease.LeaseEndDate = self.model_id.end_date
+                        lease.ExtendedTo = self.model_id.extend_date
+                        # lease.OldEndDate = ''
+                        # lease.RevisedEndDate = ''
+                        lease.Remark = ''
+                        lease.EnforceGPFlag = ''
+                        lease.ResetGPFlag = ''
+                        lease.SetResetOn = ''
+                        lease.LeaseStatus = ''
+                        lease.ResetDate = ''
+                        lease.ExternalLeaseNo = ''
+                        lease.LeaseAggrementCode = ''
+                        lease.PosInterfaceCode = ''
+                        lease.AppAccessKey = ''
+                        lease.AppSecretAccessKey = ''
+                        lease.DefaultLocalCurrency = ''
+                        lease.PropertyName = property_ids.name
+                        lease.PropertyCode = property_ids.code
+                        lease.ShopName = self.model_id.company_tanent_id.name
+                        lease.VendorName = self.model_id.company_vendor_id.name
+                        lease.PosSubmissionFrequency = ''
+                        lease.LeaseStatusDesc = ''
+                        lease.SpaceUnitNo = self.model_id.unit_no
+                        lease.AppAccessKeyStatus = ''
+                        lease.DebugMode = ''
+                        lease.ExtDataSourceID = 'ZPMS'
+                        lease.ModifiedDate = modify_date
+                        lease.ExtLeaseAgreementID = str(self.model_id.id)
+                        lease.PosSubmissionType = ''
+                        lease.SalesDataType = ''
+                        lease.PosSubmissionTypeDesc = ''
+                        lease.SalesDataTypeDesc = ''
+                        lease.SubmissionLink = ''
+                        lease.BatchInfo = data_batch.__dict__
+                        payload = lease.__dict__
+                    datapayload = json.dumps([payload])
+                    print(datapayload)
+                    r = requests.request("POST",
+                                         url_save,
+                                         data=json.dumps([payload]),
+                                         headers=headers)
+                    if r.status_code == '200':
+                        return True
+                    else:
+                        return False
 
 
 class Auth2Client:
@@ -229,8 +232,8 @@ class Auth2Client:
             name="foo",
             client_id=client_id,
             client_secret=client_secret,
-            access_token_url=url + access_token,
-            authorize_url=url + access_token,
+            access_token_url=access_token,
+            authorize_url=access_token,
             base_url=url,
         )
         return self.get_access_token()

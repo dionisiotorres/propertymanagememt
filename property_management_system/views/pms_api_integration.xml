@@ -20,7 +20,7 @@
           <group>
             <group>
                 <field name="base_url" placeholder='https://google.com'/>
-                <field name="auth_url" placeholder='https://google.com/connect/token/connect/token'/>
+                <field name="auth_url" placeholder='https://google.com/connect/token'/>
                 <field name="username"/>
                 <field name="password"/>
             </group>

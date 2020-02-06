@@ -55,8 +55,6 @@
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_utilities_supply_type_tree"/> 
     </record>
-    <odoo>
-  <data>
     <record model="ir.ui.view" id="view_pms_utilities_source_type_form">
       <field name="name">Utilities Source Type Form</field>
       <field name="model">pms.utilities.source.type</field>
@@ -113,8 +111,6 @@
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_pms_utilities_source_type_tree"/> 
     </record>
-  </data>
-</odoo>
     <menuitem  id="utilities_type_menu_root" 
         name="Utilities Supply Type" 
         parent="property_management_menu_sub"

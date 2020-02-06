@@ -17,3 +17,4 @@ from . import pms_facility
 from . import pms_equipment
 from . import pms_utilities_monthly
 from . import pms_calculation_method
+from . import pms_lease_unit_pos

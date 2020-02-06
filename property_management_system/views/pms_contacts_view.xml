@@ -6,6 +6,12 @@
             <field name="priority" eval="1"/>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+                <!-- <xpath expr="//label[@for='name']" position="replace">
+                   <label for="name" string ="Company Name" class="oe_edit_only"/>
+                </xpath> -->
+                <xpath expr="//field[@name='name']" position="replace">
+                   <field name="name" default_focus="1" placeholder="Company Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                </xpath>
                 <xpath expr="//field[@name='parent_id']" position="before">
                     <field name="title" placeholder="title" options='{"no_open": True}' attrs="{'invisible': [('is_company', '=', True)]}"/>
                 </xpath>
@@ -175,33 +181,41 @@
                 </xpath>
             </field>
         </record>
-        <!-- <record id="base.view_res_partner_filter" model="ir.ui.view">
+        <record id="view_res_partner_filter_inherit" model="ir.ui.view">
             <field name="name">res.partner.select</field>
             <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
             <field name="arch" type="xml">
-                <search string="Search Partner">
-                   <field name="name"
-                       filter_domain="['|','|',('display_name','ilike',self),('ref','=',self),('email','ilike',self)]"/>
-                   <field name="parent_id" domain="[('is_company','=',True)]" operator="child_of"/>
-                   <filter name="filter_my_partners" help="My Contacts"
-                           domain="[('user_id','=',uid)]"/>
-                   <separator/>
-                   <filter string="Individuals" name="type_person" domain="[('is_company','=',False)]"/>
-                   <filter string="Companies" name="type_company" domain="[('is_company','=',True)]"/>
-                   <separator/>
-                   <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
-                   <separator/>
-                   <field name="user_id"/>
-                   <field name="phone" filter_domain="['|',('phone','ilike',self),('mobile','=',self)]"/>
-                   <group expand="0" name="group_by" string="Group By">
-                       <filter name="Person" string="User" domain="[]" context="{'group_by' : 'user_id'}" />
-                       <filter name="group_company" string="Company" context="{'group_by': 'parent_id'}"/>
-                       <filter name="group_country" string="Country" context="{'group_by': 'country_id'}"/>
-                   </group>
-               </search>
+               <field name="parent_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+               </field>
+               <filter name="filter_my_partners" position="attributes">
+                    <attribute name="invisible">1</attribute>
+               </filter>
+               <filter name="type_person" position="attributes">
+                    <attribute name="invisible">1</attribute>
+               </filter>
+               <field name="user_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+               </field>
+                <field name="name" position="after">
+                    <field name='company_channel_type'/>
+                    <field name='trade_id'/>
+                    <field name='sub_trade_id'/>
+               </field>
+                <field name="phone" position="attributes">
+                    <attribute name="invisible">1</attribute>
+               </field>
+                 <group name="group_by" position="replace">
+                    <group expand="0" name="group_by" string="Group By">
+                      <!-- <filter name="company_channel_type" string="Tenant" context="{'group_by': 'company_channel_type'}"/> -->
+                      <filter name="trade_id" string="Trade" context="{'group_by': 'trade_id'}"/>
+                      <filter name="sub_trade_id" string="Sub Trade" context="{'group_by': 'sub_trade_id'}"/>                     
+                    </group>
+               </group>
             </field>
         </record>
-        <record id="base.action_partner_form" model="ir.actions.act_window">
+        <!-- <record id="base.action_partner_form" model="ir.actions.act_window">
             <field name="name">Contacts</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.partner</field>

@@ -72,20 +72,26 @@ class PMSSpaceUnit(models.Model):
     #                               "Type",
     #                               track_visibility=True)
     spaceunittype_id = fields.Many2one("pms.applicable.space.type",
-                                       "Type",
+                                       "Unit Type",
                                        track_visibility=True)
     uom = fields.Many2one("uom.uom",
                           "UOM",
                           related="property_id.uom_id",
                           store=True,
                           track_visibility=True)
-    area = fields.Integer("Area", track_visibility=True)
-    start_date = fields.Date("Start Date", track_visibility=True)
-    end_date = fields.Date("End Date", track_visibility=True)
+    area = fields.Float("Area", track_visibility=True)
+    # area_move0 = fields.Float("Area", track_visibility=True)
+    start_date = fields.Date("Start Date",
+                             track_visibility=True,
+                             help='When the unit is able to use.')
+    end_date = fields.Date("End Date",
+                           track_visibility=True,
+                           help='When the unit is unactive.')
     status = fields.Selection([('vacant', 'Vacant'), ('occupied', 'Occupied')],
                               string="Status",
                               default="vacant",
-                              track_visibility=True)
+                              track_visibility=True,
+                              help='Current status of the unit.')
     rate = fields.Float("Rate", track_visibility=True)
     min_rate = fields.Float("Min Rate",
                             digits=dp.get_precision('Min Rate'),
@@ -101,12 +107,12 @@ class PMSSpaceUnit(models.Model):
                                      "facilities_id",
                                      "Facilities",
                                      track_visibility=True)
-    rent_record = fields.Many2many("pms.rent_record",
-                                   "pms_unit_record_rel",
-                                   "unit_id",
-                                   "record_id",
-                                   "Add Records",
-                                   track_visibility=True)
+    # rent_record = fields.Many2many("pms.rent_record",
+    #                                "pms_unit_record_rel",
+    #                                "unit_id",
+    #                                "record_id",
+    #                                "Add Records",
+    #                                track_visibility=True)
     active = fields.Boolean("Active", default=True)
     booking_date = fields.Date("Booking Date")
     booking_expired_date = fields.Date("Booking Expired Date")
@@ -141,12 +147,12 @@ class PMSSpaceUnit(models.Model):
                     if fid.value_type == 'fix':
                         if self.unit_no or self.floor_id:
                             val.append(fid.fix_value)
-                    if fid.value_type == 'digit':
-                        if self.unit_no and len(
-                                self.unit_no) > fid.digit_value:
-                            raise UserError(
-                                _("Please Unit Length less than your format digit."
-                                  ))
+                    # if fid.value_type == 'digit':
+                    #     if self.unit_no and len(
+                    #             self.unit_no) > fid.digit_value:
+                    #         raise UserError(
+                    #             _("Please Unit Length less than your format digit."
+                    #               ))
                     if fid.value_type == 'datetime':
                         val.append(fid.datetime_value)
                 space = []
@@ -164,11 +170,11 @@ class PMSSpaceUnit(models.Model):
         length = 0
         if self.name:
             length = len(self.name)
-        if self.property_id.unit_code_len:
-            if length > self.property_id.unit_code_len:
-                raise UserError(
-                    _("Please set your code length less than %s." %
-                      (self.property_id.unit_code_len)))
+        # if self.property_id.unit_code_len:
+        #     if length > self.property_id.unit_code_len:
+        #         raise UserError(
+        #             _("Please set your code length less than %s." %
+        #               (self.property_id.unit_code_len)))
 
     # @api.multi
     # @api.onchange('name')
@@ -285,19 +291,19 @@ class PMSSpaceUnit(models.Model):
         return super(PMSSpaceUnit, self).write(val)
 
 
-class PMSRentRecord(models.Model):
-    _name = "pms.rent_record"
-    _description = "Rent Records"
+# class PMSRentRecord(models.Model):
+#     _name = "pms.rent_record"
+#     _description = "Rent Records"
 
-    def get_property_id(self):
-        property_id = space_unit_id = active_id = None
-        active_id = self._context.get('active_id')
-        space_unit_id = self.env['pms.space.unit'].browse(int(active_id))
-        property_id = space_unit_id.property_id
-        return property_id
+#     def get_property_id(self):
+#         property_id = space_unit_id = active_id = None
+#         active_id = self._context.get('active_id')
+#         space_unit_id = self.env['pms.space.unit'].browse(int(active_id))
+#         property_id = space_unit_id.property_id
+#         return property_id
 
-    sequence_no = fields.Integer("No", track_visibility=True)
-    name = fields.Text("Remark", track_visibility=True)
-    property_id = fields.Many2one("pms.properties",
-                                  "Property",
-                                  default=get_property_id)
+#     sequence_no = fields.Integer("No", track_visibility=True)
+#     name = fields.Text("Remark", track_visibility=True)
+#     property_id = fields.Many2one("pms.properties",
+#                                   "Property",
+#                                   default=get_property_id)

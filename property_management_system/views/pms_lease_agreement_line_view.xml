@@ -10,13 +10,13 @@
                 <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
             </header>
             <sheet>
-            <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
+            <!-- <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
             <button name="action_view_invoice" type="object"
                 class="oe_stat_button"
                 icon="fa-pencil-square-o">
                 <field name="invoice_count" widget="statinfo" string="Invoice"/>
             </button>
-          </div>
+          </div> -->
             <div class="oe_title" >
                 <h1>
                     <field name="name" placeholder="Description"/>
@@ -28,8 +28,6 @@
                         <field name="property_id"/>
                         <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>   
                         <field name="company_tanent_id"/>
-                        <!-- <field name="pos_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/> -->
-                        <!-- <field name="rental_charge_type"/> -->
                     </group>
                     <group>
                         <!-- <field name="rent"/> -->
@@ -37,37 +35,30 @@
                         <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                         <field name="extend_start" string="Extend From" attrs="{'invisible': [('extend_start','=',False)]}"/>
                         <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                        <!-- <field name="pos_id" invisible='1' readonly="1"/> -->
                         <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                     </group>
                     </group>
-                    <!-- <group name="rent_detail" string="Rent Charge Detail">
-                    <group>
-                        <field name="rental_charge_type" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                        <field name="area" />
-                        </group>
-                        <group>                          
-                        <field name="gto_percentage" attrs="{'invisible': [('rental_charge_type','not in', ['base+gto','baseorgto'])]}"/>
-                        <field name="rent"/>
-                        <field name="rent_total" readonly="1"/>
-                        </group>
-                    </group>
-                    <group name="maintenance" string="Maintenance">
-                        <group>
-                        <field name="maintain_charge" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                        </group>
-                        <group>                          
-                        </group>
-                    </group> -->
                     <notebook>
-                      <page string="Lease Units Charge" >
-                        <field name="appilication_type">
+                      <page string="Lease Unit Charge" >
+                        <field name="applicable_type_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                           <tree editable="buttom">
                             <field name="applicable_charge_id"/>
                             <field name="charge_type_id"/>
                             <field name="calculation_method_id"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
                             <field name="rate" />
                             <field name="total_amount"/>
+                          </tree>
+                        </field> 
+                      </page>
+                      <page string="Lease Unit POS" >
+                        <field name="leaseunitpos_line_id" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                          <tree editable="buttom">
+                            <!-- <field name="name"/> -->
+                            <field name="posinterfacecode_id"/>
+                            <field name="useposid"/>
+                            <field name="inactivedate"/>
                           </tree>
                         </field> 
                       </page>
@@ -101,13 +92,7 @@
           <field name="unit_no"/>
           <field name="start_date" />
           <field name="end_date" />
-          <!-- <field name="extend_to" />
-          <field name="rental_charge_type"/>
-          <field name="maintain_charge" />
-          <field name="rent"/>
-          <field name="rent_total"/> -->
           <field name="state"/>
-          <!-- <field name="extend_count"/> -->
         </tree>
       </field>
     </record>
@@ -133,10 +118,10 @@
        <field name="view_id" ref="view_lease_aggrement_line_tree"/>
        <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record> 
-    <!-- <menuitem  id="lease_agreement_line_menu" 
+    <menuitem  id="lease_agreement_line_menu" 
       name="Lease Agreement Detail" 
       parent="lease_management_menu_sub" 
       action="action_lease_aggrement_detail_all"
-      sequence="2"/> -->
+      sequence="2"/>
   </data>
 </odoo>

@@ -763,20 +763,21 @@ class PMSGenerateRentSchedule(models.Model):
                     'company_id': ls.lease_agreement_id.company_id.id,
                     'invoice_line_ids': [(6, 0, invoice_lines)],
                     })
-                # lease.append(inv_ids.lease_no)
+        print (self)
         return True
-    # @api.multi
-    # def action_view_invoice(self):
-    #     invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_agreement_id.lease_no)])
-    #     action = self.env.ref('account.action_invoice_tree1').read()[0]
-    #     if len(invoices) > 2:
-    #         action['domain'] = [('id', 'in', invoices[1])]
-    #     elif len(invoices) == 2:
-    #         action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
-    #         action['res_id'] = invoices[1].id
-    #     else:
-    #         action = {'type': 'ir.actions.act_window_close'}
-    #     return action
+    
+    @api.multi
+    def action_view_invoice(self):
+        invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_agreement_id.lease_no)])
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        if len(invoices) > 2:
+            action['domain'] = [('id', 'in', invoices[1])]
+        elif len(invoices) == 2:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices[1].id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
     # def action_invoice(self, vals):
     #     invoice_month = invoices = None
     #     sch_ids = start_date = end_date = []

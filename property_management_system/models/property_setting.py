@@ -778,7 +778,7 @@ class PMSGenerateRentSchedule(models.Model):
                     'company_id': ls.lease_agreement_id.company_id.id,
                     'invoice_line_ids': [(6, 0, invoice_lines)],
                     })
-        return self.env.ref('account.action_invoice_tree1').read()[0]
+        return True
 
     # @api.multi
     # def action_view_invoice(self):

@@ -109,6 +109,7 @@
       name="Lease Agreement Detail" 
       parent="lease_management_menu_sub" 
       action="action_lease_aggrement_detail_all"
+      groups="base.group_no_one"
       sequence="2"/>
   </data>
 </odoo>

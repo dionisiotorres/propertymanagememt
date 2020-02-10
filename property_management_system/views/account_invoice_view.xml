@@ -55,5 +55,14 @@
                 </field>
             </field>
         </record>
+        <menuitem id="lease_invoicing_menu_root" 
+            name="Invoicing" 
+            parent="pms_properties_menu_root"
+            sequence="99"/>
+         <menuitem id="lease_invoice_menu_root" 
+            name="Invoices" 
+            parent="lease_invoicing_menu_root"
+            action="account.action_invoice_tree"
+            sequence="99"/>
     </data>
 </odoo>

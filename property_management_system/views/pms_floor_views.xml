@@ -121,6 +121,6 @@
       name="Floor" 
       parent="property_management_menu"
       action="action_floor_all"
-      sequence="2"/>
+      sequence="1"/>
   </data>
 </odoo>

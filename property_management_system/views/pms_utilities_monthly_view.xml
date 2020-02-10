@@ -65,6 +65,7 @@
       name="Utilities Monthly" 
       parent="property_management_menu"
       action="action_utilities_monthly_all"
+      groups="base.group_no_one"
       sequence="80"/>
   </data>
 </odoo>

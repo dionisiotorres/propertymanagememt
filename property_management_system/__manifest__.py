@@ -23,6 +23,7 @@
         'data/ir_sequence_data.xml',
         'data/pms_lease_schedular_data.xml',
         'data/pos_run_schedule_data_view.xml',
+        'wizard/pms_cancel_wizard_view.xml',
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',
         'wizard/pms_generate_rent_schedule_view.xml',

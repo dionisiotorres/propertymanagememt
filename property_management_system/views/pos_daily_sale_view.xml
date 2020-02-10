@@ -64,6 +64,7 @@
         name="POS Daily Sale" 
         parent="property_management_menu"
         action="action_pos_daily_sale"
+        groups="base.group_no_one"
         sequence="2"/>
     </data>
 </odoo>

@@ -7,7 +7,7 @@
         <form>
           <header>
             <button name="action_activate" string="Activate" type="object" states="BOOKING"/>
-            <button name="action_cancel" states="BOOKING" type="object" string="Cancel"/>
+            <button name="%(action_cancel_wiz)d" states="BOOKING" type="action" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
             <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/> -->
             <!-- <button name="action_extend" states="NEW,EXTENDED" type="object" string="Extend"/> -->

@@ -191,10 +191,10 @@
        <field name="view_id" ref="view_space_tree"/>
        <!-- <field name="context">{'search_default_group_property_id': 1}</field> -->
     </record>
-    <menuitem  id="space_menu_root" 
+    <menuitem id="space_menu_root" 
       name="Unit" 
       parent="property_management_menu"
       action="action_space_all"
-      sequence="1"/>
+      sequence="2"/>
   </data>
 </odoo>

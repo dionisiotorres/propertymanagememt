@@ -80,15 +80,17 @@
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_pos_interface_code_tree"/> 
     </record>
-    <menuitem  id="lease_unit_pos_menu_root" 
+    <menuitem id="lease_unit_pos_menu_root" 
         name="Lease Unit POS" 
         parent="lease_management_menu_sub" 
         action="action_lease_unit_pos_all"
+        groups="base.group_no_one"
         sequence="100"/>
-    <menuitem  id="pos_interface_code_menu_root" 
+    <menuitem id="pos_interface_code_menu_root" 
         name="POS Interface Code" 
         parent="lease_management_menu_sub" 
         action="action_pos_interface_code_all"
+        groups="base.group_no_one"
         sequence="200"/>
   </data> 
 </odoo>

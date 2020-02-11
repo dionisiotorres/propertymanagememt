@@ -13,5 +13,29 @@
             <field name="numbercall">-1</field>
             <field eval="False" name="doall"/>
         </record>
+        <record forcecreate="True" id="ir_expired_notify" model="ir.cron">
+            <field name="name">Lease Expired Scheduler</field>
+            <field name="model_id" ref="model_pms_lease_agreement"/>
+            <field name="state">code</field>
+            <field name="code">model.lease_expired()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field eval="True" name="active"/>            
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+        </record>
+        <record forcecreate="True" id="ir_terminate_notify" model="ir.cron">
+            <field name="name">Lease Terminate Scheduler</field>
+            <field name="model_id" ref="model_pms_lease_agreement"/>
+            <field name="state">code</field>
+            <field name="code">model.lease_terminate()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field eval="True" name="active"/>            
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
+        </record>        
     </data>
 </odoo>

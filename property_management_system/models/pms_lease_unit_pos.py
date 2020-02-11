@@ -45,7 +45,8 @@ class PMSLeaseUnitPos(models.Model):
                                 if ft.value_type == 'digit':
                                     sequent_ids = self.env[
                                         'ir.sequence'].search([
-                                            ('name', '=', 'Lease Agreement')
+                                            ('name', '=',
+                                             'Lease Interface Code')
                                         ])
                                     sequent_ids.write(
                                         {'padding': ft.digit_value})

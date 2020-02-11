@@ -40,7 +40,7 @@ class PMSRentCharge(models.Model):
                               "Space Unit",
                               track_visibility=True)
 
-    state = fields.Selection([('draft', "Draft"), ('generated', "Generated")],
+    state = fields.Selection([('draft', "Draft"), ('generated', "Generated"), ('terminated', "Terminated")],
                              "Status",
                              default="draft")
     billing_date = fields.Date(string="Billing Date", required=True)

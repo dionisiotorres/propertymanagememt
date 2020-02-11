@@ -28,8 +28,7 @@
                   <field name="property_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="floor_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="spaceunittype_id"/>
-                  <field name="uom"/>                  
-                  <field name="remark"/>
+                  <field name="uom"/>
                 </group>
                 <group> 
                   <field name="area"/>
@@ -40,7 +39,7 @@
                   <field name="start_date"/>
                   <field name="end_date"/>
                   <field name="active"/>
-                  <!-- <field name="status"/>       -->
+                  <field name="remark"/>
                 </group>
               </group>
               <notebook>

@@ -55,7 +55,7 @@ class PMSLeaseAgreement(models.Model):
                               ('EXPIRED', "Expired")],
                              string="Status",
                              default="BOOKING", track_visibility=True)
-    active = fields.Boolean(default=True, track_visibility=True)
+    # active = fields.Boolean(default=True, track_visibility=True)
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
                                            "Lease Agreement Units", track_visibility=True)
@@ -109,19 +109,22 @@ class PMSLeaseAgreement(models.Model):
             if prop.new_lease_term and prop.new_lease_term.lease_period_type == 'year':
                 self.end_date = self.start_date+relativedelta(years=prop.new_lease_term.min_time_period)-relativedelta(days=1)              
 
-    @api.multi
-    def toggle_active(self):
-        for la in self:
-            if not la.active:
-                la.active = self.active
-        super(PMSLeaseAgreement, self).toggle_active()
+    # @api.multi
+    # def toggle_active(self):
+    #     for la in self:
+    #         if not la.active:
+    #             la.active = self.active
+    #     super(PMSLeaseAgreement, self).toggle_active()
 
     @api.multi
     def action_activate(self):
         if self.lease_agreement_line:
             for line in self.lease_agreement_line:
                 for unit in line.unit_no:
-                    unit.write({'status': 'occupied'})
+                    if unit.status == 'occupied' and line.state == 'BOOKING':
+                        raise UserError(_("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit." % unit.unit_no))
+                    if unit.status != 'occupied' and line.state == 'BOOKING':
+                        unit.write({'status': 'occupied'})
                 for ctype in line.applicable_type_line_id:
                     if self.property_id.rentschedule_type == 'prorated':
                         date = None
@@ -689,7 +692,7 @@ class PMSLeaseAgreement(models.Model):
             'reset_date': self.reset_date,
             'remark': self.remark,
             'state': 'BOOKING',
-            'active': self.active,
+            # 'active': self.active,
             'lease_agreement_line': [(6, 0, line)],
             'lease_no': self.lease_no,
             'old_lease_no': self.lease_no,
@@ -716,9 +719,45 @@ class PMSLeaseAgreement(models.Model):
                                          ).strftime('%Y-%m-%d')
 
     @api.multi
+    @api.depends('end_date','extend_to')
+    def lease_expired(self):
+        lease_ids = self.search([])
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_date = datetime.strptime(today, '%Y-%m-%d').date()
+        for exp in lease_ids:
+            if exp.extend_to:
+                if exp.extend_to < today_date:
+                    exp.write({'state':'EXPIRED'})
+            if not exp.extend_to and exp.end_date:
+                if exp.end_date < today_date:
+                    exp.write({'state':'EXPIRED'})
+            if exp.booking_expdate:
+                if exp.booking_expdate < today_date and exp.state == 'BOOKING':
+                    exp.write({'state':'EXPIRED'})
+
+    
+    @api.multi
+    @api.depends('terminate_period')
+    def lease_terminate(self):
+        lease_ids = self.search([])
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_date = datetime.strptime(today, '%Y-%m-%d').date()
+        for ter in lease_ids:
+            if ter.terminate_period:
+                if ter.terminate_period == today_date or ter.terminate_period <= today_date:
+                    ter.write({'state':'TERMINATED'})
+                    rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',ter.unit_no),('lease_no','=',ter.lease_no),('start_date','>=',ter.terminate_period)])
+                    for rentid in rent_schedule_ids:
+                        rentid.write({'state': 'terminated'})
+        
+    @api.multi
     def action_terminate(self):
         if self.is_terminate == True and self.terminate_period:
             if self.terminate_period <= datetime.now().date():
+                for line in self:
+                    rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',line.unit_no),('lease_no','=',line.lease_no),('start_date','>=',self.terminate_period)])
+                    for rentid in rent_schedule_ids:
+                        rentid.write({'state': 'terminated'})
                 return self.write({'state': 'TERMINATED'})
             else:
                 raise UserError(
@@ -727,7 +766,12 @@ class PMSLeaseAgreement(models.Model):
         else:
             raise UserError(
                 _("Please click is Terminate to set terminate date."))
-        return self.write({'state': 'TERMINATED'})
+        terminated = self.write({'state': 'TERMINATED'})
+        if terminated:
+            for line in self:
+                rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',line.unit_no),('lease_no','=',line.lease_no),('start_date','>=',self.terminate_period)])
+                rent_schedule_ids.write({'state':'terminated'})
+        return terminated
 
     @api.multi
     def action_view_new_lease(self):

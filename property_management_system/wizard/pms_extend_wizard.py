@@ -18,7 +18,10 @@ class PMSLeaseExtendWizard(models.TransientModel):
     def get_start_date(self):
         lease_extends = self.env['pms.lease_agreement'].browse(
             self._context.get('active_id', []))
-        return lease_extends.extend_to if lease_extends.extend_to else lease_extends.end_date
+        return lease_extends.extend_to + relativedelta(
+            days=1
+        ) if lease_extends.extend_to else lease_extends.end_date + relativedelta(
+            days=1)
 
     def get_end_date(self):
         date = None

@@ -39,7 +39,6 @@
                   <field name="lmr_date"/>
                   <field name="lmr_value"/>
                   <field name="end_date"/>
-                  <!-- <field name="status"/> -->
                 </tree>
                </field>
               </page>

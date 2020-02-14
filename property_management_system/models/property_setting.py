@@ -50,6 +50,7 @@ class PMSRentSchedule(models.Model):
     @api.multi
     def action_generate_rs(self):
         val = {}
+        dpos_obj = self.env['pos.daily.sale']
         for line in self:
             total_amount = 0
             lsd_year = line.start_date.year
@@ -76,7 +77,6 @@ class PMSRentSchedule(models.Model):
                                 meter_amount = 0
                                 if ccm_name == 'Fix':
                                     if cct_name == 'Rental':
-                                        dpos_obj = self.env['pos.daily.sale']
                                         if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
                                             total_rate = apl.rate
                                 if ccm_name == 'MeterUnit':

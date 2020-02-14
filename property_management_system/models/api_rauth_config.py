@@ -1,7 +1,6 @@
 import requests
 import json
 import datetime
-import win32api
 from odoo.addons.property_management_system.rauth import OAuth2Service
 from odoo import tools, _
 from odoo import models, api
@@ -217,10 +216,6 @@ class APIData:
                                          url_save,
                                          data=json.dumps([payload]),
                                          headers=headers)
-                    if r.status_code == 200:
-                        win32api.MessageBox(0, 'success', 'Operation')
-                    else:
-                        win32api.MessageBox(0, 'fail', 'Operation')
 
 
 class Auth2Client:

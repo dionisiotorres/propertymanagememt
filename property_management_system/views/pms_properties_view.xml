@@ -164,7 +164,7 @@
                     <field name="terminate_days"/>
                     <field name="extend_count"/>
                   </group>
-                  <group string="Format Defination">
+                  <group string="Format Definition">
                     <field name="pos_id_format" widget="selection"/>
                     <field name="unit_format" widget="selection"/>
                     <field name="lease_format" widget="selection"/>

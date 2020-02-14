@@ -28,6 +28,7 @@
         'wizard/pms_invoice_wizard_view.xml',
         'wizard/pms_generate_rent_schedule_view.xml',
         'wizard/pms_activate_wizard_view.xml',
+        'wizard/pms_terminate_wizard_view.xml',
         'data/pms.utilities.supply.type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',

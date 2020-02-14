@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 
 
 class PMSApplicableChargeType(models.Model):
@@ -36,6 +36,9 @@ class PMSApplicableChargeType(models.Model):
     is_meter = fields.Boolean("IsMeter",
                               default=False,
                               compute="compute_ismeter")
+
+    _sql_constraints = [('name_uniq', 'unique (name)',
+                         _("Name is exiting in the chrage applicable."))]
 
     @api.one
     @api.depends('calculation_method_id')

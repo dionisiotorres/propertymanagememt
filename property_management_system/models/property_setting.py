@@ -4,7 +4,7 @@ from odoo import models, fields, api, tools, _
 from odoo.addons.property_management_system.models import api_rauth_config
 
 
-class PMSRentCharge(models.Model):
+class PMSRentSchedule(models.Model):
     _name = 'pms.rent_schedule'
     _description = 'Rent Schedule'
     _inherit = ['mail.thread']
@@ -40,10 +40,12 @@ class PMSRentCharge(models.Model):
                               "Space Unit",
                               track_visibility=True)
 
-    state = fields.Selection([('draft', "Draft"), ('generated', "Generated"), ('terminated', "Terminated")],
+    state = fields.Selection([('draft', "Draft"), ('generated', "Generated"),
+                              ('terminated', "Terminated")],
                              "Status",
                              default="draft")
     billing_date = fields.Date(string="Billing Date", required=True)
+    active = fields.Boolean(default=True)
 
     @api.multi
     def action_generate_rs(self):
@@ -83,9 +85,28 @@ class PMSRentCharge(models.Model):
                                             luf_lines = lagl.unit_no.facility_line
                                             for fl in luf_lines:
                                                 if fl.facilities_line:
-                                                    umon_obj = self.env['pms.utilities.monthly']
-                                                    filter_month = str(lsd_year) + (('0' + str(lsd_month)) if len(str(lsd_month)) <= 1 else str(lsd_month))
-                                                    monthly_id = umon_obj.search([('utilities_source_type', '=', charge.source_type_id.code), ('utilities_no', '=', fl.utilities_no.name), ('utilities_supply_type', '=', fl.utilities_type_id.code), ('billingperiod', '=', filter_month)])
+                                                    umon_obj = self.env[
+                                                        'pms.utilities.monthly']
+                                                    filter_month = str(
+                                                        lsd_year) + (
+                                                            ('0' +
+                                                             str(lsd_month)) if
+                                                            len(str(lsd_month))
+                                                            <= 1 else
+                                                            str(lsd_month))
+                                                    monthly_id = umon_obj.search([
+                                                        ('utilities_source_type',
+                                                         '=', charge.
+                                                         source_type_id.code),
+                                                        ('utilities_no', '=',
+                                                         fl.utilities_no.name),
+                                                        ('utilities_supply_type',
+                                                         '=',
+                                                         fl.utilities_type_id.
+                                                         code),
+                                                        ('billingperiod', '=',
+                                                         filter_month)
+                                                    ])
                                                     if monthly_id:
                                                         meter_amount = monthly_id.end_value - monthly_id.start_value
                                         if st_name == cst_name and pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
@@ -105,12 +126,20 @@ class PMSRentCharge(models.Model):
                                     percent_amount = 0
                                     if cct_name == 'Rental' and pcm_name == ccm_name:
                                         for lid in lpl_ids:
-                                            pos_id = dpos_obj.search([('pos_interface_code', '=', lid.posinterfacecode_id.name), ('pos_receipt_date', '>=', line.start_date), ('pos_receipt_date', '<=', line.end_date)])
+                                            pos_id = dpos_obj.search([
+                                                ('pos_interface_code', '=',
+                                                 lid.posinterfacecode_id.name),
+                                                ('pos_receipt_date', '>=',
+                                                 line.start_date),
+                                                ('pos_receipt_date', '<=',
+                                                 line.end_date)
+                                            ])
                                             if pos_id:
                                                 for daily in pos_id:
                                                     net_amount += daily.manual_net_sales
                                         percent_amount = apl.rate
-                                        total_rate = (net_amount * percent_amount)/100       
+                                        total_rate = (net_amount *
+                                                      percent_amount) / 100
                             if total_rate and not total_unit:
                                 total_amount = total_rate
                             elif total_unit and not total_rate:
@@ -128,11 +157,18 @@ class PMSRentCharge(models.Model):
                     'lease_no': line.lease_no,
                     'state': line.state,
                     'unit_no': line.unit_no.id,
-                    'billing_date':line.billing_date,
+                    'billing_date': line.billing_date,
                 }
                 gen_id = self.env['pms.gen.rent.schedule'].create(val)
                 if gen_id:
                     line.write({'state': 'generated', 'amount': total_amount})
+
+    @api.multi
+    def toggle_active(self):
+        for pt in self:
+            if not pt.active:
+                pt.active = self.active
+        super(PMSRentSchedule, self).toggle_active()
 
 
 class PMSPropertyType(models.Model):
@@ -695,7 +731,8 @@ class PMSGenerateRentSchedule(models.Model):
                               ('confirmed', "Confirmed"),
                               ('invoiced', "Invoiced")],
                              "Status",
-                             default="draft", track_visibility=True)
+                             default="draft",
+                             track_visibility=True)
     billing_date = fields.Date(string="Billing Date", required=True)
 
     @api.multi
@@ -735,49 +772,78 @@ class PMSGenerateRentSchedule(models.Model):
         for ls in self:
             invoice_lines = []
             if ls.state == 'confirmed':
-                invoice_month = str(calendar.month_name[ls.billing_date.month]) + ' - ' + str(ls.billing_date.year)
+                invoice_month = str(
+                    calendar.month_name[ls.billing_date.month]) + ' - ' + str(
+                        ls.billing_date.year)
                 for line in self:
                     product_name = None
                     if line.property_id == ls.property_id and line.billing_date == ls.billing_date and line.lease_no == ls.lease_no:
                         product_name = line.charge_type.name
-                        prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
-                        prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
+                        prod_ids = self.env['product.template'].search([
+                            ('name', 'ilike', product_name)
+                        ])
+                        prod_id = self.env['product.product'].search([
+                            ('product_tmpl_id', '=', prod_ids.id)
+                        ])
                         if not prod_ids:
-                            val = {'name': product_name,
+                            val = {
+                                'name': product_name,
                                 'sale_ok': False,
-                                'is_unit': True}
-                            product_tmp_id = self.env['product.template'].create(val)
-                            product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
+                                'is_unit': True
+                            }
+                            product_tmp_id = self.env[
+                                'product.template'].create(val)
+                            product_tmp_ids = self.env[
+                                'product.product'].search([
+                                    ('product_tmpl_id', '=', product_tmp_id.id)
+                                ])
                             if not product_tmp_ids:
-                                product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
+                                product_id = self.env[
+                                    'product.product'].create(
+                                        {'product_tmpl_id': product_tmp_id.id})
                             product_id = product_tmp_ids or product_id
                         else:
                             product_id = prod_id
                         account_id = False
                         account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
-                        taxes = product_id.taxes_id.filtered(lambda r: not line.lease_agreement_id.company_id or r.company_id == line.lease_agreement_id.company_id)
+                        taxes = product_id.taxes_id.filtered(
+                            lambda r: not line.lease_agreement_id.company_id or
+                            r.company_id == line.lease_agreement_id.company_id)
                         unit = line.lease_agreement_id.unit_no
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'name': _(product_name),
-                            'account_id': account_id,
-                            'price_unit': line.amount,
-                            'quantity': 1,
-                            'uom_id': product_id.uom_id.id,
-                            'product_id': product_id.id,
+                            'name':
+                            _(product_name),
+                            'account_id':
+                            account_id,
+                            'price_unit':
+                            line.amount,
+                            'quantity':
+                            1,
+                            'uom_id':
+                            product_id.uom_id.id,
+                            'product_id':
+                            product_id.id,
                             'invoice_line_tax_ids': [(6, 0, taxes.ids)],
                         })
                         invoice_lines.append(inv_line_id.id)
                         line.write({'state': 'invoiced'})
                 inv_ids = self.env['account.invoice'].create({
-                    'lease_items': ls.name,
-                    'lease_no': ls.lease_agreement_id.lease_no,
-                    'unit_no': unit,
-                    'inv_month': invoice_month,
-                    'partner_id': ls.lease_agreement_id.company_tanent_id.id,
-                    'property_id': ls.lease_agreement_id.property_id.id,
-                    'company_id': ls.lease_agreement_id.company_id.id,
+                    'lease_items':
+                    ls.name,
+                    'lease_no':
+                    ls.lease_agreement_id.lease_no,
+                    'unit_no':
+                    unit,
+                    'inv_month':
+                    invoice_month,
+                    'partner_id':
+                    ls.lease_agreement_id.company_tanent_id.id,
+                    'property_id':
+                    ls.lease_agreement_id.property_id.id,
+                    'company_id':
+                    ls.lease_agreement_id.company_id.id,
                     'invoice_line_ids': [(6, 0, invoice_lines)],
-                    })
+                })
         return True
 
     # @api.multi

@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+import win32api
 from odoo.addons.property_management_system.rauth import OAuth2Service
 from odoo import tools, _
 from odoo import models, api
@@ -115,7 +116,7 @@ class APIData:
                         spaceunit.Status = '1'
                         spaceunit.BatchInfo = data_batch.__dict__
                         payload = spaceunit.__dict__
-                    if line.name == 'SpaceUnitFacility':
+                    if line.name == 'SpaceUnitFacilities':
                         # payload_code = str(self.values['code'])
                         # payload_name = str(self.values['name'])
                         modify_date = datetime.datetime.now().strftime(
@@ -133,14 +134,12 @@ class APIData:
                         # facility.SpaceUnitID = self
                         facility.SpaceUnitID = '41'
                         facility.SpaceUnitFacilityID = None
-                        facility.StartDate = str(
-                            self.model_id.facilities_line.start_date)
-                        facility.EndDate = str(
-                            self.model_id.facilities_line.end_date)
-                        facility.UtilitiesMeterNo = self.model_id.utilities_no.name
-                        facility.UtilitiesType = self.model_id.utilities_type_id.code
+                        facility.StartDate = str(self.model_id.start_date)
+                        facility.EndDate = str(self.model_id.end_date)
+                        facility.UtilitiesMeterNo = self.model_id.facility_line.utilities_no.name
+                        facility.UtilitiesType = self.model_id.facility_line.utilities_type_id.code
                         facility.LastReadingOn = str(
-                            self.model_id.facilities_line.start_date)
+                            self.model_id.facility_line.start_date)
                         facility.LastReadingValue = self.model_id.facilities_line.start_reading_value
                         facility.LastReadingNOC = 0
                         facility.LastReadingNOH = 0
@@ -218,10 +217,10 @@ class APIData:
                                          url_save,
                                          data=json.dumps([payload]),
                                          headers=headers)
-                    if r.status_code == '200':
-                        return True
+                    if r.status_code == 200:
+                        win32api.MessageBox(0, 'success', 'Operation')
                     else:
-                        return False
+                        win32api.MessageBox(0, 'fail', 'Operation')
 
 
 class Auth2Client:

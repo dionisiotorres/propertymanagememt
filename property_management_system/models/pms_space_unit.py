@@ -83,6 +83,7 @@ class PMSSpaceUnit(models.Model):
     # area_move0 = fields.Float("Area", track_visibility=True)
     start_date = fields.Date("Start Date",
                              track_visibility=True,
+                             required=True,
                              help='When the unit is able to use.')
     end_date = fields.Date("End Date",
                            track_visibility=True,
@@ -220,32 +221,45 @@ class PMSSpaceUnit(models.Model):
                     unit += str(line.fix_value)
                 if line.value_type == 'digit':
                     unit += str(values['unit_no'])
-                unit_ids = self.search([('name', '=', unit),
-                                        ('property_id', '=',
-                                         values['property_id']),
-                                        ('active', '=', True)])
-                if unit_ids:
+                unit_ids = self.search([
+                    ('name', '=', unit),
+                    ('property_id', '=', values['property_id']),
+                    ('end_date', '>', values['start_date']),
+                ])
+                unit_ids1 = self.search([('name', '=', unit),
+                                         ('property_id', '=',
+                                          values['property_id']),
+                                         ('start_date', '!=', False),
+                                         ('end_date', '=', False),
+                                         ('active', '=', True)])
+                if unit_ids or unit_ids1:
                     raise UserError(
                         _("%s Units is exiting in the database." % (unit)))
-                # else:
-                #     unit_id = self.search([('name', '=', unit),
-                #                            ('property_id', '=',
-                #                             values['property_id']),
-                #                            ('active', '=', True)])
-                #     unit_id1 = self.search([
-                #         ('name', '=', unit),
-                #         ('property_id', '=', values['property_id']),
-                #         ('start_date', '>=', values['start_date']),
-                #         ('end_date', '=', False)
-                #     ])
-                #     if unit_id and not unit_id.end_date:
-                #         raise UserError(
-                #             _("%s Units is exiting in the database and please set end date and retry."
-                #               % (unit)))
-
         id = None
         id = super(PMSSpaceUnit, self).create(values)
-        # if id:
+        if id:
+            property_obj = self.env['pms.properties']
+            property_id = property_obj.browse(values['property_id'])
+            if property_id.api_integration == True:
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "SpaceUnit")
+                ])
+                datas = api_rauth_config.APIData(id, values, property_id,
+                                                 integ_obj, api_line_ids)
+                if values['facility_line']:
+                    for fl in values['facility_line'][0][2]:
+                        facility_id = self.env['pms.facilities'].browse(fl)
+                        property_objs = self.env['pms.properties'].browse(
+                            facility_id.property_id.id)
+                        integ_objs = self.env['pms.api.integration'].search([])
+                        api_type_objs = api_line_ids = self.env[
+                            'pms.api.integration.line'].search([
+                                ('name', '=', "SpaceUnitFacilities")
+                            ])
+                        datas = api_rauth_config.APIData(
+                            id, values, property_objs, integ_objs,
+                            api_type_objs)
         #     property_obj = self.env['pms.properties'].browse(
         #         values['property_id'])
         #     integ_obj = self.env['pms.api.integration']
@@ -262,8 +276,8 @@ class PMSSpaceUnit(models.Model):
         #             api_type_objs = self.env['pms.api.type'].search([
         #                 ('name', '=', "Facilities")
         #             ])
-        #  datas = api_rauth_config.APIData(id, values, property_obj,
-        #                                      integ_obj, api_type_obj)
+        #          datas = api_rauth_config.APIData(id, values, property_obj, integ_obj,
+        #                                  api_type_obj)
         return id
 
     @api.multi

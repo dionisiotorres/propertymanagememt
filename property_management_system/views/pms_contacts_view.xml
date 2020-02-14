@@ -10,7 +10,7 @@
                    <label for="name" string ="Company Name" class="oe_edit_only"/>
                 </xpath> -->
                 <xpath expr="//field[@name='name']" position="replace">
-                   <field name="name" default_focus="1" placeholder="Company Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
+                   <field name="name" default_focus="1" placeholder="Name" attrs="{'required' : [('type', '=', 'contact')]}"/>
                 </xpath>
                 <xpath expr="//field[@name='parent_id']" position="before">
                     <field name="title" placeholder="title" options='{"no_open": True}' attrs="{'invisible': [('is_company', '=', True)]}"/>

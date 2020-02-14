@@ -80,7 +80,7 @@
        <field name="domain">[('state','in',['draft', 'generated'])]</field>
     </record> 
     <menuitem  id="rent_schedule_menu_root" 
-      name="Rent Schedule Detail" 
+      name="Rent Schedule" 
       parent="lease_management_menu_sub" 
       action="action_rent_schedule_all"
       sequence="2"/>

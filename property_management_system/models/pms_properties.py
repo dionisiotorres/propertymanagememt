@@ -19,22 +19,22 @@ class PMSProperties(models.Model):
     _description = 'Property Management System'
     _order = "code"
 
-    def get_uom_id(self):
-        uom_id = uom_category_id = None
-        uom_id = self.env['uom.uom'].search([('name', '=', "sqft")])
-        if not uom_id:
-            uom_category_id = self.env['uom.category'].search([('name', '=',
-                                                                'Area')])
-            if not uom_category_id:
-                uom_category_id = self.env['uom.category'].create(
-                    {'name': 'Area'})
-            uom_id = self.env['uom.uom'].create({
-                'name':
-                'sqft',
-                'category_id':
-                uom_category_id.id
-            })
-        return uom_id
+    # def get_uom_id(self):
+    #     uom_id = uom_category_id = None
+    #     uom_id = self.env['uom.uom'].search([('name', '=', "sqft")])
+    #     if not uom_id:
+    #         uom_category_id = self.env['uom.category'].search([('name', '=',
+    #                                                             'Area')])
+    #         if not uom_category_id:
+    #             uom_category_id = self.env['uom.category'].create(
+    #                 {'name': 'Area'})
+    #         uom_id = self.env['uom.uom'].create({
+    #             'name':
+    #             'sqft',
+    #             'category_id':
+    #             uom_category_id.id
+    #         })
+    #     return uom_id
 
     def default_get_curency(self):
         mmk_currency_id = self.env['res.currency'].search([('name', '=', 'MMK')
@@ -65,7 +65,7 @@ class PMSProperties(models.Model):
     uom_id = fields.Many2one("uom.uom",
                              "UOM",
                              required=True,
-                             default=get_uom_id,
+                             domain=[('category_id.name', '=', 'Area')],
                              track_visibility=True,
                              help="Unit Of Measure is need to set for Area.")
     bank_id = fields.Many2one('res.bank',

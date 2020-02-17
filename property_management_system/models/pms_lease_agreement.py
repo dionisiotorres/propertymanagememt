@@ -982,18 +982,6 @@ class PMSLeaseAgreement(models.Model):
             return new_lease_ids.action_view_new_lease()
         return {'type': 'ir.actions.act_window_close'}
 
-    # @api.multi
-    # @api.onchange('is_terminate')
-    # def onchange_is_terminate(self):
-    #     if self.is_terminate == True:
-    #         if not self.property_id.terminate_days:
-    #             raise UserError(
-    #                 _("Please set terminate days term in the property."))
-    #         else:
-    #             self.is_terminate = True
-    #             self.terminate_period = (datetime.today() + relativedelta(
-    #                 days=self.property_id.terminate_days)).strftime('%Y-%m-%d')
-
     @api.multi
     @api.depends('end_date', 'extend_to')
     def lease_expired(self):
@@ -1009,7 +997,7 @@ class PMSLeaseAgreement(models.Model):
                     exp.write({'state': 'EXPIRED'})
             if exp.booking_expdate:
                 if exp.booking_expdate < today_date and exp.state == 'BOOKING':
-                    exp.write({'state': 'EXPIRED'})
+                    exp.write({'state': 'CANCELLED'})
 
     @api.multi
     @api.depends('terminate_period')

@@ -20,10 +20,9 @@ class APIData:
         property_ids = self.property_id
         integ_obj = self.integ_obj
         api_line_ids = self.api_line_ids
-        api_integ = []
+        api_integ = data = []
         headers = {}
-        payload_code = payload_name = modify_date = None
-        payload = None
+        payload_code = payload_name = modify_date = payload = None
         if api_line_ids:
             for line in api_line_ids:
                 url_save = line.api_integration_id.base_url + '/' + line.api_url
@@ -76,84 +75,85 @@ class APIData:
                         payload_name = str(self.model_id.name)
                         payload_area = str(self.values['area'])
                         start_date = str(self.values['start_date'])
-                        end_date = str(self.values['end_date'])
+                        end_date = str(
+                            self.values['end_date']
+                        ) if self.values['end_date'] != False else None
                         floor_code = str(self.model_id.floor_code)
-                        payload_uom = str(self.model_id.uom)
-                        payload_remark = str(self.values['remark'])
+                        payload_uom = str(self.model_id.uom.name)
+                        payload_remark = str(
+                            self.values['remark']
+                        ) if self.values['remark'] != False else None
                         floor_id = str(self.model_id.floor_id.id)
                         modify_date = datetime.datetime.now().strftime(
                             '%Y-%m-%d')
-                        # if self.values['active'] == True:
-                        #     payload_active = 'true'
-                        # else:
-                        #     payload_active = 'false'
+                        if self.values['active'] == True:
+                            payload_active = '1'
+                        else:
+                            payload_active = '0'
                         data_batch = BatchInfo()
                         data_batch.AppCode = "SPI"
-                        data_batch.BatchCode = "201912179810983"
+                        data_batch.BatchCode = "47389245" + str(
+                            self.model_id.id)
                         data_batch.PropertyCode = property_ids.code
                         data_batch.InterfaceCode = ""
                         spaceunit = SpaceUnit()
                         spaceunit.PropertyCode = property_ids.code
                         spaceunit.FloorID = floor_id
-                        # spaceunit.PropertyCode = property_ids.code
                         spaceunit.SpaceUnitNo = payload_name
                         spaceunit.FloorCode = floor_code
-                        spaceunit.DisplayOrdinal = ''
+                        spaceunit.DisplayOrdinal = None
                         spaceunit.StartDate = start_date
-                        # spaceunit.EndDate = end_date
-                        spaceunit.EndDate = ''
+                        spaceunit.EndDate = end_date
                         spaceunit.Area = payload_area
                         spaceunit.SpaceUnitID = ''
-                        # spaceunit.UM = payload_uom
-                        spaceunit.UM = ''
-                        # spaceunit.Remark = payload_remark
-                        spaceunit.Remark = ''
+                        spaceunit.UM = payload_uom
+                        spaceunit.Remark = payload_remark
                         spaceunit.ExtDataSourceID = 'ZPMS'
                         spaceunit.ExtSpaceUnitID = str(self.model_id.id)
-                        # spaceunit.ModifiedDate = modify_date
                         spaceunit.ModifiedDate = modify_date
-                        spaceunit.Status = '1'
+                        spaceunit.Status = payload_active
                         spaceunit.BatchInfo = data_batch.__dict__
                         payload = spaceunit.__dict__
                     if line.name == 'SpaceUnitFacilities':
-                        # payload_code = str(self.values['code'])
-                        # payload_name = str(self.values['name'])
-                        modify_date = datetime.datetime.now().strftime(
-                            '%Y-%m-%d')
-                        # if self.values['active'] == True:
-                        #     payload_active = 'true'
-                        # else:
-                        #     payload_active = 'false'
-                        data_batch = BatchInfo()
-                        data_batch.AppCode = "SPUFI"
-                        data_batch.BatchCode = "2019121709888"
-                        data_batch.PropertyCode = property_ids.code
-                        data_batch.InterfaceCode = ""
-                        facility = SpaceUnitFacility()
-                        # facility.SpaceUnitID = self
-                        facility.SpaceUnitID = '41'
-                        facility.SpaceUnitFacilityID = None
-                        facility.StartDate = str(self.model_id.start_date)
-                        facility.EndDate = str(self.model_id.end_date)
-                        facility.UtilitiesMeterNo = self.model_id.facility_line.utilities_no.name
-                        facility.UtilitiesType = self.model_id.facility_line.utilities_type_id.code
-                        facility.LastReadingOn = str(
-                            self.model_id.facility_line.start_date)
-                        facility.LastReadingValue = self.model_id.facilities_line.start_reading_value
-                        facility.LastReadingNOC = 0
-                        facility.LastReadingNOH = 0
-                        facility.EMeterType = ''
-                        facility.Remark = None
-                        facility.IsNew = True
-                        facility.UpdateMethod = None
-                        facility.Digit = self.model_id.facilities_line.digit
-                        facility.Indicator = None
-                        facility.CanChangeMeterNo = False
-                        facility.ExtDataSourceID = 'ZPMS'
-                        facility.ExtSpaceUnitFacilityID = str(self.model_id.id)
-                        facility.ModifiedDate = modify_date
-                        facility.BatchInfo = data_batch.__dict__
-                        payload = facility.__dict__
+                        if self.model_id.facility_line.facilities_line:
+                            for facline in self.model_id.facility_line.facilities_line:
+                                modify_date = datetime.datetime.now().strftime(
+                                    '%Y-%m-%d')
+                                data_batch = BatchInfo()
+                                data_batch.AppCode = "ZPMS"
+                                data_batch.BatchCode = "47389245" + str(
+                                    self.model_id.id)
+                                data_batch.PropertyCode = self.model_id.property_id.code
+                                data_batch.InterfaceCode = "SPUFI"
+                                facility = SpaceUnitFacility()
+                                facility.SpaceUnitID = str(self.model_id.id)
+                                facility.SpaceUnitFacilityID = ''
+                                facility.StartDate = str(
+                                    self.model_id.start_date)
+                                facility.EndDate = str(
+                                    self.model_id.end_date
+                                ) if self.model_id.end_date else None
+                                facility.UtilityMeterNo = self.model_id.facility_line.utilities_no.name
+                                facility.UtilityType = self.model_id.facility_line.utilities_type_id.code
+                                facility.LastReadingOn = str(facline.lmr_date)
+                                facility.LastReadingValue = facline.lmr_value
+                                facility.LastReadingNOC = 0
+                                facility.LastReadingNOH = 0
+                                facility.EMeterType = facline.source_type_id.code
+                                facility.Remark = str(
+                                    self.model_id.remark
+                                ) if self.model_id.remark != False else None
+                                facility.IsNew = True
+                                facility.UpdateMethod = None
+                                facility.Digit = self.model_id.facility_line.utilities_no.digit
+                                facility.Indicator = None
+                                facility.CanChangeMeterNo = False
+                                facility.ExtDataSourceID = 'ZPMS'
+                                facility.ExtSpaceUnitFacilityID = str(
+                                    facline.id)
+                                facility.ModifiedDate = modify_date
+                                facility.BatchInfo = data_batch.__dict__
+                                data.append(facility.__dict__)
                     if line.name == 'LeaseAgreement':
                         # payload_code = str(self.values['code'])
                         # payload_name = str(self.values['name'])
@@ -210,12 +210,11 @@ class APIData:
                         lease.SubmissionLink = ''
                         lease.BatchInfo = data_batch.__dict__
                         payload = lease.__dict__
-                    datapayload = json.dumps([payload])
-                    print(datapayload)
-                    r = requests.request("POST",
-                                         url_save,
-                                         data=json.dumps([payload]),
-                                         headers=headers)
+                    r = requests.request(
+                        "POST",
+                        url_save,
+                        data=json.dumps([payload] if payload else data),
+                        headers=headers)
 
 
 class Auth2Client:
@@ -307,8 +306,8 @@ class SpaceUnitFacility:
     SpaceUnitFacilityID = None
     StartDate = None
     EndDate = None
-    UtilitiesMeterNo = None
-    UtilitiesType = None
+    UtilityMeterNo = None
+    UtilityType = None
     LastReadingOn = None
     LastReadingValue = None
     LastReadingNOC = None

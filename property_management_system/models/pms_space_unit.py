@@ -44,7 +44,6 @@ class PMSSpaceUnit(models.Model):
     unit_code = fields.Char("Unit",
                             compute='get_unit_no',
                             store=True,
-                            track_visibility=True,
                             readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import calendar
 from odoo import models, fields, api, tools, _
 from odoo.addons.property_management_system.models import api_rauth_config
@@ -46,6 +47,7 @@ class PMSRentSchedule(models.Model):
                              default="draft")
     billing_date = fields.Date(string="Billing Date", required=True)
     active = fields.Boolean(default=True)
+    is_api_post = fields.Boolean("Posted")
 
     @api.multi
     def action_generate_rs(self):
@@ -607,8 +609,10 @@ class PMSDepartment(models.Model):
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
     _description = "Company Categorys"
+    _order = 'code,name'
 
     name = fields.Char("Description", required=True, track_visibility=True)
+    code = fields.Char("Code", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
@@ -664,6 +668,7 @@ class Partner(models.Model):
     sub_trade_id = fields.Many2one("pms.sub_trade_category",
                                    "Sub Trade",
                                    track_visibility=True)
+    is_api_post = fields.Boolean("Posted")
 
     @api.one
     @api.depends('company_channel_type')
@@ -689,6 +694,71 @@ class Partner(models.Model):
     def _write_company_type(self):
         for partner in self:
             partner.is_company = partner.company_type == 'company'
+
+    def crm_scheduler(self):
+        values = None
+        property_id = None
+        partner_id = []
+        partner_ids = self.env['res.company'].search([])
+        for cpid in partner_ids:
+            partner_id.append(cpid.partner_id.id)
+        crmaccount_ids = self.search([('is_api_post', '=', False),
+                                      ('is_company', '=', True),
+                                      ('id', 'not in', partner_id)])
+        if crmaccount_ids:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "CRMAccount")
+            ])
+            datas = api_rauth_config.APIData(crmaccount_ids, values,
+                                             property_id, integ_obj,
+                                             api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for ca in crmaccount_ids:
+                        ca.update({'is_api_post': True})
+
+    @api.model
+    def create(self, values):
+        id = None
+        id = super(Partner, self).create(values)
+        if id:
+            property_id = None
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "CRMAccount")
+            ])
+            datas = api_rauth_config.APIData(id, values, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    id.write({'is_api_post': True})
+        return id
+
+    @api.multi
+    def write(self, vals):
+        id = None
+        id = super(Partner, self).write(vals)
+        if id:
+            property_id = None
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "CRMAccount")
+            ])
+            datas = api_rauth_config.APIData(self, vals, property_id,
+                                             integ_obj, api_line_ids)
+            # if datas.res:
+            #     response = json.loads(datas.res)
+            #     if response['error']:
+            #         return id
+            #     if response['responseStatus'] == True and response[
+            #             'message'] == 'SUCCESS':
+            #         self.write({'is_api_post': True})
+        return id
 
 
 class PMSGenerateRentSchedule(models.Model):

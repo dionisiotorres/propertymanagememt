@@ -15,6 +15,7 @@
                 <field name="utilities_no"/>
               </group>
               <group>
+                <field name='batchcode'/>
                 <field name="start_value"/>
                 <field name="end_value"/>
                 <field name="start_reading_date"/>

@@ -125,6 +125,7 @@
           <field name="end_date"/>
           <field name="status"/>
           <field name="active"/> 
+          <field name="is_api_post"/>
         </tree>
       </field>
     </record>

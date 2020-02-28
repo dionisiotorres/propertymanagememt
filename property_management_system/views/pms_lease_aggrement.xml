@@ -120,7 +120,7 @@
                               </tree>
                             </field> 
                           </page>
-                          <page string="Lease Unit POS"  attrs="{'invisible': [('parent.state','in', ['BOOKING'])]}">
+                          <page string="Lease Unit POS" >
                             <field name="leaseunitpos_line_id">
                               <tree editable="bottom">
                                 <field name="posinterfacecode_id"/>

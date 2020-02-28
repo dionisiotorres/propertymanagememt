@@ -17,7 +17,7 @@
                 <field name="lease_agreement_id" string="Shop"/>
               </group>
               <group>    
-                <field name="charge_type"/>        
+                <field name="charge_type" readonly='0'/>        
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <!-- <field name="extend_to"/> -->

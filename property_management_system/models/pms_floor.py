@@ -1,3 +1,4 @@
+import json
 import base64
 from odoo.addons.property_management_system.requests_oauth2 import OAuth2BearerToken
 from odoo import models, fields, api, tools, _
@@ -21,6 +22,7 @@ class PMSFloor(models.Model):
                                   index=True,
                                   required=True,
                                   track_visibility=True)
+    is_api_post = fields.Boolean("Posted")
 
     @api.multi
     def name_get(self):
@@ -106,6 +108,11 @@ class PMSFloor(models.Model):
                 ])
                 datas = api_rauth_config.APIData(id, values, property_id,
                                                  integ_obj, api_line_ids)
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if response['responseStatus'] == True and response[
+                            'message'] == 'SUCCESS':
+                        id.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -130,14 +137,18 @@ class PMSFloor(models.Model):
         id = None
         id = super(PMSFloor, self).write(vals)
         if id and self.property_id.api_integration == True:
-            property_obj = self.env['pms.properties']
-            property_id = property_obj.browse(self.property_id)
+            property_id = self.property_id
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "Floor")
             ])
-            datas = api_rauth_config.APIData(id, vals, property_id, integ_obj,
-                                             api_line_ids)
+            datas = api_rauth_config.APIData(self, vals, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    self.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -163,3 +174,26 @@ class PMSFloor(models.Model):
                             _("Please Unactive of Space Unit %s with Floor Code(%s) of %s."
                               ) % (unit.name, self.code, self.name))
         return super(PMSFloor, self).unlink()
+
+    def floor_scheduler(self):
+        values = None
+        property_ids = []
+        property_id = self.env['pms.properties'].search([('api_integration',
+                                                          '=', True)])
+        for pro in property_id:
+            property_ids.append(pro.id)
+        floor_ids = self.search([('is_api_post', '=', False),
+                                 ('property_id', 'in', property_ids)])
+        if floor_ids:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "Floor")
+            ])
+            datas = api_rauth_config.APIData(floor_ids, values, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for fl in floor_ids:
+                        fl.write({'is_api_post': True})

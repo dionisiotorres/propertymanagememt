@@ -1,6 +1,8 @@
+import json
 import pytz
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
+from odoo.addons.property_management_system.models import api_rauth_config
 
 _tzs = [
     (tz, tz)
@@ -231,6 +233,7 @@ class PMSProperties(models.Model):
     #                              store=True)
 
     # next_pos_id = fields.Char("Next Pos ID")
+    is_api_post = fields.Boolean("Posted")
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -295,6 +298,25 @@ class PMSProperties(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    def property_scheduler(self):
+        values = None
+        property_ids = []
+        property_id = self.search([('api_integration', '=', True),
+                                   ('is_api_post', '=', False)])
+        if property_id:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "Property")
+            ])
+            datas = api_rauth_config.APIData(property_id, values, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for pl in property_id:
+                        pl.write({'is_api_post': True})
+
     @api.model
     def create(self, values):
         if values['property_management_id'][0][2] == []:
@@ -303,7 +325,23 @@ class PMSProperties(models.Model):
                   ))
         if values['image']:
             tools.image_resize_images(values, sizes={'image': (1024, None)})
-        return super(PMSProperties, self).create(values)
+        id = None
+        id = super(PMSProperties, self).create(values)
+        if id:
+            property_id = None
+            if values['api_integration'] == True:
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "Property")
+                ])
+                datas = api_rauth_config.APIData(id, values, property_id,
+                                                 integ_obj, api_line_ids)
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if response['responseStatus'] == True and response[
+                            'message'] == 'SUCCESS':
+                        id.write({'is_api_post': True})
+        return id
 
     @api.multi
     def write(self, vals):
@@ -313,4 +351,19 @@ class PMSProperties(models.Model):
                     _("Please set your management company for setting management rules."
                       ))
         tools.image_resize_images(vals, sizes={'image': (1024, None)})
+        id = None
+        id = super(PMSProperties, self).write(vals)
+        if id and self.api_integration == True:
+            property_id = self
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "Property")
+            ])
+            datas = api_rauth_config.APIData(self, vals, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    self.write({'is_api_post': True})
         return super(PMSProperties, self).write(vals)

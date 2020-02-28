@@ -1,4 +1,6 @@
 import requests
+import json
+import urllib.request
 from odoo import api, fields, models
 from odoo.addons.property_management_system.requests_oauth2 import OAuth2BearerToken
 from odoo.addons.property_management_system.models import api_rauth_config
@@ -59,7 +61,16 @@ class PMSApiIntegrationLine(models.Model):
         CLIENT_ID = self.api_integration_id.username
         CLIENT_SECRET = self.api_integration_id.password
         access_token = self.api_integration_id.auth_url
+        # access_token = 'http://192.168.100.17:8182/connect/token'
         url = self.api_integration_id.base_url
+        # req = urllib.request.Request(access_token)
+        # try:
+        #     with urllib.request.urlopen(req) as response:
+        #         print(response)
+        # except expression as identifier:
+        #     return identifier
+
+        # result = json.loads(response.readall().decode('utf-8'))
         authon = api_rauth_config.Auth2Client(url, CLIENT_ID, CLIENT_SECRET,
                                               access_token)
         print(authon)
@@ -87,4 +98,4 @@ class PMSApiIntegrationLine(models.Model):
                 'Connection': "keep-alive",
                 'cache-control': "no-cache"
             }
-            return {'url': api_url, 'data': data, 'header': headers}
+        return {'url': api_url, 'data': data, 'header': headers}

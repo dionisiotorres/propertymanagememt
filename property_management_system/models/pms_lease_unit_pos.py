@@ -16,10 +16,11 @@ class PMSLeaseUnitPos(models.Model):
                                           "PosInterfaceCode",
                                           required=True)
     spaceunit_id = fields.Char("SpaceUnitID")
-    useposid = fields.Boolean("UsePosID")
-    posidisactive = fields.Boolean("PosIdIsActive")
+    useposid = fields.Boolean("UsePosID", default=True)
+    posidisactive = fields.Boolean("PosIdIsActive", default=True)
     inactivedate = fields.Date("InactiveDate")
     active = fields.Boolean("Active", default=True)
+    is_api_post = fields.Boolean("Posted")
 
     @api.onchange('posinterfacecode_id')
     def onchange_posinterfacecode_id(self):

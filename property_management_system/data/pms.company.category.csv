@@ -1,11 +1,11 @@
-id,name
-pms_company_cate_1,Tenant
-pms_company_cate_2,Vendor
-pms_company_cate_3,CMO Office
-pms_company_cate_4,Company
-pms_company_cate_5,Company & Tenant
-pms_company_cate_6,Landlord
-pms_company_cate_7,POS Vendor
-pms_company_cate_8,Partner
-pms_company_cate_9,Tenant & Company
-pms_company_cate_10,None
+id,code,name
+pms_company_cate_1,TENANT,Tenant
+pms_company_cate_2,VENDOR,Vendor
+pms_company_cate_3,CMO,CMO Office
+pms_company_cate_4,COMPANY,Company
+pms_company_cate_5,COMPANY;TENANT,Company & Tenant
+pms_company_cate_6,LANDLORD,Landlord
+pms_company_cate_7,NON-TENANT,POS Vendor
+pms_company_cate_8,PARTNER,Partner
+pms_company_cate_9,TENANT;COMPANY,Tenant & Company
+pms_company_cate_10,NONE,None

@@ -1,3 +1,4 @@
+import json
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
 from odoo.addons import decimal_precision as dp
@@ -67,9 +68,6 @@ class PMSSpaceUnit(models.Model):
                                 "Parent",
                                 store=True,
                                 track_visibility=True)
-    # unittype_id = fields.Many2one("pms.applicable.space.type",
-    #                               "Type",
-    #                               track_visibility=True)
     spaceunittype_id = fields.Many2one("pms.applicable.space.type",
                                        "Unit Type",
                                        track_visibility=True)
@@ -79,7 +77,6 @@ class PMSSpaceUnit(models.Model):
                           store=True,
                           track_visibility=True)
     area = fields.Float("Area", track_visibility=True)
-    # area_move0 = fields.Float("Area", track_visibility=True)
     start_date = fields.Date("Start Date",
                              track_visibility=True,
                              required=True,
@@ -107,13 +104,8 @@ class PMSSpaceUnit(models.Model):
                                      "facilities_id",
                                      "Facilities",
                                      track_visibility=True)
-    # rent_record = fields.Many2many("pms.rent_record",
-    #                                "pms_unit_record_rel",
-    #                                "unit_id",
-    #                                "record_id",
-    #                                "Add Records",
-    #                                track_visibility=True)
     active = fields.Boolean("Active", default=True)
+    is_api_post = fields.Boolean("Posted")
 
     @api.multi
     @api.onchange('end_date')
@@ -177,18 +169,6 @@ class PMSSpaceUnit(models.Model):
                       % (self.name, len(
                           self.name), self.property_id.unit_code_len)))
 
-    # @api.multi
-    # @api.onchange('name')
-    # def onchange_name(self):
-    #     length = 0
-    #     if self.name:
-    #         length = len(self.name)
-    #     if self.env.user.company_id.space_unit_code_len:
-    #         if length > self.env.user.company_id.space_unit_code_len:
-    #             raise UserError(
-    #                 _("Please set your code length less than %s." %
-    #                   (self.env.user.company_id.space_unit_code_len)))
-
     @api.multi
     def name_get(self):
         result = []
@@ -196,6 +176,30 @@ class PMSSpaceUnit(models.Model):
             code = record.name
             result.append((record.id, code))
         return result
+
+    def space_unit_scheduler(self):
+        values = None
+        property_ids = []
+        property_id = self.env['pms.properties'].search([('api_integration',
+                                                          '=', True)])
+        for pro in property_id:
+            property_ids.append(pro.id)
+        spaceunit_ids = self.search([('is_api_post', '=', False),
+                                     ('property_id', 'in', property_ids)])
+        if spaceunit_ids:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "SpaceUnit")
+            ])
+            datas = api_rauth_config.APIData(spaceunit_ids, values,
+                                             property_id, integ_obj,
+                                             api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for fc in spaceunit_ids:
+                        fc.write({'is_api_post': True})
 
     @api.model
     def create(self, values):
@@ -246,8 +250,14 @@ class PMSSpaceUnit(models.Model):
                 ])
                 datas = api_rauth_config.APIData(id, values, property_id,
                                                  integ_obj, api_line_ids)
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if response['responseStatus'] == True and response[
+                            'message'] == 'SUCCESS':
+                        id.write({'is_api_post': True})
                 if values['facility_line']:
                     for fl in values['facility_line'][0][2]:
+                        values['create'] = True
                         facility_id = self.env['pms.facilities'].browse(fl)
                         property_objs = self.env['pms.properties'].browse(
                             facility_id.property_id.id)
@@ -259,24 +269,12 @@ class PMSSpaceUnit(models.Model):
                         datas = api_rauth_config.APIData(
                             id, values, property_objs, integ_objs,
                             api_type_objs)
-        #     property_obj = self.env['pms.properties'].browse(
-        #         values['property_id'])
-        #     integ_obj = self.env['pms.api.integration']
-        #     api_type_obj = self.env['pms.api.type'].search([('name', '=',
-        #                                                      "SpaceUnit")])
-        #     datas = api_rauth_config.APIData(id, values, property_obj,
-        #                                      integ_obj, api_type_obj)
-        #     if values['facility_line']:
-        #         for fl in values['facility_line'][0][2]:
-        #             facility_id = self.env['pms.facilities'].browse(fl)
-        #             property_objs = self.env['pms.properties'].browse(
-        #                 facility_id.property_id.id)
-        #             integ_objs = self.env['pms.api.integration']
-        #             api_type_objs = self.env['pms.api.type'].search([
-        #                 ('name', '=', "Facilities")
-        #             ])
-        #          datas = api_rauth_config.APIData(id, values, property_obj, integ_obj,
-        #                                  api_type_obj)
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if response['responseStatus'] == True and response[
+                                    'message'] == 'SUCCESS':
+                                for fc in facility_id:
+                                    fc.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -305,22 +303,48 @@ class PMSSpaceUnit(models.Model):
                     raise UserError(
                         _('Please set floor in  %s property.') %
                         self.property_id.name)
-        return super(PMSSpaceUnit, self).write(val)
-
-
-# class PMSRentRecord(models.Model):
-#     _name = "pms.rent_record"
-#     _description = "Rent Records"
-
-#     def get_property_id(self):
-#         property_id = space_unit_id = active_id = None
-#         active_id = self._context.get('active_id')
-#         space_unit_id = self.env['pms.space.unit'].browse(int(active_id))
-#         property_id = space_unit_id.property_id
-#         return property_id
-
-#     sequence_no = fields.Integer("No", track_visibility=True)
-#     name = fields.Text("Remark", track_visibility=True)
-#     property_id = fields.Many2one("pms.properties",
-#                                   "Property",
-#                                   default=get_property_id)
+        id = None
+        id = super(PMSSpaceUnit, self).write(val)
+        if id:
+            property_id = None
+            if 'property_id' in val:
+                property_id = val['property_id']
+            else:
+                property_id = self.property_id.id
+            property_obj = self.env['pms.properties']
+            property_ids = property_obj.browse(property_id)
+            if property_ids.api_integration == True:
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "SpaceUnit")
+                ])
+                datas = api_rauth_config.APIData(self, val, property_ids,
+                                                 integ_obj, api_line_ids)
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if response['responseStatus'] == True and response[
+                            'message'] == 'SUCCESS':
+                        self.write({'is_api_post': True})
+                if 'facility_line' in val:
+                    if val['facility_line']:
+                        for fl in val['facility_line'][0][2]:
+                            facility_id = self.env['pms.facilities'].browse(fl)
+                            property_objs = self.env['pms.properties'].browse(
+                                facility_id.property_id.id)
+                            integ_objs = self.env[
+                                'pms.api.integration'].search([])
+                            api_type_objs = api_line_ids = self.env[
+                                'pms.api.integration.line'].search([
+                                    ('name', '=', "SpaceUnitFacilities")
+                                ])
+                            datas = api_rauth_config.APIData(
+                                self, val, property_objs, integ_objs,
+                                api_type_objs)
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if response[
+                                        'responseStatus'] == True and response[
+                                            'message'] == 'SUCCESS':
+                                    for fc in facility_id:
+                                        fc.write({'is_api_post': True})
+        return id

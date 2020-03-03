@@ -43,6 +43,7 @@ class PMSRentSchedule(models.Model):
 
     state = fields.Selection([('draft', "Draft"), ('generated', "Generated"),
                               ('terminated', "Terminated")],
+    state = fields.Selection([('draft', "Draft"), ('generated', "Generated"), ('terminated', "Terminated")],
                              "Status",
                              default="draft")
     billing_date = fields.Date(string="Billing Date", required=True)

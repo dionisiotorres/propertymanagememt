@@ -128,7 +128,7 @@ class PMSFacilities(models.Model):
             self.last_rdate = lmrdate
 
     def suf_scheduler(self):
-        values = self
+        values = self 
         property_ids = []
         property_id = self.env['pms.properties'].search([('api_integration',
                                                           '=', True)])

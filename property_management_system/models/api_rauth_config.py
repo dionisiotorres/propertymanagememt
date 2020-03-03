@@ -380,7 +380,8 @@ class APIData:
                         bt = datetime.datetime.now().strftime("%H%M%S")
                         data_batch.BatchCode = str(bd + bt)
                         data_batch.InterfaceCode = "Facilities"
-                        if 'create' not in self.values and not self.model_id.facility_line:
+                        if 'create' not in self.values and len(
+                                self.model_id) > 0:
                             for facl in self.model_id:
                                 if facl.facilities_line:
                                     for facline in facl.facilities_line:

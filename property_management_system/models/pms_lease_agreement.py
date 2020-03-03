@@ -69,7 +69,6 @@ class PMSLeaseAgreement(models.Model):
                              string="Status",
                              default="BOOKING",
                              track_visibility=True)
-                             default="BOOKING", track_visibility=True)
     # active = fields.Boolean(default=True, track_visibility=True)
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
@@ -163,7 +162,9 @@ class PMSLeaseAgreement(models.Model):
                     #     _("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit."
                     #       % unit.unit_no))
                     if unit.status == 'occupied' and line.state == 'BOOKING':
-                        raise UserError(_("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit." % unit.unit_no))
+                        raise UserError(
+                            _("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit."
+                              % unit.unit_no))
                     if unit.status != 'occupied' and line.state == 'BOOKING':
                         unit.write({'status': 'occupied'})
                 for ctype in line.applicable_type_line_id:
@@ -1006,7 +1007,7 @@ class PMSLeaseAgreement(models.Model):
                     exp.write({'state': 'CANCELLED'})
 
     @api.multi
-    @api.depends('end_date','extend_to')
+    @api.depends('end_date', 'extend_to')
     def lease_expired(self):
         lease_ids = self.search([])
         today = datetime.now().strftime('%Y-%m-%d')
@@ -1014,15 +1015,14 @@ class PMSLeaseAgreement(models.Model):
         for exp in lease_ids:
             if exp.extend_to:
                 if exp.extend_to < today_date:
-                    exp.write({'state':'EXPIRED'})
+                    exp.write({'state': 'EXPIRED'})
             if not exp.extend_to and exp.end_date:
                 if exp.end_date < today_date:
-                    exp.write({'state':'EXPIRED'})
+                    exp.write({'state': 'EXPIRED'})
             if exp.booking_expdate:
                 if exp.booking_expdate < today_date and exp.state == 'BOOKING':
-                    exp.write({'state':'EXPIRED'})
+                    exp.write({'state': 'EXPIRED'})
 
-    
     @api.multi
     @api.depends('terminate_period')
     def lease_terminate(self):
@@ -1064,17 +1064,25 @@ class PMSLeaseAgreement(models.Model):
     #                 rentid.write({'state': 'terminated', 'active': False})
     #         terminated = self.write({'state': 'TERMINATED'})
     #     return terminated
-                    ter.write({'state':'TERMINATED'})
-                    rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',ter.unit_no),('lease_no','=',ter.lease_no),('start_date','>=',ter.terminate_period)])
+                    ter.write({'state': 'TERMINATED'})
+                    rent_schedule_ids = self.env['pms.rent_schedule'].search([
+                        ('unit_no', '=', ter.unit_no),
+                        ('lease_no', '=', ter.lease_no),
+                        ('start_date', '>=', ter.terminate_period)
+                    ])
                     for rentid in rent_schedule_ids:
                         rentid.write({'state': 'terminated'})
-        
+
     @api.multi
     def action_terminate(self):
         if self.is_terminate == True and self.terminate_period:
             if self.terminate_period <= datetime.now().date():
                 for line in self:
-                    rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',line.unit_no),('lease_no','=',line.lease_no),('start_date','>=',self.terminate_period)])
+                    rent_schedule_ids = self.env['pms.rent_schedule'].search([
+                        ('unit_no', '=', line.unit_no),
+                        ('lease_no', '=', line.lease_no),
+                        ('start_date', '>=', self.terminate_period)
+                    ])
                     for rentid in rent_schedule_ids:
                         rentid.write({'state': 'terminated'})
                 return self.write({'state': 'TERMINATED'})
@@ -1088,8 +1096,12 @@ class PMSLeaseAgreement(models.Model):
         terminated = self.write({'state': 'TERMINATED'})
         if terminated:
             for line in self:
-                rent_schedule_ids = self.env['pms.rent_schedule'].search([('unit_no','=',line.unit_no),('lease_no','=',line.lease_no),('start_date','>=',self.terminate_period)])
-                rent_schedule_ids.write({'state':'terminated'})
+                rent_schedule_ids = self.env['pms.rent_schedule'].search([
+                    ('unit_no', '=', line.unit_no),
+                    ('lease_no', '=', line.lease_no),
+                    ('start_date', '>=', self.terminate_period)
+                ])
+                rent_schedule_ids.write({'state': 'terminated'})
         return terminated
 
     @api.multi

@@ -165,6 +165,29 @@ class PMSRentSchedule(models.Model):
                 if gen_id:
                     line.write({'state': 'generated', 'amount': total_amount})
 
+    def rent_schedule_schedular(self):
+        values = None
+        property_ids = []
+        property_id = self.env['pms.properties'].search([('api_integration',
+                                                          '=', True)])
+        for pro in property_id:
+            property_ids.append(pro.id)
+        lease_ids = self.search([('is_api_post', '=', False),
+                                 ('property_id', 'in', property_ids)])
+        if lease_ids:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "LeaseAgreement")
+            ])
+            datas = api_rauth_config.APIData(lease_ids, values, property_id,
+                                             integ_obj, api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for lid in lease_ids:
+                        lid.write({'is_api_post': True})
+
     @api.multi
     def toggle_active(self):
         for pt in self:

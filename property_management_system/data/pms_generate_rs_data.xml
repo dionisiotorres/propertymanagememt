@@ -24,7 +24,7 @@
             <field name="state">code</field>
             <field name="code">records.action_reject()</field>
         </record>
-         <record id="id_pms_gen_confirm_schedule" model="ir.actions.server">
+        <record id="id_pms_gen_confirm_schedule" model="ir.actions.server">
             <field name="name">Confirm</field>
             <field name="model_id" ref="model_pms_gen_rent_schedule"/>
             <field name="state">code</field>

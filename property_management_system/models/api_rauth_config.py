@@ -475,147 +475,255 @@ class APIData:
                         bd = datetime.datetime.now().strftime('%Y%M%d')
                         bt = datetime.datetime.now().strftime("%H%M%S")
                         data_batch.BatchCode = str(bd + bt)
-                        data_batch.PropertyCode = property_ids.code
                         data_batch.InterfaceCode = "LeaseAgreements"
                         lease = LeaseAgreement()
-                        lease.LeaseAgreementID = ""
-                        lease.CrmAccountID = self.model_id.company_tanent_id.id or None
-                        lease.PosVendorID = self.model_id.company_vendor_id.id or None
-                        lease.PropertyID = property_ids.id
-                        lease.LeaseStartDate = self.model_id.start_date.strftime(
-                            '%Y-%m-%d'
-                        ) if self.model_id.start_date != False else None
-                        lease.LeaseEndDate = self.model_id.end_date.strftime(
-                            '%Y-%m-%d'
-                        ) if self.model_id.end_date != False else None
-                        lease.ExtendedTo = self.model_id.extend_to.strftime(
-                            '%Y-%m-%d'
-                        ) if self.model_id.extend_to != False else None
-                        lease.Remark = self.model_id.remark or None
-                        status = None
-                        if self.values == 'BOOKING':
-                            status = "New"
-                        elif self.values == 'NEW':
-                            status = "New"
-                        elif self.values == 'EXTENDED':
-                            status = "Extended"
-                        elif self.values == 'TERMINATED':
-                            status = 'Terminated'
+                        if len(self.model_id) >= 1 and self.values == None:
+                            for lg in self.model_id:
+                                data_batch.PropertyCode = lg.property_id.code
+                                lease.LeaseAgreementID = ""
+                                lease.CrmAccountID = lg.company_tanent_id.id or None
+                                lease.PosVendorID = lg.company_vendor_id.id or None
+                                lease.PropertyID = lg.property_id.id
+                                lease.LeaseStartDate = lg.start_date.strftime(
+                                    '%Y-%m-%d'
+                                ) if lg.start_date != False else None
+                                lease.LeaseEndDate = lg.end_date.strftime(
+                                    '%Y-%m-%d'
+                                ) if lg.end_date != False else None
+                                lease.ExtendedTo = lg.extend_to.strftime(
+                                    '%Y-%m-%d'
+                                ) if lg.extend_to != False else None
+                                lease.Remark = lg.remark or None
+                                status = None
+                                if lg.state == 'NEW':
+                                    status = "New"
+                                elif lg.state == 'EXTENDED':
+                                    status = "Extended"
+                                elif lg.state == 'TERMINATED':
+                                    status = 'Terminated'
+                                else:
+                                    status = 'New'
+                                lease.LeaseStatus = status
+                                lease.ExternalLeaseNo = str(
+                                    lg.lease_no) or None
+                                lease.DefaultLocalCurrency = lg.property_id.currency_id.name or None
+                                lease.PropertyCode = property_ids.code
+                                lease.PosSubmissionFrequency = lg.pos_submission_frequency or None
+                                lease.SpaceUnitNo = lg.unit_no or None
+                                lease.AppAccessKeyStatus = True
+                                lease.ExtDataSourceID = 'ZPMS'
+                                lease.ModifiedDate = modify_date
+                                lease.ExtLeaseAgreementID = lg.id
+                                lease.PosSubmissionType = lg.pos_submission_type or None
+                                lease.SalesDataType = lg.sale_data_type or None
+                                lease.BatchInfo = data_batch.__dict__
+                                data.append(lease.__dict__)
                         else:
-                            status = 'New'
-                        lease.LeaseStatus = status
-                        lease.ExternalLeaseNo = str(
-                            self.model_id.lease_no) or None
-                        lease.DefaultLocalCurrency = self.model_id.property_id.currency_id.name or None
-                        lease.PropertyCode = property_ids.code
-                        lease.PosSubmissionFrequency = self.model_id.pos_submission_frequency or None
-                        lease.SpaceUnitNo = self.model_id.unit_no or None
-                        lease.AppAccessKeyStatus = True
-                        lease.ExtDataSourceID = 'ZPMS'
-                        lease.ModifiedDate = modify_date
-                        lease.ExtLeaseAgreementID = self.model_id.id
-                        lease.PosSubmissionType = self.model_id.pos_submission_type or None
-                        lease.SalesDataType = self.model_id.sale_data_type or None
-                        lease.BatchInfo = data_batch.__dict__
-                        payload = lease.__dict__
-                    if line.name == 'Leaseunititem':
-                        if self.model_id.lease_agreement_line:
-                            data_batch = BatchInfo()
-                            data_batch.AppCode = "ZPMS"
-                            bd = datetime.datetime.now().strftime('%Y%M%d')
-                            bt = datetime.datetime.now().strftime("%H%M%S")
-                            data_batch.BatchCode = str(bd + bt)
                             data_batch.PropertyCode = property_ids.code
-                            data_batch.InterfaceCode = "LeaseUnitItem"
-                            for facline in self.model_id.lease_agreement_line:
+                            lease.LeaseAgreementID = ""
+                            lease.CrmAccountID = self.model_id.company_tanent_id.id or None
+                            lease.PosVendorID = self.model_id.company_vendor_id.id or None
+                            lease.PropertyID = property_ids.id
+                            lease.LeaseStartDate = self.model_id.start_date.strftime(
+                                '%Y-%m-%d'
+                            ) if self.model_id.start_date != False else None
+                            lease.LeaseEndDate = self.model_id.end_date.strftime(
+                                '%Y-%m-%d'
+                            ) if self.model_id.end_date != False else None
+                            lease.ExtendedTo = self.model_id.extend_to.strftime(
+                                '%Y-%m-%d'
+                            ) if self.model_id.extend_to != False else None
+                            lease.Remark = self.model_id.remark or None
+                            status = None
+                            if self.values == 'BOOKING':
+                                status = "New"
+                            elif self.values == 'NEW':
+                                status = "New"
+                            elif self.values == 'EXTENDED':
+                                status = "Extended"
+                            elif self.values == 'TERMINATED':
+                                status = 'Terminated'
+                            else:
+                                status = 'New'
+                            lease.LeaseStatus = status
+                            lease.ExternalLeaseNo = str(
+                                self.model_id.lease_no) or None
+                            lease.DefaultLocalCurrency = self.model_id.property_id.currency_id.name or None
+                            lease.PropertyCode = property_ids.code
+                            lease.PosSubmissionFrequency = self.model_id.pos_submission_frequency or None
+                            lease.SpaceUnitNo = self.model_id.unit_no or None
+                            lease.AppAccessKeyStatus = True
+                            lease.ExtDataSourceID = 'ZPMS'
+                            lease.ModifiedDate = modify_date
+                            lease.ExtLeaseAgreementID = self.model_id.id
+                            lease.PosSubmissionType = self.model_id.pos_submission_type or None
+                            lease.SalesDataType = self.model_id.sale_data_type or None
+                            lease.BatchInfo = data_batch.__dict__
+                            payload = lease.__dict__
+                    if line.name == 'Leaseunititem':
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "ZPMS"
+                        bd = datetime.datetime.now().strftime('%Y%M%d')
+                        bt = datetime.datetime.now().strftime("%H%M%S")
+                        data_batch.BatchCode = str(bd + bt)
+                        data_batch.InterfaceCode = "LeaseUnitItem"
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d')
+                        if len(self.model_id) >= 1 and self.values == None:
+                            for lgl in self.model_id:
+                                data_batch.PropertyCode = lgl.property_id.code
                                 leaseline = LeaseAgreementItem()
-                                modify_date = datetime.datetime.now().strftime(
-                                    '%Y-%m-%d')
-                                leaseline.LeaseAgreementID = self.model_id.id if self.model_id != False else ""
+                                leaseline.LeaseAgreementID = lgl.lease_agreement_id.id if lgl.lease_agreement_id.id != False else ""
                                 leaseline.LeaseAgreementItemID = ''
-                                leaseline.SpaceUnitID = facline.unit_no.id if facline.unit_no.id != False else ""
-                                leaseline.StartDate = facline.start_date.strftime(
+                                leaseline.SpaceUnitID = lgl.unit_no.id if lgl.unit_no.id != False else ""
+                                leaseline.StartDate = lgl.start_date.strftime(
                                     '%Y-%m-%d'
-                                ) if facline.start_date != False else None
-                                leaseline.EndDate = facline.end_date.strftime(
+                                ) if lgl.start_date != False else None
+                                leaseline.EndDate = lgl.end_date.strftime(
                                     '%Y-%m-%d'
-                                ) if facline.end_date != False else None
-                                leaseline.ExtendedTo = facline.extend_to.strftime(
+                                ) if lgl.end_date != False else None
+                                leaseline.ExtendedTo = lgl.extend_to.strftime(
                                     '%Y-%m-%d'
-                                ) if facline.extend_to != False else None
-                                leaseline.Remark = facline.remark if facline.remark != False else None
-                                leaseline.CrmAccountID = self.model_id.company_tanent_id.id if self.model_id.company_tanent_id != False else None
+                                ) if lgl.extend_to != False else None
+                                leaseline.Remark = lgl.remark if lgl.remark != False else None
+                                leaseline.CrmAccountID = lgl.company_tanent_id.id if lgl.company_tanent_id != False else None
                                 leaseline.ExtDataSourceID = "ZPMS"
                                 leaseline.ModifiedDate = modify_date
-                                leaseline.ExtLeaseAgreementItemID = (
-                                    facline.id)
+                                leaseline.ExtLeaseAgreementItemID = (lgl.id)
                                 leaseline.Active = True
                                 leaseline.BatchInfo = data_batch.__dict__
                                 data.append(leaseline.__dict__)
+                        else:
+                            if self.model_id.lease_agreement_line:
+                                data_batch.PropertyCode = property_ids.code
+                                for facline in self.model_id.lease_agreement_line:
+                                    leaseline = LeaseAgreementItem()
+                                    leaseline.LeaseAgreementID = self.model_id.id if self.model_id != False else ""
+                                    leaseline.LeaseAgreementItemID = ''
+                                    leaseline.SpaceUnitID = facline.unit_no.id if facline.unit_no.id != False else ""
+                                    leaseline.StartDate = facline.start_date.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facline.start_date != False else None
+                                    leaseline.EndDate = facline.end_date.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facline.end_date != False else None
+                                    leaseline.ExtendedTo = facline.extend_to.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facline.extend_to != False else None
+                                    leaseline.Remark = facline.remark if facline.remark != False else None
+                                    leaseline.CrmAccountID = self.model_id.company_tanent_id.id if self.model_id.company_tanent_id != False else None
+                                    leaseline.ExtDataSourceID = "ZPMS"
+                                    leaseline.ModifiedDate = modify_date
+                                    leaseline.ExtLeaseAgreementItemID = (
+                                        facline.id)
+                                    leaseline.Active = True
+                                    leaseline.BatchInfo = data_batch.__dict__
+                                    data.append(leaseline.__dict__)
                     if line.name == 'Leaseunitpos':
-                        if self.model_id.lease_agreement_line and self.model_id.lease_agreement_line.leaseunitpos_line_id:
-                            data_batch = BatchInfo()
-                            data_batch.AppCode = "ZPMS"
-                            data_batch.PropertyCode = property_ids.id
-                            bd = datetime.datetime.now().strftime('%Y%M%d')
-                            bt = datetime.datetime.now().strftime("%H%M%S")
-                            data_batch.BatchCode = str(bd + bt)
-                            data_batch.InterfaceCode = "LeaseUnitPOS"
-                            for lline in self.model_id.lease_agreement_line:
-                                if lline.leaseunitpos_line_id:
-                                    for pl in lline.leaseunitpos_line_id:
-                                        modify_date = datetime.datetime.now(
-                                        ).strftime('%Y-%m-%d')
-                                        leasepos = LeaseUnitPos()
-                                        leasepos.LeaseAgreementItemPosInterfaceCodeID = ""
-                                        leasepos.LeaseAgreementID = self.model_id.id
-                                        leasepos.LeaseAgreementItemID = lline.id
-                                        leasepos.SpaceUnitID = lline.unit_no.id
-                                        leasepos.InactiveDate = pl.inactivedate.strftime(
-                                            '%Y-%m-%d'
-                                        ) if pl.inactivedate != False else None
-                                        leasepos.PosInterfaceCode = pl.posinterfacecode_id.name
-                                        leasepos.UsePosID = pl.useposid
-                                        leasepos.Status = pl.posidisactive
-                                        leasepos.ExtDataSourceID = "ZPMS"
-                                        leasepos.ExtLeaseAgreementItemPosInterfaceCodeID = pl.id
-                                        leasepos.ModifiedDate = modify_date
-                                        leasepos.Active = pl.active
-                                        leasepos.BatchInfo = data_batch.__dict__
-                                        data.append(leasepos.__dict__)
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "ZPMS"
+                        data_batch.PropertyCode = property_ids.id
+                        bd = datetime.datetime.now().strftime('%Y%M%d')
+                        bt = datetime.datetime.now().strftime("%H%M%S")
+                        data_batch.BatchCode = str(bd + bt)
+                        data_batch.InterfaceCode = "LeaseUnitPOS"
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d')
+                        if len(self.model_id) >= 1 and self.values == None:
+                            for lup in self.model_id:
+                                leasepos = LeaseUnitPos()
+                                leasepos.LeaseAgreementItemPosInterfaceCodeID = ""
+                                leasepos.LeaseAgreementID = lup.leaseagreementitem_id.lease_agreement_id.id
+                                leasepos.LeaseAgreementItemID = lup.leaseagreementitem_id.id
+                                leasepos.SpaceUnitID = lup.leaseagreementitem_id.unit_no.id
+                                leasepos.InactiveDate = lup.inactivedate.strftime(
+                                    '%Y-%m-%d'
+                                ) if lup.inactivedate != False else None
+                                leasepos.PosInterfaceCode = lup.posinterfacecode_id.name
+                                leasepos.UsePosID = lup.useposid
+                                leasepos.Status = lup.posidisactive
+                                leasepos.ExtDataSourceID = "ZPMS"
+                                leasepos.ExtLeaseAgreementItemPosInterfaceCodeID = lup.id
+                                leasepos.ModifiedDate = modify_date
+                                leasepos.Active = lup.active
+                                leasepos.BatchInfo = data_batch.__dict__
+                                data.append(leasepos.__dict__)
+                        else:
+                            if self.model_id.lease_agreement_line and self.model_id.lease_agreement_line.leaseunitpos_line_id:
+                                for lline in self.model_id.lease_agreement_line:
+                                    if lline.leaseunitpos_line_id:
+                                        for pl in lline.leaseunitpos_line_id:
+                                            leasepos = LeaseUnitPos()
+                                            leasepos.LeaseAgreementItemPosInterfaceCodeID = ""
+                                            leasepos.LeaseAgreementID = self.model_id.id
+                                            leasepos.LeaseAgreementItemID = lline.id
+                                            leasepos.SpaceUnitID = lline.unit_no.id
+                                            leasepos.InactiveDate = pl.inactivedate.strftime(
+                                                '%Y-%m-%d'
+                                            ) if pl.inactivedate != False else None
+                                            leasepos.PosInterfaceCode = pl.posinterfacecode_id.name
+                                            leasepos.UsePosID = pl.useposid
+                                            leasepos.Status = pl.posidisactive
+                                            leasepos.ExtDataSourceID = "ZPMS"
+                                            leasepos.ExtLeaseAgreementItemPosInterfaceCodeID = pl.id
+                                            leasepos.ModifiedDate = modify_date
+                                            leasepos.Active = pl.active
+                                            leasepos.BatchInfo = data_batch.__dict__
+                                            data.append(leasepos.__dict__)
                     if line.name == 'RentSchedule':
-                        if self.model_id.lease_agreement_line and self.model_id.lease_rent_config_id:
-                            data_batch = BatchInfo()
-                            data_batch.AppCode = "ZPMS"
-                            data_batch.PropertyCode = property_ids.id
-                            bd = datetime.datetime.now().strftime('%Y%M%d')
-                            bt = datetime.datetime.now().strftime("%H%M%S")
-                            data_batch.BatchCode = str(bd + bt)
-                            data_batch.InterfaceCode = "RentSchedule"
-                            modify_date = datetime.datetime.now().strftime(
-                                '%Y-%m-%d')
-                            for lline in self.model_id.lease_agreement_line:
-                                if lline.rent_schedule_line:
-                                    for pl in lline.rent_schedule_line:
-                                        rentschedule = RentSchedule()
-                                        rentschedule.RentScheduleID = ""
-                                        rentschedule.PropertyID = self.property_id.id
-                                        rentschedule.StartDate = pl.start_date.strftime(
-                                            '%Y-%m-%d'
-                                        ) if pl.start_date else None
-                                        rentschedule.EndDate = pl.end_date.strftime(
-                                            '%Y-%m-%d'
-                                        ) if pl.end_date else None
-                                        rentschedule.ChargeType = pl.charge_type.charge_type_id.name if pl.charge_type else None
-                                        rentschedule.CurrencyCode = self.model_id.currency_id.name
-                                        rentschedule.AmountLocal = pl.amount
-                                        rentschedule.LeaseAgreementItemID = lline.id
-                                        rentschedule.ExtRentScheduleID = pl.id
-                                        rentschedule.ExtDataSourceID = 'ZPMS'
-                                        rentschedule.ModifiedDate = modify_date
-                                        rentschedule.Active = pl.active
-                                        rentschedule.BatchInfo = data_batch.__dict__
-                                        data.append(rentschedule.__dict__)
+                        data_batch = BatchInfo()
+                        data_batch.AppCode = "ZPMS"
+                        bd = datetime.datetime.now().strftime('%Y%M%d')
+                        bt = datetime.datetime.now().strftime("%H%M%S")
+                        data_batch.BatchCode = str(bd + bt)
+                        data_batch.InterfaceCode = "RentSchedule"
+                        modify_date = datetime.datetime.now().strftime(
+                            '%Y-%m-%d')
+                        if len(self.model_id) >= 1 and self.values == None:
+                            for rs in self.model_id:
+                                data_batch.PropertyCode = rs.property_id.id
+                                rentschedule = RentSchedule()
+                                rentschedule.RentScheduleID = ""
+                                rentschedule.PropertyID = rs.property_id.id
+                                rentschedule.StartDate = rs.start_date.strftime(
+                                    '%Y-%m-%d') if rs.start_date else None
+                                rentschedule.EndDate = rs.end_date.strftime(
+                                    '%Y-%m-%d') if rs.end_date else None
+                                rentschedule.ChargeType = rs.charge_type.charge_type_id.name if rs.charge_type else None
+                                rentschedule.CurrencyCode = rs.lease_agreement_id.currency_id.name
+                                rentschedule.AmountLocal = rs.amount
+                                rentschedule.LeaseAgreementItemID = rs.lease_agreement_id.id
+                                rentschedule.ExtRentScheduleID = rs.id
+                                rentschedule.ExtDataSourceID = 'ZPMS'
+                                rentschedule.ModifiedDate = modify_date
+                                rentschedule.Active = rs.active
+                                rentschedule.BatchInfo = data_batch.__dict__
+                                data.append(rentschedule.__dict__)
+                        else:
+                            if self.model_id.lease_agreement_line and self.model_id.lease_rent_config_id:
+                                for lline in self.model_id.lease_agreement_line:
+                                    if lline.rent_schedule_line:
+                                        for pl in lline.rent_schedule_line:
+                                            data_batch.PropertyCode = property_ids.id
+                                            rentschedule = RentSchedule()
+                                            rentschedule.RentScheduleID = ""
+                                            rentschedule.PropertyID = self.property_id.id
+                                            rentschedule.StartDate = pl.start_date.strftime(
+                                                '%Y-%m-%d'
+                                            ) if pl.start_date else None
+                                            rentschedule.EndDate = pl.end_date.strftime(
+                                                '%Y-%m-%d'
+                                            ) if pl.end_date else None
+                                            rentschedule.ChargeType = pl.charge_type.charge_type_id.name if pl.charge_type else None
+                                            rentschedule.CurrencyCode = self.model_id.currency_id.name
+                                            rentschedule.AmountLocal = pl.amount
+                                            rentschedule.LeaseAgreementItemID = lline.id
+                                            rentschedule.ExtRentScheduleID = pl.id
+                                            rentschedule.ExtDataSourceID = 'ZPMS'
+                                            rentschedule.ModifiedDate = modify_date
+                                            rentschedule.Active = pl.active
+                                            rentschedule.BatchInfo = data_batch.__dict__
+                                            data.append(rentschedule.__dict__)
                     if line.name == 'UpdatePOSDailySale':
                         data = self.values
                     if line.name == 'UpdateUtilitiesMonthlySale':

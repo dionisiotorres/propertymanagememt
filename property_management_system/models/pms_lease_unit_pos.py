@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import json
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.addons.property_management_system.models import api_rauth_config
 
 
 class PMSLeaseUnitPos(models.Model):
@@ -110,6 +112,38 @@ class PMSLeaseUnitPos(models.Model):
                     data.append(pids.id)
             domain = {'posinterfacecode_id': [('id', 'in', data)]}
             return {'domain': domain}
+
+    def leaseunitpos_schedular(self):
+        values = None
+        property_ids = []
+        leaseposids = []
+        leaseipos_ids = self.search([('is_api_post', '=', False),
+                                     ('leaseagreementitem_id', '!=', None)])
+        for lp in leaseipos_ids:
+            property_id = self.env['pms.properties'].search([
+                ('api_integration', '=', True),
+                ('id', '=', lp.leaseagreementitem_id.property_id.id)
+            ])
+            if property_id not in property_ids:
+                property_ids.append(property_id.id)
+            if property_id:
+                leaseposids.append(lp.id)
+        leaseipos_api_id = self.search([('is_api_post', '=', False),
+                                        ('id', 'in', leaseposids)])
+        if leaseipos_api_id:
+            integ_obj = self.env['pms.api.integration'].search([])
+            api_line_ids = self.env['pms.api.integration.line'].search([
+                ('name', '=', "Leaseunitpos")
+            ])
+            datas = api_rauth_config.APIData(leaseipos_api_id, values,
+                                             property_id, integ_obj,
+                                             api_line_ids)
+            if datas.res:
+                response = json.loads(datas.res)
+                if response['responseStatus'] == True and response[
+                        'message'] == 'SUCCESS':
+                    for lup in leaseipos_api_id:
+                        lup.write({'is_api_post': True})
 
 
 class PMSLeaseInterfaceCode(models.Model):

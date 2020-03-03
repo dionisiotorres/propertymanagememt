@@ -59,8 +59,6 @@
                   <field name="company_id" invisible="1"/>
                   <!-- <field name="is_terminate" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}"/> -->
                   <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','TERMINATED'])], 'readonly':[('state','in',['TERMINATED'])]}"/>
-                  <field name="is_terminate" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}"/>
-                  <field name="terminate_period" attrs="{'invisible': [('is_terminate','=',False)], 'readonly':[('state','in',['TERMINATED'])]}"/>
               </group>
             </group>
             <notebook>

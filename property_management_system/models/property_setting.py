@@ -973,13 +973,14 @@ class Partner(models.Model):
                 datas = api_rauth_config.APIData.get_data(
                     self, vals, property_id, integ_obj, api_line_ids)
                 if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        self.write({'is_api_post': True})
+                    if 'res' in datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            self.write({'is_api_post': True})
         return id
 
     @api.multi

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
+import datetime
 from odoo import models, fields, api, _
+from datetime import datetime
 from odoo.exceptions import UserError
 from odoo.addons.property_management_system.models import api_rauth_config
 
@@ -80,11 +82,6 @@ class PMSLeaseUnitPos(models.Model):
                     posinterface_id = self.posinterfacecode_id.create(
                         {'name': leasepos_no_pre + leasepos_no})
                     self.posinterfacecode_id = posinterface_id
-                    # if not self.posinterfacecode_id:
-                    #     leaseunit_ids = self.leaseagreementitem_id
-                    #     if leaseunit_ids.property_id:
-                    #         property_id = leaseunit_ids.property_id
-                    #         if property_id.is_autogenerate_posid != True:
                     interfacecode = self.env[
                         'pms.lease.interface.code'].search([])
                     intids = []
@@ -115,19 +112,15 @@ class PMSLeaseUnitPos(models.Model):
 
     def leaseunitpos_schedular(self):
         values = None
-        property_ids = []
+        property_id = None
         leaseposids = []
         leaseipos_ids = self.search([('is_api_post', '=', False),
                                      ('leaseagreementitem_id', '!=', None)])
         for lp in leaseipos_ids:
-            property_id = self.env['pms.properties'].search([
-                ('api_integration', '=', True),
-                ('id', '=', lp.leaseagreementitem_id.property_id.id)
-            ])
-            if property_id not in property_ids:
-                property_ids.append(property_id.id)
-            if property_id:
+            if lp.leaseagreementitem_id.property_id.api_integration == True:
+                property_id = lp.leaseagreementitem_id.property_id
                 leaseposids.append(lp.id)
+        print(leaseposids)
         leaseipos_api_id = self.search([('is_api_post', '=', False),
                                         ('id', 'in', leaseposids)])
         if leaseipos_api_id:
@@ -135,15 +128,18 @@ class PMSLeaseUnitPos(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "Leaseunitpos")
             ])
-            datas = api_rauth_config.APIData(leaseipos_api_id, values,
-                                             property_id, integ_obj,
-                                             api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for lup in leaseipos_api_id:
-                        lup.write({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(leaseipos_api_id, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for lup in leaseipos_api_id:
+                                        lup.write({'is_api_post': True})
 
 
 class PMSLeaseInterfaceCode(models.Model):

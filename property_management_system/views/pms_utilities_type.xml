@@ -114,6 +114,7 @@
     <menuitem  id="utilities_type_menu_root" 
         name="Utilities Supply Type" 
         parent="property_management_menu_sub"
+        groups="base.group_system"
         action="action_utilities_supply_type_all"/>
     <menuitem  id="utilities_source_type_menu_root" 
         name="Utilities Source Type" 

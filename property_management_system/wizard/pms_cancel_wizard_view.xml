@@ -5,12 +5,12 @@
             <field name="model">pms.lease_cancel_wizard</field>
             <field name="arch" type="xml">
                 <form string="Cancel Lease">
-                    <p class="oe_grey">
+                    <p  style="font-weight:bold;">
                         Will be changed from this booking to the cancel status.
                     </p>
                     <footer>
-                        <button name="action_cancel_wiz" string="YES" type="object" context="{'active_id':active_id}" class="btn-primary"/>
-                        <button string="NO" class="btn-secondary" special="cancel"/>
+                        <button name="action_cancel_wiz" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>
             </field>

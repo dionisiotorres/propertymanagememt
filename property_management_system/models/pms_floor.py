@@ -9,7 +9,7 @@ from odoo.addons.property_management_system.models import api_rauth_config
 class PMSFloor(models.Model):
     _name = 'pms.floor'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
-    _description = "PMS Floor"
+    _description = "ZPMS Floor"
     _order = "code,name"
 
     name = fields.Char("Floor", required=True, track_visibility=True)
@@ -41,7 +41,7 @@ class PMSFloor(models.Model):
         if self.env.user.company_id.floor_code_len:
             if length > self.env.user.company_id.floor_code_len:
                 raise UserError(
-                    _("Please set your code length less than %s." %
+                    _("Floor Code Length must not exceed %s characters." %
                       (self.env.user.company_id.floor_code_len)))
 
     @api.multi
@@ -93,9 +93,7 @@ class PMSFloor(models.Model):
                                 ('property_id', '=', values['property_id'])])
 
         if floor_id:
-            raise UserError(
-                _("Please set another floor code(%s) that exiting in the Mall of %s."
-                  ) % (values['code'], floor_id.property_id.name))
+            raise UserError(_("%s is already existed.") % (values['code']))
         id = None
         id = super(PMSFloor, self).create(values)
         if id:
@@ -106,13 +104,15 @@ class PMSFloor(models.Model):
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "Floor")
                 ])
-                datas = api_rauth_config.APIData(id, values, property_id,
-                                                 integ_obj, api_line_ids)
+                datas = api_rauth_config.APIData.get_data(
+                    id, values, property_id, integ_obj, api_line_ids)
                 if datas.res:
                     response = json.loads(datas.res)
-                    if response['responseStatus'] == True and response[
-                            'message'] == 'SUCCESS':
-                        id.write({'is_api_post': True})
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    id.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -123,17 +123,13 @@ class PMSFloor(models.Model):
                                     ('property_id', '=', vals['property_id'])])
 
             if floor_id:
-                raise UserError(
-                    _("Please set another floor code(%s) that exiting in the Mall of 5%s."
-                      ) % (values['code'], floor_id.property_id.name))
+                raise UserError(_("%s is already existed.") % (values['code']))
         if 'code' in vals and 'property_id' not in vals:
             floor_id = self.search([('code', '=', vals['code']),
                                     ('property_id', '=', self.property_id.name)
                                     ])
             if floor_id:
-                raise UserError(
-                    _("Please set another floor code(%s) that exiting in the Mall of %s."
-                      ) % (vals['code'], floor_id.property_id.name))
+                raise UserError(_("%s is already existed.") % (vals['code']))
         id = None
         id = super(PMSFloor, self).write(vals)
         if id and self.property_id.api_integration == True:
@@ -142,13 +138,27 @@ class PMSFloor(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "Floor")
             ])
-            datas = api_rauth_config.APIData(self, vals, property_id,
-                                             integ_obj, api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    self.write({'is_api_post': True})
+            if 'is_api_post' in vals:
+                if vals['is_api_post'] != True:
+                    datas = api_rauth_config.APIData.get_data(
+                        self, vals, property_id, integ_obj, api_line_ids)
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus'] == True:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        self.write({'is_api_post': True})
+            else:
+                datas = api_rauth_config.APIData.get_data(
+                    self, vals, property_id, integ_obj, api_line_ids)
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    self.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -189,11 +199,14 @@ class PMSFloor(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "Floor")
             ])
-            datas = api_rauth_config.APIData(floor_ids, values, property_id,
-                                             integ_obj, api_line_ids)
+            datas = api_rauth_config.APIData.get_data(floor_ids, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
             if datas.res:
                 response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for fl in floor_ids:
-                        fl.write({'is_api_post': True})
+                if 'responseStatus' in response:
+                    if response['responseStatus'] == True:
+                        if 'message' in response:
+                            if response['message'] == 'SUCCESS':
+                                for fl in floor_ids:
+                                    fl.write({'is_api_post': True})

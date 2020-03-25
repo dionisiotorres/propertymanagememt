@@ -53,7 +53,7 @@
                       </div>
                     </div>
                   </div>
-                  <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Format Defination</h4>
+                  <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Format Definition</h4>
                   <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-4 o_setting_box">
                       <div class="o_setting_right_pane">
@@ -129,7 +129,7 @@
                     </div>
                     <div class="col-12 col-lg-4 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Pre-Terminate Terms(Days)</span>
+                        <span class="o_form_label">Pre-Terminate Term(Days)</span>
                         <div class="text-muted">
                           Define Pre-Terminate period term to terminate a lease.
                         </div>

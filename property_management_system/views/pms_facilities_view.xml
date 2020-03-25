@@ -27,6 +27,7 @@
                 <!-- <field name="start_date"/> -->
                 <field name="property_id" options="{'no_create': True, 'no_create_edit':True}"/>
                 <field name="install_date"/>
+                <field name="end_date"/>
                 <field name="remark"/>
               </group>
             </group>
@@ -69,17 +70,19 @@
         <search>
             <field name="utilities_type_id"/>
             <field name="interface_type"/>
-            <!-- <field name="start_date"/> -->
+            <separator/>
+            <filter string="Status" name="status" icon="terp-personal" domain="[('status','=',0)]"/>
         </search>
       </field>
     </record>
      <record id="action_facilities_all" model="ir.actions.act_window">
-       <field name="name">Facilities</field>
-       <field name="res_model">pms.facilities</field>
-       <field name="view_type">form</field>
-       <field name="view_mode">tree,form</field>
-       <field name="view_id" ref="view_facilities_tree"/> 
-    </record> 
+        <field name="name">Facilities</field>
+        <field name="res_model">pms.facilities</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_facilities_tree"/> 
+        <field name="context">{"search_default_status":1}</field>
+      </record> 
     <menuitem  id="facilities_menu_root" 
       name="Facilities" 
       parent="property_management_menu"
@@ -130,7 +133,7 @@
         </tree>
       </field>
     </record>
-     <record model="ir.ui.view" id="view_facilities_filter">
+     <record model="ir.ui.view" id="view_facilities_line_filter">
       <field name="name">Facility Line filter</field>
       <field name="model">pms.facility.lines</field>
       <field name="arch" type="xml">

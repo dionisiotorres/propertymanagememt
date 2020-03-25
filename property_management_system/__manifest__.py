@@ -13,11 +13,14 @@
     'category':
     'base',
     'version':
-    '1.0.0',
-    'depends': ['base', 'contacts', 'uom', 'account', 'mail'],
+    '1.0.4',
+    'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
         'security/ir.model.access.csv',
+        'data/pms_config_data.xml',
+        'data/pms.api.integration.csv',
+        'data/pms.api.integration.line.csv',
         'data/pms_generate_rs_data.xml',
         'data/pms.company.category.csv',
         'data/ir_sequence_data.xml',
@@ -34,6 +37,7 @@
         'data/pms.city.csv',
         'data/pms.township.csv',
         'data/pms.calculation.method.csv',
+        'data/pms.charge_types.csv',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',
@@ -69,6 +73,7 @@
         'views/pms_rent_schedule.xml',
         'views/pms_lease_unit_pos_view.xml',
     ],
+    'qweb': ['static/src/xml/*.xml'],
     'installable':
     True,
     'application':

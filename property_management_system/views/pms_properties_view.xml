@@ -174,7 +174,6 @@
                   </group>
                    <group string="API Information">
                     <field name="api_integration" string="MIMS Integration"/>
-                    <field name="is_api_post"/>
                   </group>
                 </group>
               </page>
@@ -201,7 +200,6 @@
           <field name="gross_floor_area" string="GFA"/>
           <field name="net_lett_able_area" string="NLA"/>
           <field name="web_site_url" widget="url" string="Website"/>
-           <field name="is_api_post"/>
         </tree>
       </field>
     </record>

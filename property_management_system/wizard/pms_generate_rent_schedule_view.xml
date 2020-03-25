@@ -19,7 +19,7 @@
                         </tree>
                     </field>
                     <footer>
-                        <button name="generate_rs" string="Generate Rent Schedule" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button name="generate_rs" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

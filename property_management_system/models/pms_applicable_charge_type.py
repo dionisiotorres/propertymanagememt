@@ -1,4 +1,5 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PMSApplicableChargeType(models.Model):
@@ -11,9 +12,14 @@ class PMSApplicableChargeType(models.Model):
                                      'Main Charge Type',
                                      required=True,
                                      track_visibility=True)
+    calculate_method_ids = fields.Many2many(
+        'pms.calculation.method',
+        "Calculation Method",
+        related="charge_type_id.calculate_method_ids")
     calculation_method_id = fields.Many2one('pms.calculation.method',
                                             "Calculation Method",
                                             track_visibility=True,
+                                            readonly=False,
                                             required=True,
                                             store=True)
     is_apply_tax = fields.Boolean('Apply Tax', track_visibility=True)
@@ -40,6 +46,19 @@ class PMSApplicableChargeType(models.Model):
     _sql_constraints = [('name_uniq', 'unique (name)',
                          _("Name is exiting in the chrage applicable."))]
 
+    # @api.onchange('charge_type_id')
+    # def onchange_field_charge_type_id(self):
+    #     if self.charge_type_id:
+    #         for line in self.charge_type_id.calculate_method_ids:
+    #             product_ids = line.ids
+    #         return {
+    #             'domain': {
+    #                 'calculation_method_id': [('id', 'in', product_ids)]
+    #             }
+    #         }
+    #     else:
+    #         return {'domain': {'calculation_method_id': []}}
+
     @api.one
     @api.depends('calculation_method_id')
     def compute_ismeter(self):
@@ -48,6 +67,21 @@ class PMSApplicableChargeType(models.Model):
                 self.is_meter = True
             else:
                 self.is_meter = False
+
+    @api.model
+    def create(self, values):
+        charge_type_id = self.search([('name', '=', values['name'])])
+        if charge_type_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PMSApplicableChargeType, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'name' in vals:
+            charge_type_id = self.search([('name', '=', vals['name'])])
+            if charge_type_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PMSApplicableChargeType, self).write(vals)
 
 
 class PMSUnitChargeLine(models.Model):

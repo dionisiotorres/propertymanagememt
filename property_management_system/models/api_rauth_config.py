@@ -8,19 +8,26 @@ from odoo import models, api
 
 
 class APIData:
-    def __init__(self, model_id, values, property_id, integ_obj, api_line_ids):
-        self.values = values
-        self.model_id = model_id
-        self.property_id = property_id
-        self.integ_obj = integ_obj
-        self.api_line_ids = api_line_ids
-        self.res = None
-        return self.get_data()
+    # def __init__(self,
+    #              model_id=None,
+    #              values=None,
+    #              property_id=None,
+    #              integ_obj=None,
+    #              api_line_ids=None):
+    #     self.values = values
+    #     self.model_id = model_id
+    #     self.property_id = property_id
+    #     self.integ_obj = integ_obj
+    #     self.api_line_ids = api_line_ids
+    #     self.res = None
+    #     return self.get_data()
 
-    def get_data(self):
-        property_ids = self.property_id
-        integ_obj = self.integ_obj
-        api_line_ids = self.api_line_ids
+    def get_data(self, values, property_id, integ_obj, api_line_ids):
+        self.values = values
+        self.model_id = self
+        property_ids = property_id
+        integ_obj = integ_obj
+        api_line_ids = api_line_ids
         api_integ = data = []
         headers = {}
         payload_code = payload_name = modify_date = payload = payload_area = None
@@ -135,12 +142,13 @@ class APIData:
                         bd = datetime.datetime.now().strftime('%Y%M%d')
                         bt = datetime.datetime.now().strftime("%H%M%S")
                         data_batch = BatchInfo()
-                        floor = Floor()
+                        # floor = Floor()
                         data_batch.AppCode = "ZPMS"
                         data_batch.BatchCode = str(bd + bt)
                         data_batch.InterfaceCode = "Floors"
                         if self.values == None:
                             for fl in self.model_id:
+                                floor = Floor()
                                 payload_code = fl.code
                                 payload_name = fl.name
                                 data_batch.PropertyCode = fl.property_id.code
@@ -158,6 +166,7 @@ class APIData:
                                 'is_api_post'] == True:
                             return None
                         else:
+                            floor = Floor()
                             if 'code' in self.values:
                                 payload_code = str(self.values['code'])
                             if 'name' in self.values:
@@ -173,7 +182,7 @@ class APIData:
                             floor.ExtFloorID = str(self.model_id.id)
                             payload = floor.__dict__
                     if line.name == 'CRMAccount':
-                        if len(self.model_id) > 1:
+                        if len(self.model_id) >= 1 or self.values == None:
                             for crm in self.model_id:
                                 payload_name = crm.name
                                 modify_date = datetime.datetime.now().strftime(
@@ -215,7 +224,8 @@ class APIData:
                                     crm.trade_id.name
                                 ) if crm.trade_id else None
                                 crmaccount.TradeCategory = str(
-                                    crm.sub_trade_id.name)
+                                    crm.sub_trade_id.name
+                                ) if crm.sub_trade_id else None
                                 crmaccount.CRMAccountTypeDescription = None
                                 crmaccount.ExtDataSourceID = "ZPMS"
                                 crmaccount.ExtCRMAccountID = str(crm.id)
@@ -275,7 +285,8 @@ class APIData:
                                 self.model_id.trade_id.name
                             ) if self.model_id.trade_id else None
                             crmaccount.TradeCategory = str(
-                                self.model_id.sub_trade_id.name)
+                                self.model_id.sub_trade_id.name
+                            ) if self.model_id.sub_trade_id else None
                             crmaccount.CRMAccountTypeDescription = None
                             crmaccount.ExtDataSourceID = "ZPMS"
                             crmaccount.ExtCRMAccountID = str(self.model_id.id)
@@ -381,52 +392,80 @@ class APIData:
                         data_batch.BatchCode = str(bd + bt)
                         data_batch.InterfaceCode = "Facilities"
                         if 'create' not in self.values and len(
-                                self.model_id) > 0:
+                                self.model_id) >= 1:
                             for facl in self.model_id:
-                                if facl.facilities_line:
-                                    for facline in facl.facilities_line:
-                                        facility = SpaceUnitFacility()
-                                        space_unit_ids = self.values.env[
+                                flineids = space_unit_id = PropertyCode = UtilityMeterNo = UtilityType = StartDate = Remark = Digit = None
+                                if 'facilities_line' in facl:
+                                    if facl.facilities_line:
+                                        flineids = facl.facilities_line
+                                        space_unit_id = self.values.env[
                                             'pms.space.unit'].search([
                                                 ('property_id', '=',
                                                  facl.property_id.id)
                                             ])
-                                        if space_unit_ids:
-                                            for sp in space_unit_ids:
-                                                if sp.facility_line:
-                                                    for spf in sp.facility_line:
-                                                        if spf.id == facl.id:
-                                                            facility.SpaceUnitID = sp.id
-                                        data_batch.PropertyCode = facl.property_id.code
-                                        facility.SpaceUnitFacilityID = ''
-                                        facility.StartDate = str(
-                                            facl.install_date)
-                                        facility.EndDate = str(
-                                            facline.end_date
-                                        ) if facline.end_date else None
-                                        facility.UtilityMeterNo = facl.utilities_no.name
-                                        facility.UtilityType = facl.utilities_type_id.code
-                                        facility.LastReadingOn = str(
-                                            facline.lmr_date)
-                                        facility.LastReadingValue = facline.lmr_value
-                                        facility.LastReadingNOC = 0
-                                        facility.LastReadingNOH = 0
-                                        facility.EMeterType = facline.source_type_id.code
-                                        facility.Remark = str(
-                                            facl.remark
-                                        ) if facl.remark != False else None
-                                        facility.IsNew = True
-                                        facility.UpdateMethod = None
-                                        facility.Digit = facl.utilities_no.digit
-                                        facility.Indicator = None
-                                        facility.CanChangeMeterNo = False
-                                        facility.ExtDataSourceID = 'ZPMS'
-                                        facility.ExtSpaceUnitFacilityID = str(
-                                            facline.id)
-                                        facility.ModifiedDate = modify_date
-                                        facility.BatchInfo = data_batch.__dict__
-                                        if facility.SpaceUnitID:
-                                            data.append(facility.__dict__)
+                                    PropertyCode = facl.property_id.code
+                                    UtilityMeterNo = facl.utilities_no.name
+                                    UtilityType = facl.utilities_type_id.code
+                                    StartDate = facl.install_date.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facl.install_date != False else None
+                                    Remark = str(
+                                        facl.remark
+                                    ) if facl.remark != False else None
+                                    Digit = facl.utilities_no.digit
+                                if 'facility_line' in facl:
+                                    if facl.facility_line:
+                                        for fal in facl.facility_line:
+                                            if fal.facilities_line:
+                                                flineids = fal.facilities_line
+                                                StartDate = fal.install_date.strftime(
+                                                    '%Y-%m-%d'
+                                                ) if fal.install_date != False else None
+                                                PropertyCode = fal.property_id.code
+                                                UtilityMeterNo = fal.utilities_no.name
+                                                UtilityType = fal.utilities_type_id.code
+                                                Remark = str(
+                                                    fal.remark
+                                                ) if fal.remark != False else None
+                                                Digit = fal.utilities_no.digit
+                                for facline in flineids:
+                                    facility = SpaceUnitFacility()
+                                    data_batch.PropertyCode = PropertyCode
+                                    facility.UtilityMeterNo = UtilityMeterNo
+                                    facility.UtilityType = UtilityType
+                                    facility.StartDate = StartDate
+                                    facility.Remark = Remark
+                                    facility.Digit = Digit
+                                    if space_unit_id:
+                                        for sp in space_unit_id:
+                                            if sp.facility_line:
+                                                for spf in sp.facility_line:
+                                                    if spf.id == facl.id:
+                                                        facility.SpaceUnitID = sp.id
+                                    else:
+                                        facility.SpaceUnitID = self.model_id.id
+                                    facility.SpaceUnitFacilityID = ''
+                                    facility.EndDate = facline.end_date.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facline.end_date != False else None
+                                    facility.LastReadingOn = facline.lmr_date.strftime(
+                                        '%Y-%m-%d'
+                                    ) if facline.lmr_date != False else None
+                                    facility.LastReadingValue = facline.lmr_value
+                                    facility.LastReadingNOC = 0
+                                    facility.LastReadingNOH = 0
+                                    facility.EMeterType = facline.source_type_id.code
+                                    facility.IsNew = True
+                                    facility.UpdateMethod = None
+                                    facility.Indicator = None
+                                    facility.CanChangeMeterNo = False
+                                    facility.ExtDataSourceID = 'ZPMS'
+                                    facility.ExtSpaceUnitFacilityID = str(
+                                        facline.id)
+                                    facility.ModifiedDate = modify_date
+                                    facility.BatchInfo = data_batch.__dict__
+                                    if facility.SpaceUnitID:
+                                        data.append(facility.__dict__)
                         else:
                             if self.model_id.facility_line.facilities_line:
                                 for facline in self.model_id.facility_line.facilities_line:
@@ -491,19 +530,26 @@ class APIData:
                                 lease.LeaseEndDate = lg.end_date.strftime(
                                     '%Y-%m-%d'
                                 ) if lg.end_date != False else None
-                                lease.ExtendedTo = lg.extend_to.strftime(
-                                    '%Y-%m-%d'
-                                ) if lg.extend_to != False else None
-                                lease.Remark = lg.remark or None
+                                lease.Remark = ''
                                 status = None
+                                ext_date = None
                                 if lg.state == 'NEW':
                                     status = "New"
                                 elif lg.state == 'EXTENDED':
                                     status = "Extended"
+                                    ext_date = lg.extend_to
                                 elif lg.state == 'TERMINATED':
-                                    status = 'Terminated'
+                                    status = 'Pre-terminated'
+                                elif lg.state == 'CANNELLED':
+                                    status = 'Cancelled'
+                                elif lg.state == 'RENEWED':
+                                    status = 'Renewed'
+                                elif lg.state == 'EXPIRED':
+                                    status = 'Expired'
                                 else:
                                     status = 'New'
+                                lease.ExtendedTo = ext_date.strftime(
+                                    '%Y-%m-%d') if ext_date != None else None
                                 lease.LeaseStatus = status
                                 lease.ExternalLeaseNo = str(
                                     lg.lease_no) or None
@@ -520,6 +566,7 @@ class APIData:
                                 lease.BatchInfo = data_batch.__dict__
                                 data.append(lease.__dict__)
                         else:
+                            ext_date = None
                             data_batch.PropertyCode = property_ids.code
                             lease.LeaseAgreementID = ""
                             lease.CrmAccountID = self.model_id.company_tanent_id.id or None
@@ -531,21 +578,25 @@ class APIData:
                             lease.LeaseEndDate = self.model_id.end_date.strftime(
                                 '%Y-%m-%d'
                             ) if self.model_id.end_date != False else None
-                            lease.ExtendedTo = self.model_id.extend_to.strftime(
-                                '%Y-%m-%d'
-                            ) if self.model_id.extend_to != False else None
                             lease.Remark = self.model_id.remark or None
                             status = None
-                            if self.values == 'BOOKING':
+                            if self.values['state'] == 'NEW':
                                 status = "New"
-                            elif self.values == 'NEW':
-                                status = "New"
-                            elif self.values == 'EXTENDED':
+                            elif self.values['state'] == 'EXTENDED':
                                 status = "Extended"
-                            elif self.values == 'TERMINATED':
-                                status = 'Terminated'
+                                ext_date = self.model_id.extend_to
+                            elif self.values['state'] == 'TERMINATED':
+                                status = 'Pre-terminated'
+                            elif self.values['state'] == 'CANNELLED':
+                                status = 'Cancelled'
+                            elif self.values['state'] == 'RENEWED':
+                                status = 'Renewed'
+                            elif self.values['state'] == 'EXPIRED':
+                                status = 'Expired'
                             else:
-                                status = 'New'
+                                status = None
+                            lease.ExtendedTo = ext_date.strftime(
+                                '%Y-%m-%d') if ext_date != None else None
                             lease.LeaseStatus = status
                             lease.ExternalLeaseNo = str(
                                 self.model_id.lease_no) or None
@@ -693,7 +744,7 @@ class APIData:
                                 rentschedule.ChargeType = rs.charge_type.charge_type_id.name if rs.charge_type else None
                                 rentschedule.CurrencyCode = rs.lease_agreement_id.currency_id.name
                                 rentschedule.AmountLocal = rs.amount
-                                rentschedule.LeaseAgreementItemID = rs.lease_agreement_id.id
+                                rentschedule.LeaseAgreementItemID = rs.lease_agreement_line_id.id
                                 rentschedule.ExtRentScheduleID = rs.id
                                 rentschedule.ExtDataSourceID = 'ZPMS'
                                 rentschedule.ModifiedDate = modify_date
@@ -737,10 +788,15 @@ class APIData:
                         data=json.dumps([payload] if payload else data),
                         headers=headers)
                     self.res = r.text
+        return self
 
 
 class Auth2Client:
-    def __init__(self, url, client_id, client_secret, access_token):
+    def __init__(self,
+                 url=None,
+                 client_id=None,
+                 client_secret=None,
+                 access_token=None):
         self.access_token = self.service = self.url = None
         self.url = url
         self.service = OAuth2Service(
@@ -751,8 +807,7 @@ class Auth2Client:
             authorize_url=access_token,
             base_url=url,
         )
-        data = self.get_access_token()
-        return data
+        return self.get_access_token()
 
     def get_access_token(self):
         data = {

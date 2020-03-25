@@ -1,0 +1,87 @@
+<table xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<row>
+  <id>2</id>
+  <message_main_attachment_id xsi:nil="true"/>
+  <propertytype_id>1</propertytype_id>
+  <uom_id>20</uom_id>
+  <bank_id xsi:nil="true"/>
+  <township>175</township>
+  <city_id>32</city_id>
+  <state_id>686</state_id>
+  <currency_id>118</currency_id>
+  <country_id>145</country_id>
+  <name>Junction City</name>
+  <code>JC</code>
+  <gross_floor_area>200000.00</gross_floor_area>
+  <net_lett_able_area>190000.00</net_lett_able_area>
+  <web_site_url>www.junctioncity.com.mm</web_site_url>
+  <is_autogenerate_posid>false</is_autogenerate_posid>
+  <project_start_date>2020-01-21</project_start_date>
+  <target_open_date>2020-01-31</target_open_date>
+  <actual_opening_date>2020-01-31</actual_opening_date>
+  <timezone>Asia/Yangon</timezone>
+  <no>No.1</no>
+  <street>AYA Street</street>
+  <zip>102312</zip>
+  <property_code_len>15</property_code_len>
+  <unit_code_len>15</unit_code_len>
+  <floor_code_len>15</floor_code_len>
+  <unit_format>1</unit_format>
+  <lease_format>2</lease_format>
+  <pos_id_format xsi:nil="true"/>
+  <new_lease_term>1</new_lease_term>
+  <extend_lease_term>2</extend_lease_term>
+  <terminate_days>30</terminate_days>
+  <extend_count>5</extend_count>
+  <rentschedule_type>calendar</rentschedule_type>
+  <api_integration>false</api_integration>
+  <create_uid>2</create_uid>
+  <create_date>2020-01-21T09:09:12.633935</create_date>
+  <write_uid>2</write_uid>
+  <write_date>2020-01-21T09:09:12.633935</write_date>
+</row>
+
+<row>
+  <id>1</id>
+  <message_main_attachment_id xsi:nil="true"/>
+  <propertytype_id>1</propertytype_id>
+  <uom_id>20</uom_id>
+  <bank_id xsi:nil="true"/>
+  <township xsi:nil="true"/>
+  <city_id xsi:nil="true"/>
+  <state_id xsi:nil="true"/>
+  <currency_id>118</currency_id>
+  <country_id>145</country_id>
+  <name>Myanmar Palaza</name>
+  <code>MP</code>
+  <gross_floor_area>100000.00</gross_floor_area>
+  <net_lett_able_area>150000.00</net_lett_able_area>
+  <web_site_url>https://www.myanmarplaza.com.mm</web_site_url>
+  <is_autogenerate_posid>false</is_autogenerate_posid>
+  <project_start_date>2020-01-17</project_start_date>
+  <target_open_date>2020-01-31</target_open_date>
+  <actual_opening_date>2020-02-01</actual_opening_date>
+  <timezone>Asia/Yangon</timezone>
+  <no>No - 10</no>
+  <street>Kabar Aye Pagoda Road</street>
+  <zip xsi:nil="true"/>
+  <property_code_len>15</property_code_len>
+  <unit_code_len>15</unit_code_len>
+  <floor_code_len>15</floor_code_len>
+  <unit_format>1</unit_format>
+  <lease_format>2</lease_format>
+  <pos_id_format xsi:nil="true"/>
+  <new_lease_term>1</new_lease_term>
+  <extend_lease_term>2</extend_lease_term>
+  <terminate_days>30</terminate_days>
+  <extend_count>5</extend_count>
+  <rentschedule_type>prorated</rentschedule_type>
+  <api_integration>false</api_integration>
+  <create_uid>2</create_uid>
+  <create_date>2020-01-17T09:02:07.614717</create_date>
+  <write_uid>2</write_uid>
+  <write_date>2020-01-21T09:21:10.281591</write_date>
+</row>
+
+</table>

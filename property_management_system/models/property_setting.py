@@ -2,6 +2,7 @@
 import json
 import calendar
 from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 from odoo.addons.property_management_system.models import api_rauth_config
 
 
@@ -55,99 +56,106 @@ class PMSRentSchedule(models.Model):
         dpos_obj = self.env['pos.daily.sale']
         for line in self:
             total_amount = 0
-            lsd_year = line.start_date.year
-            lsd_month = line.start_date.month
+            cct_name = ccm_name = None
+            lsd_year = line.end_date.year
+            lsd_month = line.end_date.month
             if line.state == 'draft':
-                cct_name = ccm_name = None
                 for charge in line.charge_type:
                     net_amount = 0
                     cct_name = charge.charge_type_id.name
                     ccm_name = charge.calculation_method_id.name
                     for lagl in line.lease_agreement_line_id:
                         total_rate = total_unit = 0
-                        laptl_ids = None
-                        if lagl.leaseunitpos_line_id:
-                            lpl_ids = lagl.leaseunitpos_line_id
-                            laptl_ids = lagl.applicable_type_line_id
-                            pct_name = pcm_name = None
-                            for apl in laptl_ids:
-                                pct_name = apl.charge_type_id.name
-                                pcm_name = apl.calculation_method_id.name
-                                apc_id = apl.applicable_charge_id
-                                st_name = apc_id.source_type_id.name
-                                cst_name = charge.source_type_id.name
-                                meter_amount = 0
+                        pct_name = pcm_name = laptl_ids = None
+                        laptl_ids = lagl.applicable_type_line_id
+                        for apl in laptl_ids:
+                            pct_name = apl.charge_type_id.name
+                            pcm_name = apl.calculation_method_id.name
+                            apc_id = apl.applicable_charge_id
+                            st_name = apc_id.source_type_id.name
+                            cst_name = charge.source_type_id.name
+                            meter_amount = 0
+                            if cct_name == 'Rental':
                                 if ccm_name == 'Fix':
-                                    if cct_name == 'Rental':
-                                        if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
-                                            total_rate = apl.rate
-                                if ccm_name == 'MeterUnit':
-                                    if cct_name == 'Utilities':
-                                        if lagl.unit_no.facility_line:
-                                            luf_lines = lagl.unit_no.facility_line
-                                            for fl in luf_lines:
-                                                if fl.facilities_line:
-                                                    umon_obj = self.env[
-                                                        'pms.utilities.monthly']
-                                                    filter_month = str(
-                                                        lsd_year) + (
-                                                            ('0' +
-                                                             str(lsd_month)) if
-                                                            len(str(lsd_month))
-                                                            <= 1 else
-                                                            str(lsd_month))
-                                                    monthly_id = umon_obj.search([
-                                                        ('utilities_source_type',
-                                                         '=', charge.
-                                                         source_type_id.code),
-                                                        ('utilities_no', '=',
-                                                         fl.utilities_no.name),
-                                                        ('utilities_supply_type',
-                                                         '=',
-                                                         fl.utilities_type_id.
-                                                         code),
-                                                        ('billingperiod', '=',
-                                                         filter_month)
-                                                    ])
-                                                    if monthly_id:
-                                                        meter_amount = monthly_id.end_value - monthly_id.start_value
-                                        if st_name == cst_name and pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
-                                            if charge.use_formula == False:
-                                                amount = apl.rate
-                                                total_unit = meter_amount * amount
-                                            else:
-                                                if self.unit_charge_line:
-                                                    uc_lines = self.unit_charge_line
-                                                    for ucl in uc_lines:
-                                                        if meter_amount > ucl.from_unt and meter_amount < ucl.to_unit:
-                                                            total_unit = meter_amount * apl.rate
-                                if ccm_name == 'Area':
-                                    if cct_name == 'Rental':
-                                        total_rate = unit_no.area * apl.rate
-                                if ccm_name == 'Percentage':
+                                    if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
+                                        total_rate = apl.rate
+                                elif ccm_name == 'Area':
+                                    total_rate = lagl.unit_no.area * apl.rate
+                                elif ccm_name == 'Percentage':
                                     percent_amount = 0
-                                    if cct_name == 'Rental' and pcm_name == ccm_name:
-                                        for lid in lpl_ids:
-                                            pos_id = dpos_obj.search([
-                                                ('pos_interface_code', '=',
-                                                 lid.posinterfacecode_id.name),
-                                                ('pos_receipt_date', '>=',
-                                                 line.start_date),
-                                                ('pos_receipt_date', '<=',
-                                                 line.end_date)
-                                            ])
-                                            if pos_id:
-                                                for daily in pos_id:
-                                                    net_amount += daily.manual_net_sales
-                                        percent_amount = apl.rate
-                                        total_rate = (net_amount *
-                                                      percent_amount) / 100
+                                    if pcm_name == ccm_name:
+                                        if lagl.leaseunitpos_line_id:
+                                            lpl_ids = lagl.leaseunitpos_line_id
+                                            for lid in lpl_ids:
+                                                pos_id = dpos_obj.search([
+                                                    ('pos_interface_code', '=',
+                                                     lid.posinterfacecode_id.
+                                                     name),
+                                                    ('pos_receipt_date', '>=',
+                                                     line.start_date),
+                                                    ('pos_receipt_date', '<=',
+                                                     line.end_date)
+                                                ])
+                                                if pos_id:
+                                                    for daily in pos_id:
+                                                        net_amount += daily.grosssalesamount
+                                            percent_amount = apl.rate
+                                            total_rate = (net_amount *
+                                                          percent_amount) / 100
+                                else:
+                                    total_rate = 0
+                            if cct_name == 'Service':
+                                if ccm_name == 'Fix':
+                                    if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
+                                        total_rate = apl.rate
+                                else:
+                                    total_rate = 0
+                            if cct_name == 'Utilities':
+                                if ccm_name == 'MeterUnit':
+                                    if lagl.unit_no.facility_line:
+                                        luf_lines = lagl.unit_no.facility_line
+                                        for fl in luf_lines:
+                                            if fl.facilities_line:
+                                                umon_obj = self.env[
+                                                    'pms.utilities.monthly']
+                                                filter_month = str(lsd_year) + (
+                                                    ('0' + str(lsd_month))
+                                                    if len(str(lsd_month)) <= 1
+                                                    else str(lsd_month))
+                                                meter_code = line.charge_type.source_type_id.code
+                                                monthly_id = umon_obj.search([
+                                                    ('utilities_source_type',
+                                                     '=', meter_code),
+                                                    ('utilities_no', '=',
+                                                     fl.utilities_no.name),
+                                                    ('utilities_supply_type',
+                                                     '=',
+                                                     fl.utilities_type_id.code
+                                                     ),
+                                                    ('billingperiod', '=',
+                                                     filter_month)
+                                                ])
+                                                if monthly_id:
+                                                    meter_amount = monthly_id.end_value - monthly_id.start_value
+                                    if st_name == cst_name and pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
+                                        if charge.use_formula == False:
+                                            amount = apl.rate
+                                            total_unit = meter_amount * amount
+                                        else:
+                                            if charge.unit_charge_line:
+                                                for ucl in charge.unit_charge_line:
+                                                    if meter_amount > ucl.from_unit and meter_amount < ucl.to_unit:
+                                                        total_unit = meter_amount * ucl.rate
+                                else:
+                                    total_unit = 0
                             if total_rate and not total_unit:
                                 total_amount = total_rate
                             elif total_unit and not total_rate:
                                 total_amount = total_unit
                             else:
                                 total_amount = total_amount
+                schedule_invoice = line.lease_no + "/" + line.unit_no.name + "/" + str(
+                    line.id)
                 val = {
                     'name': line.name,
                     'property_id': line.property_id.id,
@@ -160,10 +168,26 @@ class PMSRentSchedule(models.Model):
                     'state': line.state,
                     'unit_no': line.unit_no.id,
                     'billing_date': line.billing_date,
+                    'schedule_invoice': schedule_invoice,
                 }
-                gen_id = self.env['pms.gen.rent.schedule'].create(val)
+                gen_ids = self.env['pms.gen.rent.schedule'].search([
+                    ('schedule_invoice', '=', schedule_invoice)
+                ])
+                if gen_ids:
+                    gen_id = gen_ids.write(val)
+                else:
+                    gen_id = self.env['pms.gen.rent.schedule'].create(val)
                 if gen_id:
                     line.write({'state': 'generated', 'amount': total_amount})
+
+    def action_reset_draft(self):
+        if self.state == 'generated':
+            self.write({'state': 'draft'})
+
+    def action_reset_drafts(self):
+        if self:
+            for rent in self:
+                rent.action_reset_draft()
 
     def rent_schedule_schedular(self):
         values = None
@@ -177,16 +201,20 @@ class PMSRentSchedule(models.Model):
         if lease_ids:
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "LeaseAgreement")
+                ('name', '=', "RentSchedule")
             ])
-            datas = api_rauth_config.APIData(lease_ids, values, property_id,
-                                             integ_obj, api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for lid in lease_ids:
-                        lid.write({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(lease_ids, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for lid in lease_ids:
+                                        lid.write({'is_api_post': True})
 
     @api.multi
     def toggle_active(self):
@@ -194,6 +222,20 @@ class PMSRentSchedule(models.Model):
             if not pt.active:
                 pt.active = self.active
         super(PMSRentSchedule, self).toggle_active()
+
+    @api.model
+    def create(self, values):
+        rentschedule_id = self.search([
+            ('property_id', '=', values['property_id']),
+            ('unit_no', '=', values['unit_no']),
+            ('lease_no', '=', values['lease_no']),
+            ('charge_type', '=', values['charge_type']),
+            ('start_date', '=', values['start_date']),
+            ('end_date', '=', values['end_date']),
+        ])
+        if rentschedule_id:
+            raise UserError(_("Rent Schedular is already existed."))
+        return super(PMSRentSchedule, self).create(values)
 
 
 class PMSPropertyType(models.Model):
@@ -238,8 +280,8 @@ class PMSUtilitiesSourceType(models.Model):
                                         required=True,
                                         track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-    _sql_constraints = [('code_unique', 'unique(code)',
-                         'Your name/code is exiting in the database.')]
+    # _sql_constraints = [('code_unique', 'unique(code)',
+    #                      'Your name/code is exiting in the database.')]
 
     @api.multi
     def name_get(self):
@@ -256,6 +298,21 @@ class PMSUtilitiesSourceType(models.Model):
                 st.active = self.active
         super(PMSUtilitiesSourceType, self).toggle_active()
 
+    @api.model
+    def create(self, values):
+        soruc_id = self.search([('code', '=', values['code'])])
+        if soruc_id:
+            raise UserError(_("%s is already existed" % values['code']))
+        return super(PMSUtilitiesSourceType, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'code' in vals:
+            soruc_id = self.search([('code', '=', vals['code'])])
+            if soruc_id:
+                raise UserError(_("%s is already existed" % vals['code']))
+        return super(PMSUtilitiesSourceType, self).write(vals)
+
 
 class PMSUtilitiesSupplyType(models.Model):
     _name = "pms.utilities.supply.type"
@@ -271,7 +328,22 @@ class PMSUtilitiesSupplyType(models.Model):
     ordinal_no = fields.Integer("Ordinal No")
     active = fields.Boolean(default=True, track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
-                         'Your code is exiting in the database.')]
+                         'Code is already existed.')]
+
+    # @api.model
+    # def create(self, values):
+    #     supp_id = self.search([('code', '=', values['code'])])
+    #     if supp_id:
+    #         raise UserError(_("%s is already existed" % values['code']))
+    #     return super(PMSUtilitiesSupplyType, self).create(values)
+
+    # @api.multi
+    # def write(self, vals):
+    #     if 'code' in vals:
+    #         supp_id = self.search([('code', '=', vals['code'])])
+    #         if supp_id:
+    #             raise UserError(_("%s is already existed" % vals['code']))
+    #     return super(PMSUtilitiesSupplyType, self).write(vals)
 
     @api.multi
     def name_get(self):
@@ -511,6 +583,8 @@ class PMSCity(models.Model):
                                track_visibility=True)
     name = fields.Char("City Name", required=True, track_visibility=True)
     code = fields.Char("City Code", required=True, track_visibility=True)
+    _sql_constraints = [('code_unique', 'unique(code)',
+                         'City Code is already existed.')]
 
 
 class Company(models.Model):
@@ -551,6 +625,56 @@ class Company(models.Model):
         for company in self:
             company.partner_id.township = company.township
 
+    @api.model
+    def create(self, vals):
+        # if vals.get('name'):
+        #     companyname = vals.get('name')
+        #     company_id = self.search([('name', '=', companyname)])
+        #     if company_id:
+        #         raise UserError(_("%s is already existed." % companyname))
+        if not vals.get('name') or vals.get('partner_id'):
+            self.clear_caches()
+            return super(Company, self).create(vals)
+        partner = self.env['res.partner'].create({
+            'name': vals['name'],
+            'is_company': True,
+            'image': vals.get('logo'),
+            'customer': False,
+            'email': vals.get('email'),
+            'phone': vals.get('phone'),
+            'website': vals.get('website'),
+            'vat': vals.get('vat'),
+        })
+        vals['partner_id'] = partner.id
+        self.clear_caches()
+        company = super(Company, self).create(vals)
+        # The write is made on the user to set it automatically in the multi company group.
+        self.env.user.write({'company_ids': [(4, company.id)]})
+        partner.write({'company_id': company.id})
+
+        # Make sure that the selected currency is enabled
+        if vals.get('currency_id'):
+            currency = self.env['res.currency'].browse(vals['currency_id'])
+            if not currency.active:
+                currency.write({'active': True})
+        return company
+
+    @api.multi
+    def write(self, values):
+        self.clear_caches()
+        if values.get('name'):
+            companyname = values.get('name')
+            company_id = self.search([('name', '=', companyname)])
+            if company_id:
+                raise UserError(_("%s is already existed." % companyname))
+        # Make sure that the selected currency is enabled
+        if values.get('currency_id'):
+            currency = self.env['res.currency'].browse(values['currency_id'])
+            if not currency.active:
+                currency.write({'active': True})
+
+        return super(Company, self).write(values)
+
 
 # class PMSTownship(models.Model):
 #     _name = "pms.township"
@@ -573,18 +697,28 @@ class PMSTownship(models.Model):
                               ondelete='cascade',
                               required=True,
                               track_visibility=True)
+    _sql_constraints = [('code_unique', 'unique(code)',
+                         'Township Code is already existed.')]
 
 
-class PMSState(models.Model):
-    _name = "pms.state"
-    _description = "State"
+# class PMSState(models.Model):
+#     _name = "pms.state"
+#     _description = "State"
 
-    country_id = fields.Many2one("pms.country",
-                                 "Country Name",
-                                 required=True,
-                                 track_visibility=True)
-    name = fields.Char("State Name", required=True, track_visibility=True)
-    code = fields.Char("State Code", required=True, track_visibility=True)
+#     country_id = fields.Many2one("pms.country",
+#                                  "Country Name",
+#                                  required=True,
+#                                  track_visibility=True)
+#     name = fields.Char("State Name", required=True, track_visibility=True)
+#     code = fields.Char("State Code", required=True, track_visibility=True)
+
+
+class CountryState(models.Model):
+    _description = "Country state"
+    _inherit = 'res.country.state'
+    _order = 'code'
+    _sql_constraints = [('code_unique', 'unique(code)',
+                         'State Code is already existed.')]
 
 
 class PMSCountry(models.Model):
@@ -593,6 +727,8 @@ class PMSCountry(models.Model):
 
     name = fields.Char("Country Name", required=True, track_visibility=True)
     code = fields.Char("Country Code", required=True, track_visibility=True)
+    _sql_constraints = [('code_unique', 'unique(code)',
+                         'Country Code is already existed.')]
 
 
 class PMSCurrency(models.Model):
@@ -632,10 +768,11 @@ class PMSDepartment(models.Model):
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
     _description = "Company Categorys"
-    _order = 'code,name'
+    _order = 'ordinal_no,code,name'
 
     name = fields.Char("Description", required=True, track_visibility=True)
     code = fields.Char("Code", track_visibility=True)
+    ordinal_no = fields.Integer("Ordinal No", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
 
     @api.multi
@@ -714,14 +851,15 @@ class Partner(models.Model):
             else:
                 partner.company_type = 'person'
 
-    def _write_company_type(self):
-        for partner in self:
-            partner.is_company = partner.company_type == 'company'
+    # def _write_company_type(self):
+    #     for partner in self:
+    #         partner.is_company = partner.company_type = 'company'
 
     def crm_scheduler(self):
         values = None
         property_id = None
         partner_id = []
+
         partner_ids = self.env['res.company'].search([])
         for cpid in partner_ids:
             partner_id.append(cpid.partner_id.id)
@@ -733,55 +871,102 @@ class Partner(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
-            datas = api_rauth_config.APIData(crmaccount_ids, values,
-                                             property_id, integ_obj,
-                                             api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for ca in crmaccount_ids:
-                        ca.update({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(crmaccount_ids, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for ca in crmaccount_ids:
+                                        ca.update({'is_api_post': True})
 
     @api.model
     def create(self, values):
+        if 'name' in values:
+            crm_id = self.search([('name', '=', values['name']),
+                                  ('is_company', '=', True)])
+            if crm_id:
+                raise UserError(_("%s is already existed" % values['name']))
         id = None
         id = super(Partner, self).create(values)
-        if id:
+        if id and id.is_company == True:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
-            datas = api_rauth_config.APIData(id, values, property_id,
-                                             integ_obj, api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    id.write({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(id, values, property_id,
+                                                      integ_obj, api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    id.write({'is_api_post': True})
         return id
 
     @api.multi
     def write(self, vals):
+        if 'name' in vals:
+            crm_id = self.env['res.partner'].search([
+                ('name', '=', vals['name']), ('is_company', '=', True)
+            ])
+            if crm_id:
+                for crm in crm_id:
+                    if crm.name != self.name:
+                        raise UserError(
+                            _("%s is already existed" % vals['name']))
         id = None
         id = super(Partner, self).write(vals)
-        if id:
+        if id and self.is_company == True:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
-            datas = api_rauth_config.APIData(self, vals, property_id,
-                                             integ_obj, api_line_ids)
-            # if datas.res:
-            #     response = json.loads(datas.res)
-            #     if response['error']:
-            #         return id
-            #     if response['responseStatus'] == True and response[
-            #             'message'] == 'SUCCESS':
-            #         self.write({'is_api_post': True})
+            if 'is_api_post' in vals:
+                if vals['is_api_post'] != True:
+                    datas = api_rauth_config.APIData.get_data(
+                        self, vals, property_id, integ_obj, api_line_ids)
+                    if datas != None:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus'] == True:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            self.write({'is_api_post': True})
+            else:
+                datas = api_rauth_config.APIData.get_data(
+                    self, vals, property_id, integ_obj, api_line_ids)
+                if datas != None:
+                    if 'res' in datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus'] == True:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            self.write({'is_api_post': True})
         return id
+
+    @api.multi
+    def copy(self, default=None):
+        self.ensure_one()
+        chosen_name = default.get('name') if default else ''
+        if self.name:
+            crm_id = self.search([('name', '=', self.name)])
+            if crm_id:
+                raise UserError(_("%s is already existed" % self.name))
+        new_name = chosen_name or _('%s (copy)') % self.name
+        default = dict(default or {}, name=new_name)
+        return super(Partner, self).copy(default)
 
 
 class PMSGenerateRentSchedule(models.Model):
@@ -827,6 +1012,7 @@ class PMSGenerateRentSchedule(models.Model):
                              default="draft",
                              track_visibility=True)
     billing_date = fields.Date(string="Billing Date", required=True)
+    schedule_invoice = fields.Char("Schedule Invoice")
 
     @api.multi
     def action_confirm(self):

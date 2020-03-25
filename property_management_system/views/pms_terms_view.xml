@@ -41,13 +41,13 @@
       <field name="arch" type="xml">
         <tree>
             <field name="name"/>
-                <field name="space_unit_fromat_id"/>
-                <field name="pos_id_format_id"/>
-                <field name="company_id"/>
-                <field name="is_auto_generate_posid"/>
-                <field name="property_code_len"/>
-                <field name="floor_code_len"/>
-                <field name="space_unit_code_len"/>
+            <field name="space_unit_fromat_id"/>
+            <field name="pos_id_format_id"/>
+            <field name="company_id"/>
+            <field name="is_auto_generate_posid"/>
+            <field name="property_code_len"/>
+            <field name="floor_code_len"/>
+            <field name="space_unit_code_len"/>
         </tree>
       </field>
     </record>

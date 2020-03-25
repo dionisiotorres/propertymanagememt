@@ -11,4 +11,4 @@ class PMSLeaseCancelWizard(models.TransientModel):
         lease_ids = self.env['pms.lease_agreement'].browse(
             self._context.get('active_id', []))
         lease_ids.action_activate()
-        return True
+        return lease_ids.send_mail()

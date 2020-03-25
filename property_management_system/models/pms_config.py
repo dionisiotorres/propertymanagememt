@@ -1,4 +1,5 @@
-from odoo import fields, models, api, _
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PmsFormat(models.Model):
@@ -54,6 +55,22 @@ class PmsFormat(models.Model):
                 pt.active = self.active
         super(PmsFormat, self).toggle_active()
 
+    @api.model
+    def create(self, values):
+        format_id = self.search([('name', '=', values['name'])])
+        if format_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PmsFormat, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        format_id = None
+        if 'name' in vals:
+            sample_id = self.search([('name', '=', vals['name'])])
+            if sample_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PmsFormat, self).write(vals)
+
 
 class PmsFormatDetail(models.Model):
     _name = "pms.format.detail"
@@ -61,7 +78,12 @@ class PmsFormatDetail(models.Model):
     _order = "position_order"
 
     @api.one
-    @api.depends('fix_value', 'digit_value', 'dynamic_value', 'datetime_value')
+    @api.depends(
+        'fix_value',
+        'digit_value',
+        'dynamic_value',
+        'datetime_value',
+    )
     def get_value_type(self):
         if self.value_type:
             if self.value_type == 'fix':
@@ -73,18 +95,12 @@ class PmsFormatDetail(models.Model):
             if self.value_type == 'datetime':
                 self.value = self.datetime_value
 
-    # @api.model
-    # def get_position_order(self):
-    #     if self.mapped('format_id.format_line_id'):
-    #         count = 0
-    #         for cf in self.mapped('format_id'):
-    #             count += 1
-    #             cf.position_order = count
-
     name = fields.Char("Name", default="New")
-    # autogenerate = fields.Boolean("Auto Generate?")
     format_id = fields.Many2one("pms.format", "Format")
-    position_order = fields.Integer("Position Order")
+    position_order = fields.Integer("Position Order",
+                                    compute='_get_line_numbers',
+                                    store=True,
+                                    readonly=False)
     value_type = fields.Selection([('fix', "Fix"), ('dynamic', 'Dynamic'),
                                    ('digit', 'Digit'),
                                    ('datetime', 'Datetime')],
@@ -105,6 +121,23 @@ class PmsFormatDetail(models.Model):
                                       store=True)
     value = fields.Char("Value", compute='get_value_type')
 
+    @api.one
+    def _get_line_numbers(self):
+        for fmt in self.mapped('format_id'):
+            line_no = 1
+            for line in fmt.format_line_id:
+                line.position_order = line_no
+                line_no += 1
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super(PmsFormatDetail, self).default_get(fields_list)
+        res.update({
+            'position_order':
+            len(self._context.get('format_line_id', [])) + 1
+        })
+        return res
+
 
 class Users(models.Model):
     _inherit = "res.users"
@@ -121,38 +154,66 @@ class Users(models.Model):
 class Company(models.Model):
     _inherit = "res.company"
 
-    # property_id = fields.Many2one("pms.properties", "Property")
+    def _default_space_unit_format(self):
+        if not self.pos_id_format:
+            return self.env.ref('base.main_company').space_unit_code_format
+
+    def _default_pos_id_format(self):
+        if not self.pos_id_format:
+            return self.env.ref('base.main_company').pos_id_format
+
+    def _default_lease_agreement_format(self):
+        if not self.lease_agre_format_id:
+            return self.env.ref('base.main_company').lease_agre_format_id
+
+    def _default_new_lease_term(self):
+        if not self.new_lease_term:
+            return self.env.ref('base.main_company').new_lease_term
+
+    def _default_lease_extend_term(self):
+        if not self.extend_lease_term:
+            return self.env.ref('base.main_company').extend_lease_term
+
     property_code_len = fields.Integer("Property Code Length",
+                                       default=8,
                                        track_visibility=True)
-    floor_code_len = fields.Integer('Floor Code Length', track_visibility=True)
-    space_unit_code_len = fields.Integer('Space Unit Code Length')
-    space_unit_code_format = fields.Many2one('pms.format',
-                                             'Space Unit Format',
-                                             track_visibility=True)
+    floor_code_len = fields.Integer('Floor Code Length',
+                                    track_visibility=True,
+                                    default=15)
+    space_unit_code_len = fields.Integer('Space Unit Code Length', default=30)
+    space_unit_code_format = fields.Many2one(
+        'pms.format',
+        'Space Unit Format',
+        default=_default_space_unit_format,
+        track_visibility=True)
     pos_id_format = fields.Many2one('pms.format',
                                     'POS ID Format',
+                                    default=_default_pos_id_format,
                                     track_visibility=True)
     new_lease_term = fields.Many2one('pms.leaseterms',
                                      string="Add New Lease Term",
+                                     default=_default_new_lease_term,
                                      track_visibility=True)
     extend_lease_term = fields.Many2one('pms.leaseterms',
                                         string="Extened Lease Term",
+                                        default=_default_lease_extend_term,
                                         track_visibility=True)
-    # terminate_lease_term = fields.Many2one(
-    #     'pms.leaseterms',
-    #     string="Terminate Lease Term",
-    # )
-    lease_agre_format_id = fields.Many2one('pms.format',
-                                           'Lease Agreement Format',
-                                           track_visibility=True)
+    lease_agre_format_id = fields.Many2one(
+        'pms.format',
+        'Lease Agreement Format',
+        default=_default_lease_agreement_format,
+        track_visibility=True)
     rentschedule_type = fields.Selection(
         [('prorated', "Prorated"), ('calendar', "Calendar")],
         default='prorated',
         string="Rent Schedule Type",
         track_visibility=True,
     )
-    extend_count = fields.Integer("Extend count", track_visibility=True)
-    pre_notice_terminate_term = fields.Integer("Pre-Terminate Terms(Days)",
+    extend_count = fields.Integer("Extend count",
+                                  track_visibility=True,
+                                  default=3)
+    pre_notice_terminate_term = fields.Integer("Pre-Terminate Term(Days)",
+                                               default=30,
                                                track_visibility=True)
 
 
@@ -194,12 +255,6 @@ class ResConfigSettings(models.TransientModel):
                                         related="company_id.extend_lease_term",
                                         readonly=False,
                                         required=False)
-    # terminate_lease_term = fields.Many2one(
-    #     'pms.leaseterms',
-    #     string="Terminate Lease Term",
-    #     related="company_id.terminate_lease_term",
-    #     readonly=False,
-    #     required=False)
     lease_agre_format_id = fields.Many2one(
         'pms.format',
         'Lease Format',
@@ -214,7 +269,7 @@ class ResConfigSettings(models.TransientModel):
                                   related="company_id.extend_count",
                                   readonly=False)
     pre_notice_terminate_term = fields.Integer(
-        "Pre-Terminate Terms(Days)",
+        "Pre-Terminate Term(Days)",
         related="company_id.pre_notice_terminate_term",
         readonly=False)
 
@@ -242,11 +297,6 @@ class ResConfigSettings(models.TransientModel):
     def onchange_extend_lease_term(self):
         if self.extend_lease_term:
             self.company_id.extend_lease_term = self.extend_lease_term
-
-    # @api.onchange('terminate_lease_term')
-    # def onchange_terminate_lease_term(self):
-    #     if self.terminate_lease_term:
-    #         self.company_id.terminate_lease_term = self.terminate_lease_term
 
     @api.onchange('lease_agre_format_id')
     def onchange_lease_agre_format_id(self):
@@ -291,6 +341,22 @@ class PMSLeaseTerms(models.Model):
                                          track_visibility=True)
     min_time_period = fields.Integer("Min Time Period", track_visibility=True)
     max_time_period = fields.Integer("Max Time Period", track_visibility=True)
-    # extend_count = fields.Integer("Extend count")
-    notify_period = fields.Integer("Notice Period(mon)", track_visibility=True)
+    notify_period = fields.Integer("Notice Period(Month)",
+                                   track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
+
+    @api.model
+    def create(self, values):
+        format_id = self.search([('name', '=', values['name'])])
+        if format_id:
+            raise UserError(_("%s is already existed." % values['name']))
+        return super(PMSLeaseTerms, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        format_id = None
+        if 'name' in vals:
+            sample_id = self.search([('name', '=', vals['name'])])
+            if sample_id:
+                raise UserError(_("%s is already existed." % vals['name']))
+        return super(PMSLeaseTerms, self).write(vals)

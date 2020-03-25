@@ -12,27 +12,15 @@ class PMSApiIntegration(models.Model):
     _orders = 'id, name'
 
     name = fields.Char("API Provider")
-    # url = fields.Char("URL", track_visibility=True)
     base_url = fields.Char("Base Url",
                            help='Base Url is use to get and send data.')
-    # get_api = fields.Char("GET API", track_visibility=True)
-    # post_api = fields.Char('POST API', track_visibility=True)
     auth_url = fields.Char(
         'Authentication Url',
         help='Authentication Url is used to get access token.')
-    # access_token = fields.Char("Access Token", track_visibility=True)
-    # client_id = fields.Char("Client ID", track_visibility=True)
-    # client_secret = fields.Char("Client Secret", track_visibility=True)
     username = fields.Char("Username")
     password = fields.Char("Password")
     api_integration_line = fields.One2many("pms.api.integration.line",
                                            'api_integration_id', "API Lines")
-    # api_type = fields.Many2one("pms.api.type",
-    #                            "API Type",
-    #                            track_visibility=True)
-    # property_id = fields.Many2one("pms.properties",
-    #                               "Property",
-    #                               track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
 
 
@@ -61,16 +49,7 @@ class PMSApiIntegrationLine(models.Model):
         CLIENT_ID = self.api_integration_id.username
         CLIENT_SECRET = self.api_integration_id.password
         access_token = self.api_integration_id.auth_url
-        # access_token = 'http://192.168.100.17:8182/connect/token'
         url = self.api_integration_id.base_url
-        # req = urllib.request.Request(access_token)
-        # try:
-        #     with urllib.request.urlopen(req) as response:
-        #         print(response)
-        # except expression as identifier:
-        #     return identifier
-
-        # result = json.loads(response.readall().decode('utf-8'))
         authon = api_rauth_config.Auth2Client(url, CLIENT_ID, CLIENT_SECRET,
                                               access_token)
         print(authon)
@@ -78,11 +57,10 @@ class PMSApiIntegrationLine(models.Model):
             api_url = url + '/' + self.api_url
             with requests.Session() as s:
                 s.auth = OAuth2BearerToken(authon.access_token)
-                r = s.get(api_url)
+                r = s.get(api_url, timeout=15)
                 r.raise_for_status()
                 data = r.json()
         if authon.access_token and self.http_method_type == 'post':
-            # url_get = url + self.api_url
             if self.api_url:
                 api_url = url + '/' + self.api_url
             host = url.split("//")[1]

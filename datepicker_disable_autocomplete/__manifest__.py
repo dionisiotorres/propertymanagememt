@@ -9,9 +9,6 @@
     Fix browser issue with date field entry. Disable autocomplete of date fields that already have calendar dropdowns.
     """,
     'author': 'Genesis Digital',
-    'price': 0,
-    'currency': 'EUR',
-    'website': 'http://genesisdigital.asia',
     'images': ['static/description/main_screenshot.png'],
     'license': 'Other proprietary',
     'depends': ['web'],

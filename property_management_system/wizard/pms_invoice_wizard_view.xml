@@ -5,7 +5,7 @@
             <field name="model">pms.invoice_wizard</field>
             <field name="arch" type="xml">
                 <form string="Invoice Lease Details">
-                    <p class="oe_grey">
+                    <p style="font-weight:bold;">
                         Invoices will be created in draft so that you can review
                         them before validation.
                     </p>
@@ -32,7 +32,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="create_lease_invoice" string="Create Invoice" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button name="create_lease_invoice" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

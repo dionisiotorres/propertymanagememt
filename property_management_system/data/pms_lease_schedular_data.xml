@@ -156,6 +156,18 @@
             <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>
             <field eval="False" name="doall"/>
+        </record>
+         <record id="ir_cron_spaceunit_unactive" model="ir.cron">
+            <field name="name">SpaceUnit Unactive Schedular</field>
+            <field name="model_id" ref="model_pms_space_unit"/>
+            <field name="state">code</field>
+            <field name="code">model.spaceunit_unactive_schedular()</field>
+            <field name="user_id" ref="base.user_root" />
+            <field eval="True" name="active"/>            
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="False" name="doall"/>
         </record>    
     </data>
 </odoo>

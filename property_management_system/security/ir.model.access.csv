@@ -21,8 +21,6 @@ access_pms_display_type,pms.display.type,model_pms_display_type,group_property_u
 access_pms_display_type_manager,pms.display.type,model_pms_display_type,group_property_manager,1,1,1,1
 access_pms_city,pms.city,model_pms_city,group_property_user,1,1,1,1
 access_pms_city_manager,pms.city,model_pms_city,group_property_manager,1,1,1,1
-access_pms_state,pms.state,model_pms_state,group_property_user,1,1,1,1
-access_pms_state_manager,pms.state,model_pms_state,group_property_manager,1,1,1,1
 access_pms_country,pms.country,model_pms_country,group_property_user,1,1,1,1
 access_pms_country_manager,pms.country,model_pms_country,group_property_manager,1,1,1,1
 access_pms_currency,pms.currency,model_pms_currency,group_property_user,1,1,1,1
@@ -51,8 +49,8 @@ access_pms_township_all,pms.township,model_pms_township,group_property_user,1,1,
 access_pms_township_mamager,pms.township,model_pms_township,group_property_manager,1,1,1,1
 access_pms_uitility_source_type,pms.utilities.source.type,model_pms_utilities_source_type,group_property_user,1,1,1,1
 access_pms_uitility_source_type_manager,pms.utilities.source.type,model_pms_utilities_source_type,group_property_manager,1,1,1,1
-access_pms_utilities_supply_type,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_user,1,1,1,1
-access_pms_utilities_supply_type_manager,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_manager,1,1,1,1
+access_pms_utilities_supply_type,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_user,1,0,0,0
+access_pms_utilities_supply_type_manager,pms.utilities.supply.type,model_pms_utilities_supply_type,group_property_manager,1,0,0,0
 access_pms_equipment_type,pms.equipment.type,model_pms_equipment_type,group_property_user,1,1,1,1
 access_pms_equipment_type_manager,pms.equipment.type,model_pms_equipment_type,group_property_manager,1,1,1,1
 access_pms_equipment,pms.equipment,model_pms_equipment,group_property_user,1,1,1,1
@@ -63,8 +61,8 @@ access_pms_lease_agreement_line,pms.lease_agreement.line,model_pms_lease_agreeme
 access_pms_lease_agreement_line_manager,pms.lease_agreement.line,model_pms_lease_agreement_line,group_property_manager,1,1,1,1
 access_pms_department,pms.department,model_pms_department,group_property_user,1,1,1,1
 access_pms_space_unit_management,pms.space.unit.management,model_pms_space_unit_management,group_property_user,1,1,1,1
-access_pms_rent_schedule,pms.rent_schedule,model_pms_rent_schedule,group_property_user,1,1,1,1
-access_pms_rent_schedule_manager,pms.rent_schedule,model_pms_rent_schedule,group_property_manager,1,1,1,1
+access_pms_rent_schedule,pms.rent_schedule,model_pms_rent_schedule,group_property_user,1,1,1,0
+access_pms_rent_schedule_manager,pms.rent_schedule,model_pms_rent_schedule,group_property_manager,1,1,1,0
 access_ir_sequence_user,ir.sequence,base.model_ir_sequence,group_property_user,1,1,1,0
 access_ir_sequence_manager,ir.sequence,base.model_ir_sequence,group_property_manager,1,1,1,0
 access_pms_api_integration,pms.api.integration,model_pms_api_integration,group_property_user,1,1,1,0
@@ -79,8 +77,8 @@ access_pms_calcualte_method,pms.calculation.method,model_pms_calculation_method,
 access_pms_calcualte_method_manager,pms.calculation.method,model_pms_calculation_method,group_property_manager,1,1,1,1
 access_pms_api_inte_line,pms.api.integration.line,model_pms_api_integration_line,group_property_user,1,1,1,0
 access_pms_api_inte_line_manager,pms.api.integration.line,model_pms_api_integration_line,group_property_manager,1,1,1,1
-access_pms_gen,pms.gen.rent.schedule,model_pms_gen_rent_schedule,group_property_user,1,1,1,1
-access_pms_gen_manager,pms.gen.rent.schedule,model_pms_gen_rent_schedule,group_property_manager,1,1,1,1
+access_pms_gen,pms.gen.rent.schedule,model_pms_gen_rent_schedule,group_property_user,1,1,1,0
+access_pms_gen_manager,pms.gen.rent.schedule,model_pms_gen_rent_schedule,group_property_manager,1,1,1,0
 access_pms_lease_unit_pos,pms.lease.unit.pos,model_pms_lease_unit_pos,group_property_user,1,1,1,1
 access_pms_lease_unit_pos_manager,pms.lease.unit.pos,model_pms_lease_unit_pos,group_property_manager,1,1,1,1
 access_pms_lease_interface_code,pms.lease.interface.code,model_pms_lease_interface_code,group_property_user,1,1,1,1

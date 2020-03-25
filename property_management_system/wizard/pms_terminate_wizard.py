@@ -25,7 +25,7 @@ class PMSLeaseTerminateWizard(models.TransientModel):
                     if pro.terminate_days:
                         date = today_date + relativedelta(
                             days=pro.terminate_days)
-        return date
+        return date or None
 
     date = fields.Date("Terminated Date", default=_get_date)
 
@@ -53,4 +53,4 @@ class PMSLeaseTerminateWizard(models.TransientModel):
                 lease_ids.write({'terminate_period': date})
         else:
             raise UserError(_("Please set terminate period."))
-        return True
+        return lease_ids.send_mail()

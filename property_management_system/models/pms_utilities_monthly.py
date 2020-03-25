@@ -69,6 +69,6 @@ class UtilitiesMonthly(models.Model):
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "UpdateUtilitiesMonthlySale")
                 ])
-                datas = api_rauth_config.APIData(posid, uniq, property_id,
-                                                 integ_obj, api_line_ids)
+                datas = api_rauth_config.APIData.get_data(
+                    posid, uniq, property_id, integ_obj, api_line_ids)
             return monthlydata_id

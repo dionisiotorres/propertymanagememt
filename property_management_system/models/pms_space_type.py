@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PMSSpaceType(models.Model):
@@ -16,3 +17,18 @@ class PMSSpaceType(models.Model):
             if not pt.active:
                 pt.active = self.active
         super(PMSSpaceType, self).toggle_active()
+
+    @api.model
+    def create(self, values):
+        equip_id = self.search([('name', '=', values['name'])])
+        if equip_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PMSSpaceType, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'name' in vals:
+            equip_id = self.search([('name', '=', vals['name'])])
+            if equip_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PMSSpaceType, self).write(vals)

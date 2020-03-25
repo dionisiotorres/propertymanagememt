@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="view_cancel_wiz" model="ir.ui.view">
+        <record id="view_activate_wiz" model="ir.ui.view">
             <field name="name">Activate Lease</field>
             <field name="model">pms.lease.activate.wizard</field>
             <field name="arch" type="xml">
-                <form string="Cancel Lease">
-                    <p class="oe_grey">
-                        Will be generate rent schedules and change to new state. 
-                        In the state, space units in this lease will not allow 
-                        to activate in the other booking state of the lease with the space units that are existing in this lease.
+                <form string="Activate Lease">
+                    <p style="font-weight:bold;">
+                        Are you sure want to Activate?
                     </p>
                     <footer>
-                        <button name="action_activate_wiz" string="Activate" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button name="action_activate_wiz" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

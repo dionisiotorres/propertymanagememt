@@ -1,4 +1,5 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PMSApplicableSpaceType(models.Model):
@@ -11,7 +12,7 @@ class PMSApplicableSpaceType(models.Model):
                                     "Main Space Type",
                                     required=True)
     chargeable = fields.Boolean("IsChargable", track_visibility=True)
-    divisible = fields.Boolean("Can be divided", track_visibility=True)
+    divisible = fields.Boolean("Manageable", track_visibility=True)
     ordinal_no = fields.Integer("Ordinal No",
                                 required=True,
                                 help='To display order as prefer')
@@ -23,3 +24,18 @@ class PMSApplicableSpaceType(models.Model):
             if not pt.active:
                 pt.active = self.active
         super(PMSTerms, self).toggle_active()
+
+    @api.model
+    def create(self, values):
+        charge_type_id = self.search([('name', '=', values['name'])])
+        if charge_type_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PMSApplicableSpaceType, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'name' in vals:
+            charge_type_id = self.search([('name', '=', vals['name'])])
+            if charge_type_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PMSApplicableSpaceType, self).write(vals)

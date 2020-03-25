@@ -29,7 +29,7 @@ class PMSFacilities(models.Model):
                                       track_visibility=True)
     remark = fields.Text("Remark", track_visibility=True)
     status = fields.Boolean("Status",
-                            default=True,
+                            default=False,
                             track_visibility=True,
                             help='Current Status of utilities.')
     facilities_line = fields.One2many("pms.facility.lines",
@@ -55,9 +55,15 @@ class PMSFacilities(models.Model):
                              compute="compute_meters",
                              help='Last Month Reading Value.')
     is_api_post = fields.Boolean("Posted")
-
-    # _sql_constraints = [('name_unique', 'unique(name)',
-    #                      'Your name is exiting in the database.')]
+    active = fields.Boolean(
+        "Active",
+        default=True,
+        track_visibility=True,
+    )
+    end_date = fields.Date(
+        "End Date",
+        track_visibility=True,
+    )
 
     # @api.onchange('utilities_type_id')
     # def onchange_utilities_type_id(self):
@@ -128,7 +134,7 @@ class PMSFacilities(models.Model):
             self.last_rdate = lmrdate
 
     def suf_scheduler(self):
-        values = self 
+        values = self
         property_ids = []
         property_id = self.env['pms.properties'].search([('api_integration',
                                                           '=', True)])
@@ -141,17 +147,27 @@ class PMSFacilities(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "SpaceUnitFacilities")
             ])
-            datas = api_rauth_config.APIData(facility_ids, values, property_id,
-                                             integ_obj, api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for fc in facility_ids:
-                        fc.write({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(facility_ids, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for fc in facility_ids:
+                                        fc.write({'is_api_post': True})
 
     @api.model
     def create(self, values):
+        epuip_id = self.env['pms.equipment'].search([('id', '=',
+                                                      values['utilities_no'])])
+        fac_id = self.search([('name', '=', epuip_id.name),
+                              ('end_date', '=', False)])
+        if fac_id:
+            raise UserError(_("%s is already existed" % epuip_id.name))
         id = None
         ldata = []
         emetertype = lmrvalue = lmrdate = None
@@ -160,29 +176,12 @@ class PMSFacilities(models.Model):
                 for line in values['facilities_line']:
                     if line[2]['end_date'] == False:
                         ldata.append(line[2]['source_type_id'])
-                    # utiliy_id = self.env['pms.utilities.source.type'].browse(
-                    #     line[2]['source_type_id'])
-                    # if emetertype:
-                    #     emetertype += " | " + str(utiliy_id.code)
-                    #     lmrvalue += " | " + str(line[2]['lmr_value'])
-                    # if not emetertype:
-                    #     emetertype = str(utiliy_id.code)
-                    #     lmrvalue = str(line[2]['lmr_value'])
-                    #     lmrdate = line[2]['lmr_date']
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
                     raise UserError(_("Utiliteis Source Type is same."))
-                # else:
-                #     fac_ids = self.search([('utilities_no', '=',
-                #                             values['utilities_no'])])
-                #     if fac_ids:
-                #         for fid in fac_ids:
-                #             if fid.facilities_line:
-                #                 for fl in fid.facilities_line:
-                #                     if fl.source_type_id.id in ldata:
-                #                         raise UserError(
-                #                             _("Plese can not set duplicate supply source type."
-                #                               ))
+        if 'end_date' in values:
+            if values['end_date'] != False:
+                values['active'] = False
         id = super(PMSFacilities, self).create(values)
         if id:
             id.write({'is_api_post': False})
@@ -190,6 +189,13 @@ class PMSFacilities(models.Model):
 
     @api.multi
     def write(self, values):
+        if 'utilities_no' in values:
+            epuip_id = self.env['pms.equipment'].search([
+                ('id', '=', values['utilities_no'])
+            ])
+            fac_id = self.search([('name', '=', epuip_id.name)])
+            if fac_id:
+                raise UserError(_("%s is already existed" % epuip_id.name))
         ldata = []
         emetertype = lmrvalue = utiliy_id = lmrdate = None
         if 'facilities_line' in values:
@@ -204,8 +210,12 @@ class PMSFacilities(models.Model):
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
                     raise UserError(
-                        _("Plese can not set duplicate Supply Source type."))
+                        _("System does not allow same utilities source type for one utilities no."
+                          ))
         if 'is_api_post' not in values:
             values['is_api_post'] = False
+        if 'end_date' in values:
+            if values['end_date'] != False:
+                values['active'] = False
         result = super(PMSFacilities, self).write(values)
         return result

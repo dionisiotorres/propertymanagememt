@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api, tools
+from odoo import models, fields, api, tools, _
+from odoo.exceptions import UserError
 
 
 class PMSEquipment(models.Model):
     _name = 'pms.equipment'
+    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = "Equipments"
+
+    def _get_name(self):
+        return self.name
 
     equipment_type_id = fields.Many2one("pms.equipment.type",
                                         string="Equipment Type",
@@ -36,8 +41,7 @@ class PMSEquipment(models.Model):
         "Rollover Type",
         help='Which method will be use if equipment roll over.')
 
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
+    # _sql_constraints = [('name_unique', 'unique(name)', raise UserError(_('%s is already existed.' % self.name))]
 
     @api.multi
     def _get_count_facility(self):
@@ -66,6 +70,21 @@ class PMSEquipment(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    @api.model
+    def create(self, values):
+        equip_id = self.search([('name', '=', values['name'])])
+        if equip_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PMSEquipment, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'name' in vals:
+            equip_id = self.search([('name', '=', vals['name'])])
+            if equip_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PMSEquipment, self).write(vals)
+
 
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'
@@ -76,5 +95,20 @@ class PMSEquipmentType(models.Model):
     ordinal_no = fields.Integer("Ordinal No",
                                 required=True,
                                 help='To display order as prefer.')
-    _sql_constraints = [('name_unique', 'unique(name)',
-                         'Your name is exiting in the database.')]
+    # _sql_constraints = [('name_unique', 'unique(name)',
+    #                      'Your name is exiting in the database.')]
+
+    @api.model
+    def create(self, values):
+        equip_type_id = self.search([('name', '=', values['name'])])
+        if equip_type_id:
+            raise UserError(_("%s is already existed" % values['name']))
+        return super(PMSEquipmentType, self).create(values)
+
+    @api.multi
+    def write(self, vals):
+        if 'name' in vals:
+            equip_type_id = self.search([('name', '=', vals['name'])])
+            if equip_type_id:
+                raise UserError(_("%s is already existed" % vals['name']))
+        return super(PMSEquipmentType, self).write(vals)

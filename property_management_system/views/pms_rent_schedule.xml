@@ -4,12 +4,13 @@
       <field name="name">Rent Schedule Form</field>
       <field name="model">pms.rent_schedule</field>
       <field name="arch" type="xml">
-        <form>
+        <form create="false" edit="false">
             <header>
+                <button name="action_reset_draft" string="Reset To Draft" type="object" states="generated"/>
                 <field name="state" widget="statusbar" statusbar_visible="draft,confrimed,invoiced"/>
             </header>
           <sheet>
-            <group>
+            <group readonly='1'>
               <group>
                 <field name="property_id"/>
                 <field name="unit_no"/>
@@ -37,7 +38,7 @@
       <field name="name">Rent Schedule list</field>
       <field name="model">pms.rent_schedule</field>
       <field name="arch" type="xml">
-        <tree>
+        <tree create="false" edit="false" >
             <field name="property_id"/>
             <field name="lease_agreement_id" string="Shop"/>
             <field name="lease_no"/>
@@ -89,7 +90,7 @@
       <field name="name">Generate Rent Schedule Form</field>
       <field name="model">pms.gen.rent.schedule</field>
       <field name="arch" type="xml">
-        <form>
+        <form create="false" edit="false">
             <header>
                   <button name="action_submit" id="action_submit"
                         string="Submit" class="btn-primary" type="object"
@@ -116,6 +117,7 @@
                 <field name="end_date" attrs="{'readonly':[('state','in',['confirmed','invoiced'])]}"/>
                 <field name="amount" attrs="{'readonly':[('state','in',['confirmed','invoiced'])]}"/>
                 <field name="billing_date" attrs="{'readonly':[('state','in',['confirmed','invoiced'])]}"/>
+                <field name="schedule_invoice" attrs="{'readonly':[('state','in',['confirmed','invoiced'])]}"/>
               </group>
             </group>
           </sheet>
@@ -130,7 +132,7 @@
       <field name="name">Generate Rent Schedule list</field>
       <field name="model">pms.gen.rent.schedule</field>
       <field name="arch" type="xml">
-        <tree>
+        <tree create="false" edit="false">
             <field name="property_id"/>
             <field name="lease_agreement_id" string="Shop"/>
             <field name="lease_no"/>

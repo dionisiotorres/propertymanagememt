@@ -19,10 +19,10 @@
           </div>
           <group>
             <group>
-                <field name="base_url" placeholder='https://google.com'/>
+                <field name="base_url" placeholder='https://google.com' widget="url"/>
                 <field name="auth_url" placeholder='https://google.com/connect/token'/>
                 <field name="username"/>
-                <field name="password"/>
+                <field name="password" password="True"/>
             </group>
           </group>
           <notebook>
@@ -48,8 +48,6 @@
           <field name="name"/>
           <field name="base_url"/>
           <field name="auth_url"/>
-          <field name="username"/>
-          <field name="password"/>
         </tree>
       </field>
     </record>
@@ -75,6 +73,6 @@
       name="API Integration" 
       parent="pms_menu_config"
       action="action_api_integration_all"
-      sequence="100" groups="base.group_no_one"/>
+      sequence="100"/>
   </data>
 </odoo>

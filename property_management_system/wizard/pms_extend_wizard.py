@@ -5,7 +5,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
-
 class PMSLeaseExtendWizard(models.TransientModel):
     _name = "pms.lease_extend_wizard"
     _description = "Extend Wizard"
@@ -52,7 +51,7 @@ class PMSLeaseExtendWizard(models.TransientModel):
                     else:
                         date = lease_extends.extend_to + relativedelta(
                             years=company.extend_lease_term.min_time_period)
-                return date - relativedelta(days=1)
+                return date
 
     lease_no = fields.Many2one("pms.lease_agreement",
                                default=get_lease_agreement_id,
@@ -89,6 +88,7 @@ class PMSLeaseExtendWizard(models.TransientModel):
                 'extend_to': self.extend_end_date,
             })
             lease_extends.action_activate()
-        return lease_extends.write({
+        lease_extends.write({
             'state': 'EXTENDED',
         })
+        return lease_extends.send_mail()

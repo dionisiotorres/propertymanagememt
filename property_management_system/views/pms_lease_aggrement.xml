@@ -1,5 +1,6 @@
 <odoo>
   <data>
+    <!-- Lease Agreement / Item Entry Form -->
     <record model="ir.ui.view" id="view_lease_aggrement_form">
       <field name="name">Lease Agreement Form</field>
       <field name="model">pms.lease_agreement</field>
@@ -9,8 +10,6 @@
             <button name="%(action_activate_wiz)d" string="Activate" type="action" states="BOOKING"/>
             <button name="%(action_cancel_wiz)d" states="BOOKING" type="action" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
-            <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice"/> -->
-            <!-- <button name="action_extend" states="NEW,EXTENDED" type="object" string="Extend"/> -->
             <button name="%(action_extend_wiz)d" states="NEW,EXTENDED" type="action" string="Extend" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
             <button name="action_renew" states="NEW,EXTENDED" type="object" string="Renew"/>
             <button name="%(action_terminate_wiz)d" states="NEW,EXTENDED" type="action" string="TERMINATE"/>
@@ -23,17 +22,8 @@
                 icon="fa-pencil-square-o"
                 string="New"  attrs="{'invisible': [('state','not in', ['RENEWED'])]}">
             </button>
-            <!-- <button name="action_view_invoice" type="object"
-                class="oe_stat_button"
-                icon="fa-pencil-square-o"
-                string="Invoice"  attrs="{'invisible': [('state','in', ['BOOKING'])]}">
-            </button> -->
-            <!-- <button type="object" class="oe_stat_button" icon="fa-archive">
-                <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-            </button> -->
           </div>
             <div class="oe_title" >
-                <!-- <label for="name" string="Description"/> -->
                 <h1>
                     <field name="name" placeholder="Description"/>
                 </h1>
@@ -57,40 +47,29 @@
                   <field name="end_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
                   <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['EXTENDED','TERMINATED'])],'readonly':[('state','in',['EXTENDED','TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
-                  <!-- <field name="is_terminate" attrs="{'invisible': [('state','not in', ['NEW','EXTENDED','TERMINATED'])],'readonly':[('state','in',['TERMINATED'])]}"/> -->
                   <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','TERMINATED'])], 'readonly':[('state','in',['TERMINATED'])]}"/>
               </group>
             </group>
             <notebook>
                 <page string="Lease Agreement Units">
-                    <field name="lease_agreement_line" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"  context="{'start_date': start_date,'end_date':end_date}">
+                    <field name="lease_agreement_line" context="{'start_date': start_date,'end_date':end_date}">
                     <form>
                       <header>
-                        <!-- <button name="action_invoice" states="NEW" type="object" string="Create Invoice" class="btn-primary" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
-                        <!-- <button name="%(action_invoice_wiz)d" states="NEW" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', '!=', 'NEW')]}"/> -->
                         <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
                       </header>
                       <sheet>
-                      <!-- <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
-                        <button name="action_view_invoice" type="object"
-                            class="oe_stat_button"
-                            icon="fa-pencil-square-o"
-                            string="Invoice">
-                            <field name="invoice_count"/>
-                        </button>
-                      </div> -->
-                      <group>
-                        <group>
-                          <field name="lease_agreement_id" invisible="1"/>
-                          <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                        <group attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                          <group>
+                            <field name="lease_agreement_id" invisible="1"/>
+                            <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                          </group>
+                          <group>
+                            <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                            <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                            <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','in', ['BOOKING'])]}"/>
+                            <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                          </group>
                         </group>
-                        <group>
-                          <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                          <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                          <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','in', ['BOOKING'])]}"/>
-                          <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
-                        </group>
-                      </group>
                       <notebook>
                           <page string="Lease Unit Charges">
                             <field name="applicable_type_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}" context="{'active_id': active_id}">
@@ -156,7 +135,7 @@
                     </group>
                   </group>
                 </page>
-                <page string="Charge Configuration">
+                <page string="Charge Configuration" attrs="{'invisible': [('state','in', ['BOOKING'])]}">
                   <field name="applicable_type_line_id"  readonly="1">
                     <form>
                       <group>
@@ -185,7 +164,7 @@
                     </tree>
                   </field>
                 </page>
-                <page string="Rent Schedule" >
+                <page string="Rent Schedule" attrs="{'invisible': [('state','in', ['BOOKING'])]}">
                   <field name = "lease_rent_config_id" readonly="1">
                     <tree editable="buttom">
                       <field name="lease_agreement_line_id"/>
@@ -239,11 +218,6 @@
             <templates>
                 <t t-name="kanban-box">
                     <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_pms_partner_kanban">
-                        <!-- <t t-if="record.id.raw_value">
-                          <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{kanban_image('pms.lease_agreement', 'image_medium', record.id.raw_value)}')">
-                              <img alt="Logo" class="o_kanban_image_inner_pic" t-att-src="kanban_image('pms.lease_agreement', 'image_small',record.id.raw_value)"/>
-                          </div>
-                        </t> -->
                         <t t-if="record.id.raw_value">
                             <img alt="Logo" t-att-src='_s + "/property_management_system/static/src/image/lease.jpg"'/>
                         </t>
@@ -252,8 +226,6 @@
                             <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
                             <ul>
                                 <li t-if="record.property_id.raw_value"><field name="property_id"/></li>
-                                <!-- <li t-if="record.company_tanent_id.raw_value"><field name="company_tanent_id"/></li>
-                                <li t-if="record.unit_no.raw_value"><field name="unit_no"/></li> -->
                                 <li t-if="record.lease_no.raw_value"><field name="lease_no"/></li>
                                 <li t-if="record.state.raw_value"><field name="state"/></li>
                             </ul>
@@ -288,8 +260,7 @@
        <field name="view_type">form</field>
        <field name="view_mode">tree,form,kanban</field>
        <field name="view_id" ref="view_lease_agreement_tree"/> 
-       <field name="search_view_id" ref="view_lease_agreement_filter"/> 
-       <!-- <field name="context">{'search_default_group_property_id': 1}</field>  -->
+       <field name="search_view_id" ref="view_lease_agreement_filter"/>
     </record>
     <menuitem  id="lease_management_menu_sub" 
       name="Lease Management" 
@@ -448,6 +419,7 @@
             </div>
             <group>
                 <group>
+                    <field name="calculate_method_ids" widget="many2many_tags"/>
                     <field name="ordinal_no"/> 
                 </group>
                 <group>
@@ -463,6 +435,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
+          <field name="calculate_method_ids" widget="many2many_tags"/>
           <field name="ordinal_no"/>
         </tree>
       </field>
@@ -472,7 +445,6 @@
       <field name="model">pms.charge_types</field>
       <field name="arch" type="xml">
         <search>
-           <!-- <field name="code"/> -->
             <field name="name"/>
         </search>
       </field>
@@ -488,6 +460,7 @@
       name="Charge Type" 
       parent="lease_management_menu_config" 
       action="action_charge_type_all"
+      groups="base.group_system"
       sequence="10"/>
   </data> 
 </odoo>

@@ -29,7 +29,6 @@
               </group>
               <group>
                 <field name="floor_code_ref"/>
-                <field name="is_api_post" />
               </group>
             </group>
           </sheet>
@@ -50,7 +49,6 @@
           <field name="floor_code_ref"/>
           <field name="name"/>
           <field name="active"/>
-          <field name="is_api_post"/>
         </tree>
       </field>
     </record>
@@ -103,7 +101,6 @@
           <field name="active"/>
           <group expand="0" string="Group By">
             <filter name="group_property_id" string="Property" icon="terp-partner" context="{'group_by':'property_id'}"/>
-            <filter name="is_api_post" string="API Status" context="{'group_by':'is_api_post'}"/>
           </group>
         </search>
       </field>

@@ -9,7 +9,7 @@
                         <field name="date"/>
                    </group>
                     <footer>
-                        <button name="action_terminate_wiz" string="Terminate" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button name="action_terminate_wiz" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

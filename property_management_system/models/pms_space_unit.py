@@ -1,6 +1,8 @@
 import json
+import datetime
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
+from datetime import datetime
 from odoo.addons import decimal_precision as dp
 from odoo.addons.property_management_system.models import api_rauth_config
 
@@ -37,15 +39,8 @@ class PMSSpaceUnit(models.Model):
                 floor = self.env['pms.floor'].create(val)
                 return floor
 
-    name = fields.Char("Unit No",
-                       compute='get_unit_no',
-                       store=True,
-                       track_visibility=True,
-                       readonly=True)
-    unit_code = fields.Char("Unit",
-                            compute='get_unit_no',
-                            store=True,
-                            readonly=True)
+    name = fields.Char("Unit No", store=True, track_visibility=True)
+    unit_code = fields.Char("Unit", compute="get_unit_code", readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",
                                   default=get_property_id,
@@ -61,15 +56,16 @@ class PMSSpaceUnit(models.Model):
                              track_visibility=True,
                              store=False)
     unit_no = fields.Char("Space Unit No",
-                          store=True,
                           required=True,
-                          track_visibility=True)
+                          readonly=False,
+                          store=True)
     parent_id = fields.Many2one("pms.space.unit",
                                 "Parent",
                                 store=True,
                                 track_visibility=True)
     spaceunittype_id = fields.Many2one("pms.applicable.space.type",
                                        "Unit Type",
+                                       required=True,
                                        track_visibility=True)
     uom = fields.Many2one("uom.uom",
                           "UOM",
@@ -106,18 +102,31 @@ class PMSSpaceUnit(models.Model):
                                      track_visibility=True)
     active = fields.Boolean("Active", default=True)
     is_api_post = fields.Boolean("Posted")
+    meter_no = fields.Char("Meters", compute="get_meter_no", readonly=True)
 
     @api.multi
     @api.onchange('end_date')
-    def onchange_active(self):
+    def onchange_end_date(self):
+        today = datetime.now()
         if self.end_date:
-            self.active = False
-        else:
-            self.active = True
+            if self.end_date >= today.date():
+                self.active = True
+            else:
+                self.active = False
+
+    def spaceunit_unactive_schedular(self):
+        today = datetime.now()
+        spaceunit_ids = self.search([('end_date', '!=', None),
+                                     ('active', '=', True)])
+        if spaceunit_ids:
+            for sp in spaceunit_ids:
+                if sp.end_date:
+                    if sp.end_date <= today.date():
+                        sp.active = False
 
     @api.one
     @api.depends('unit_no', 'floor_id', 'property_id')
-    def get_unit_no(self):
+    def get_unit_code(self):
         if self.floor_id:
             self.unit_code = self.floor_id.floor_code_ref + '-'
         if self.property_id:
@@ -137,37 +146,47 @@ class PMSSpaceUnit(models.Model):
                     if fid.value_type == 'fix':
                         if self.unit_no or self.floor_id:
                             val.append(fid.fix_value)
-                    if fid.value_type == 'digit':
-                        if self.unit_no and len(
-                                self.unit_no) > fid.digit_value:
-                            raise UserError(
-                                _("Unit code(%s)'s length is %s that's length greater than digit %s of the format in the Property Setting."
-                                  ) % (self.unit_no, len(
-                                      self.unit_no), fid.digit_value))
                     if fid.value_type == 'datetime':
                         val.append(fid.datetime_value)
                 space = []
-                self.name = ''
                 self.unit_code = ''
                 if len(val) > 0:
                     for l in range(len(val)):
-                        self.name += str(val[l])
                         self.unit_code += str(val[l])
-                    if self.unit_no:
-                        self.name += str(self.unit_no)
-
+                if self.unit_no:
+                    self.name = self.unit_code + self.unit_no
             else:
-                raise UserError(
-                    _("Unit Format is not exit in the Property Setting."))
-        length = 0
-        if self.name:
-            length = len(self.name)
-        if self.property_id.unit_code_len:
-            if length > self.property_id.unit_code_len:
-                raise UserError(
-                    _("Unit(%s)'s length is %s. That's length is less than or equal %s."
-                      % (self.name, len(
-                          self.name), self.property_id.unit_code_len)))
+                raise UserError(_("Please define unit format at first."))
+
+    # @api.onchange('unit_code')
+    # def onchange_unit_code(self):
+    #     if self.name:
+    #         if self.property_id:
+    #             if self.property_id.unit_format:
+    #                 format_ids = self.env['pms.format.detail'].search(
+    #                     [('format_id', '=', self.property_id.unit_format.id)],
+    #                     order='position_order asc')
+    #                 val = []
+    #                 for fid in format_ids:
+    #                     if fid.value_type == 'dynamic':
+    #                         if self.floor_id.code and fid.dynamic_value == 'floor code':
+    #                             val.append(self.floor_id.code)
+    #                         if self.floor_id.floor_code_ref and fid.dynamic_value == 'floor ref code':
+    #                             val.append(self.floor_id.floor_code_ref)
+    #                         if self.property_id.code and fid.dynamic_value == 'property code':
+    #                             val.append(self.property_id.code)
+    #                     if fid.value_type == 'fix':
+    #                         if self.unit_no or self.floor_id:
+    #                             val.append(fid.fix_value)
+    #                     if fid.value_type == 'datetime':
+    #                         val.append(fid.datetime_value)
+    #             space = []
+    #             self.unit_code = ''
+    #             if len(val) > 0:
+    #                 for l in range(len(val)):
+    #                     self.unit_code += str(val[l])
+    #             if self.unit_code:
+    #                 print(self.unit_code)
 
     @api.multi
     def name_get(self):
@@ -176,6 +195,33 @@ class PMSSpaceUnit(models.Model):
             code = record.name
             result.append((record.id, code))
         return result
+
+    @api.one
+    @api.depends('facility_line', 'meter_no')
+    def get_meter_no(self):
+        meters = ''
+        if self.facility_line:
+            for fl in self.facility_line:
+                meter = ''
+                meter += fl.name
+                if fl.facilities_line:
+                    meter += "("
+                    f_meter = ''
+                    for fsl in fl.facilities_line:
+                        if len(fl.facilities_line) > 1:
+                            if f_meter == '':
+                                f_meter += fsl.source_type_id.code
+                            else:
+                                f_meter += "|" + fsl.source_type_id.code
+                        else:
+                            f_meter += fsl.source_type_id.code
+                    meter += f_meter
+                    meter += ")"
+                    if meters != '':
+                        meters += ',' + meter
+                    else:
+                        meters += meter
+            self.meter_no = meters
 
     def space_unit_scheduler(self):
         values = None
@@ -191,15 +237,18 @@ class PMSSpaceUnit(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "SpaceUnit")
             ])
-            datas = api_rauth_config.APIData(spaceunit_ids, values,
-                                             property_id, integ_obj,
-                                             api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if response['responseStatus'] == True and response[
-                        'message'] == 'SUCCESS':
-                    for fc in spaceunit_ids:
-                        fc.write({'is_api_post': True})
+            datas = api_rauth_config.APIData.get_data(spaceunit_ids, values,
+                                                      property_id, integ_obj,
+                                                      api_line_ids)
+            if datas != None:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for fc in spaceunit_ids:
+                                        fc.write({'is_api_post': True})
 
     @api.model
     def create(self, values):
@@ -224,6 +273,10 @@ class PMSSpaceUnit(models.Model):
                     unit += str(line.fix_value)
                 if line.value_type == 'digit':
                     unit += str(values['unit_no'])
+                    if len(values['unit_no']) > line.digit_value:
+                        raise UserError(
+                            _("Total Unit length must not exceed %s characters."
+                              % (line.digit_value)))
                 unit_ids = self.search([
                     ('name', '=', unit),
                     ('property_id', '=', values['property_id']),
@@ -236,8 +289,18 @@ class PMSSpaceUnit(models.Model):
                                          ('end_date', '=', False),
                                          ('active', '=', True)])
                 if unit_ids or unit_ids1:
-                    raise UserError(
-                        _("%s Units is exiting in the database." % (unit)))
+                    raise UserError(_("%s is already existed." % (unit)))
+            values['name'] = unit
+            if len(values['name']) > property_id.unit_code_len:
+                raise UserError(
+                    _("Total Unit length must not exceed %s characters." %
+                      (property_id.unit_code_len)))
+        if 'facility_line' in values:
+            for fl in values['facility_line']:
+                print(fl[2])
+                if fl[2]:
+                    fac_id = self.env['pms.facilities'].browse(fl[2])
+                    fac_id.write({'status': True})
         id = None
         id = super(PMSSpaceUnit, self).create(values)
         if id:
@@ -248,13 +311,15 @@ class PMSSpaceUnit(models.Model):
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "SpaceUnit")
                 ])
-                datas = api_rauth_config.APIData(id, values, property_id,
-                                                 integ_obj, api_line_ids)
+                datas = api_rauth_config.APIData.get_data(
+                    id, values, property_id, integ_obj, api_line_ids)
                 if datas.res:
                     response = json.loads(datas.res)
-                    if response['responseStatus'] == True and response[
-                            'message'] == 'SUCCESS':
-                        id.write({'is_api_post': True})
+                    if 'responseStatus' in response:
+                        if response['responseStatus'] == True:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    id.write({'is_api_post': True})
                 if values['facility_line']:
                     for fl in values['facility_line'][0][2]:
                         values['create'] = True
@@ -266,15 +331,17 @@ class PMSSpaceUnit(models.Model):
                             'pms.api.integration.line'].search([
                                 ('name', '=', "SpaceUnitFacilities")
                             ])
-                        datas = api_rauth_config.APIData(
+                        datas = api_rauth_config.APIData.get_data(
                             id, values, property_objs, integ_objs,
                             api_type_objs)
                         if datas.res:
                             response = json.loads(datas.res)
-                            if response['responseStatus'] == True and response[
-                                    'message'] == 'SUCCESS':
-                                for fc in facility_id:
-                                    fc.write({'is_api_post': True})
+                            if 'responseStatus' in response:
+                                if response['responseStatus'] == True:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            for fc in facility_id:
+                                                fc.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -303,6 +370,12 @@ class PMSSpaceUnit(models.Model):
                     raise UserError(
                         _('Please set floor in  %s property.') %
                         self.property_id.name)
+        if 'facility_line' in val:
+            for fl in val['facility_line']:
+                print(fl[2])
+                if fl[2]:
+                    fac_id = self.env['pms.facilities'].browse(fl[2])
+                    fac_id.write({'status': True})
         id = None
         id = super(PMSSpaceUnit, self).write(val)
         if id:
@@ -318,8 +391,8 @@ class PMSSpaceUnit(models.Model):
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "SpaceUnit")
                 ])
-                datas = api_rauth_config.APIData(self, val, property_ids,
-                                                 integ_obj, api_line_ids)
+                datas = api_rauth_config.APIData.get_data(
+                    self, val, property_ids, integ_obj, api_line_ids)
                 if datas.res:
                     response = json.loads(datas.res)
                     if response['responseStatus'] == True and response[
@@ -337,14 +410,17 @@ class PMSSpaceUnit(models.Model):
                                 'pms.api.integration.line'].search([
                                     ('name', '=', "SpaceUnitFacilities")
                                 ])
-                            datas = api_rauth_config.APIData(
+                            datas = api_rauth_config.APIData.get_data(
                                 self, val, property_objs, integ_objs,
                                 api_type_objs)
                             if datas.res:
                                 response = json.loads(datas.res)
-                                if response[
-                                        'responseStatus'] == True and response[
-                                            'message'] == 'SUCCESS':
-                                    for fc in facility_id:
-                                        fc.write({'is_api_post': True})
+                                if 'responseStatus' in response:
+                                    if response['responseStatus'] == True:
+                                        if 'message' in response:
+                                            if response[
+                                                    'message'] == 'SUCCESS':
+                                                for fc in facility_id:
+                                                    fc.write(
+                                                        {'is_api_post': True})
         return id

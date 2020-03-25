@@ -5,7 +5,7 @@
             <field name="model">pms.lease_extend_wizard</field>
             <field name="arch" type="xml">
                 <form string="Extend Lease Details">
-                    <p class="oe_grey">
+                    <p style="font-weight:bold;">
                         Extend will be extended in lease with the extend start date and end date.
                     </p>
                     <group>
@@ -25,7 +25,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="action_extend_wiz" string="Lease Extend" type="object" context="{'active_id':active_id}" class="btn-primary"/>
+                        <button name="action_extend_wiz" string="OK" type="object" context="{'active_id':active_id}" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

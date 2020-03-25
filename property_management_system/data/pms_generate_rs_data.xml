@@ -30,5 +30,11 @@
             <field name="state">code</field>
             <field name="code">records.action_confirm()</field>
         </record>
+        <record id="id_pms_rent_schedule_reset_draft" model="ir.actions.server">
+            <field name="name">Reset To Draft</field>
+            <field name="model_id" ref="model_pms_rent_schedule"/>
+            <field name="state">code</field>
+            <field name="code">records.action_reset_drafts()</field>
+        </record>
     </data>
 </odoo>

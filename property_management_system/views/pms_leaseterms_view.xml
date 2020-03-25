@@ -24,8 +24,6 @@
               <field name="max_time_period" />
               </group>
               <group>
-                <!-- <field name="rentschedule_type"/> -->
-                <!-- <field name="extend_count"/> -->
                 <field name="notify_period"/>
               </group>
             </group>
@@ -39,14 +37,11 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
-            <field name="lease_period_type"/> 
-            <field name="min_time_period"/> 
-            <field name="max_time_period"/>  
-            <field name="max_time_period"/>
-            <!-- <field name="rentschedule_type"/> -->
-            <!-- <field name="extend_count"/> -->
-            <field name="notify_period"/>
-            <field name="active"/>  
+          <field name="lease_period_type"/> 
+          <field name="min_time_period"/> 
+          <field name="max_time_period"/>  
+          <field name="notify_period"/>
+          <field name="active"/>  
         </tree>
       </field>
     </record>

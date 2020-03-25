@@ -39,9 +39,10 @@ class POSDailySale(models.Model):
             sale_id = posdatas[1]
             for sid in sale_id:
                 currency_id = code = business_date = None
-                code = self.env['pms.properties'].search([
-                    ('code', '=', sid['propertyCode'])
-                ]).code
+                # code = self.env['pms.properties'].search([
+                #     ('code', '=', sid['propertyCode'])
+                # ]).code
+                code = sid['propertyCode']
                 currency_id = self.env['res.currency'].search([
                     ('name', '=', sid['currency'])
                 ]).id
@@ -59,7 +60,7 @@ class POSDailySale(models.Model):
                 ])
                 if not pos_exited_ids:
                     val = {
-                        'property_id': code,
+                        'property_code': code,
                         'pos_interface_code': sid['posInterfaceCode'],
                         'pos_receipt_date': business_date,
                         'grosssalesamount': sid['grossSalesAmount'],
@@ -83,6 +84,6 @@ class POSDailySale(models.Model):
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "UpdatePOSDailySale")
                 ])
-                datas = api_rauth_config.APIData(posid, uniq, property_id,
-                                                 integ_obj, api_line_ids)
+                datas = api_rauth_config.APIData.get_data(
+                    posid, uniq, property_id, integ_obj, api_line_ids)
             return pos_sale_id

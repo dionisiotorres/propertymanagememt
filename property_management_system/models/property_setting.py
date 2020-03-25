@@ -949,9 +949,9 @@ class Partner(models.Model):
                     if crm.name != self.name:
                         raise UserError(
                             _("%s is already existed" % vals['name']))
-        id = res = None
-        id = res = super(Partner, self).write(vals)
-        if res and self.is_company:
+        id = None
+        id = super(Partner, self).write(vals)
+        if self.is_company:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([

@@ -115,7 +115,7 @@ class PMSFacilities(models.Model):
         if self.facilities_line:
             if len(self.facilities_line) > 0:
                 for line in self.facilities_line:
-                    if line.end_date == False:
+                    if not line.end_date:
                         ldata.append(line.source_type_id)
                     utiliy_id = self.env['pms.utilities.source.type'].browse(
                         line.source_type_id.id)
@@ -150,11 +150,11 @@ class PMSFacilities(models.Model):
             datas = api_rauth_config.APIData.get_data(facility_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     for fc in facility_ids:
@@ -174,13 +174,13 @@ class PMSFacilities(models.Model):
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
-                    if line[2]['end_date'] == False:
+                    if not line[2]['end_date']:
                         ldata.append(line[2]['source_type_id'])
                 dupes = [x for n, x in enumerate(ldata) if x in ldata[:n]]
                 if dupes:
                     raise UserError(_("Utiliteis Source Type is same."))
         if 'end_date' in values:
-            if values['end_date'] != False:
+            if values['end_date']:
                 values['active'] = False
         id = super(PMSFacilities, self).create(values)
         if id:
@@ -201,7 +201,7 @@ class PMSFacilities(models.Model):
         if 'facilities_line' in values:
             if len(values['facilities_line']) > 0:
                 for line in values['facilities_line']:
-                    if line[2] != False:
+                    if line[2]:
                         if 'source_type_id' in line[2]:
                             ldata.append(line[2]['source_type_id'])
                 if self.facilities_line:
@@ -215,7 +215,7 @@ class PMSFacilities(models.Model):
         if 'is_api_post' not in values:
             values['is_api_post'] = False
         if 'end_date' in values:
-            if values['end_date'] != False:
+            if values['end_date']:
                 values['active'] = False
         result = super(PMSFacilities, self).write(values)
         return result

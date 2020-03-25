@@ -197,7 +197,7 @@ class PMSSpaceUnit(models.Model):
         return result
 
     @api.one
-    @api.depends('facility_line', 'meter_no')
+    @api.depends('facility_line')
     def get_meter_no(self):
         meters = ''
         if self.facility_line:
@@ -240,11 +240,11 @@ class PMSSpaceUnit(models.Model):
             datas = api_rauth_config.APIData.get_data(spaceunit_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     for fc in spaceunit_ids:
@@ -306,18 +306,18 @@ class PMSSpaceUnit(models.Model):
         if id:
             property_obj = self.env['pms.properties']
             property_id = property_obj.browse(values['property_id'])
-            if property_id.api_integration == True:
+            if property_id.api_integration:
                 integ_obj = self.env['pms.api.integration'].search([])
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "SpaceUnit")
                 ])
                 datas = api_rauth_config.APIData.get_data(
                     id, values, property_id, integ_obj, api_line_ids)
-                if data != None:
+                if datas:
                     if datas.res:
                         response = json.loads(datas.res)
                         if 'responseStatus' in response:
-                            if response['responseStatus'] == True:
+                            if response['responseStatus']:
                                 if 'message' in response:
                                     if response['message'] == 'SUCCESS':
                                         id.write({'is_api_post': True})
@@ -335,11 +335,11 @@ class PMSSpaceUnit(models.Model):
                         datas = api_rauth_config.APIData.get_data(
                             id, values, property_objs, integ_objs,
                             api_type_objs)
-                        if data != None:
+                        if datas:
                             if datas.res:
                                 response = json.loads(datas.res)
                                 if 'responseStatus' in response:
-                                    if response['responseStatus'] == True:
+                                    if response['responseStatus']:
                                         if 'message' in response:
                                             if response[
                                                     'message'] == 'SUCCESS':
@@ -390,17 +390,17 @@ class PMSSpaceUnit(models.Model):
                 property_id = self.property_id.id
             property_obj = self.env['pms.properties']
             property_ids = property_obj.browse(property_id)
-            if property_ids.api_integration == True:
+            if property_ids.api_integration:
                 integ_obj = self.env['pms.api.integration'].search([])
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "SpaceUnit")
                 ])
                 datas = api_rauth_config.APIData.get_data(
                     self, val, property_ids, integ_obj, api_line_ids)
-                if data != None:
+                if datas:
                     if datas.res:
                         response = json.loads(datas.res)
-                        if response['responseStatus'] == True and response[
+                        if response['responseStatus'] and response[
                                 'message'] == 'SUCCESS':
                             self.write({'is_api_post': True})
                 if 'facility_line' in val:
@@ -418,11 +418,11 @@ class PMSSpaceUnit(models.Model):
                             datas = api_rauth_config.APIData.get_data(
                                 self, val, property_objs, integ_objs,
                                 api_type_objs)
-                            if data != None:
+                            if datas:
                                 if datas.res:
                                     response = json.loads(datas.res)
                                     if 'responseStatus' in response:
-                                        if response['responseStatus'] == True:
+                                        if response['responseStatus']:
                                             if 'message' in response:
                                                 if response[
                                                         'message'] == 'SUCCESS':

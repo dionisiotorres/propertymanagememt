@@ -206,11 +206,11 @@ class PMSRentSchedule(models.Model):
             datas = api_rauth_config.APIData.get_data(lease_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     for lid in lease_ids:
@@ -901,11 +901,11 @@ class Partner(models.Model):
             datas = api_rauth_config.APIData.get_data(crmaccount_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     for ca in crmaccount_ids:
@@ -920,7 +920,7 @@ class Partner(models.Model):
                 raise UserError(_("%s is already existed" % values['name']))
         id = None
         id = super(Partner, self).create(values)
-        if id and id.is_company == True:
+        if id and id.is_company:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
@@ -928,11 +928,11 @@ class Partner(models.Model):
             ])
             datas = api_rauth_config.APIData.get_data(id, values, property_id,
                                                       integ_obj, api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     id.write({'is_api_post': True})
@@ -951,36 +951,35 @@ class Partner(models.Model):
                             _("%s is already existed" % vals['name']))
         id = None
         id = super(Partner, self).write(vals)
-        if id and self.is_company == True:
+        if id and self.is_company:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
             if 'is_api_post' in vals:
-                if vals['is_api_post'] != True:
+                if vals['is_api_post']:
                     datas = api_rauth_config.APIData.get_data(
                         self, vals, property_id, integ_obj, api_line_ids)
-                    if datas != None:
+                    if datas:
                         if datas.res:
                             response = json.loads(datas.res)
                             if 'responseStatus' in response:
-                                if response['responseStatus'] == True:
+                                if response['responseStatus']:
                                     if 'message' in response:
                                         if response['message'] == 'SUCCESS':
                                             self.write({'is_api_post': True})
             else:
                 datas = api_rauth_config.APIData.get_data(
                     self, vals, property_id, integ_obj, api_line_ids)
-                if datas != None:
-                    if 'res' in datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus'] == True:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            self.write({'is_api_post': True})
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        self.write({'is_api_post': True})
         return id
 
     @api.multi

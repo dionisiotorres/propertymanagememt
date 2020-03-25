@@ -131,11 +131,11 @@ class PMSLeaseUnitPos(models.Model):
             datas = api_rauth_config.APIData.get_data(leaseipos_api_id, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas != None:
+            if datas:
                 if datas.res:
                     response = json.loads(datas.res)
                     if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
+                        if response['responseStatus']:
                             if 'message' in response:
                                 if response['message'] == 'SUCCESS':
                                     for lup in leaseipos_api_id:

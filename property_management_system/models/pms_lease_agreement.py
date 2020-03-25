@@ -830,7 +830,7 @@ class PMSLeaseAgreement(models.Model):
                                       ))
                 if line.property_id:
                     property_id = line.property_id
-                    if property_id.is_autogenerate_posid == True:
+                    if property_id.is_autogenerate_posid:
                         for prop in property_id:
                             if not prop.pos_id_format:
                                 raise UserError(
@@ -986,7 +986,7 @@ class PMSLeaseAgreement(models.Model):
         notify_date = new_lease_ids = extend_lease_ids = par_id = None
         par_id = partner_obj.search([('id', '=', self.company_tanent_id.id)])
         noti = None
-        if self.end_date == False:
+        if not self.end_date:
             if self.state == 'NEW':
                 noti = 'Activated'
                 notify_date = today_month_day
@@ -1380,13 +1380,16 @@ class PMSLeaseAgreement(models.Model):
                             [('name', '=', "LeaseAgreement")])
                         datas = api_rauth_config.APIData.get_data(
                             self, vals, property_id, integ_obj, rent_ids)
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus'] == True:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            self.write({'is_api_post': True})
+                        if datas:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus']:
+                                        if 'message' in response:
+                                            if response[
+                                                    'message'] == 'SUCCESS':
+                                                self.write(
+                                                    {'is_api_post': True})
                         if self.lease_agreement_line:
                             leaseitem_api_id = self.env[
                                 'pms.api.integration.line'].search([
@@ -1395,16 +1398,19 @@ class PMSLeaseAgreement(models.Model):
                             datas = api_rauth_config.APIData.get_data(
                                 self, vals, property_id, integ_obj,
                                 leaseitem_api_id)
-                            if datas.res:
-                                response = json.loads(datas.res)
-                                if 'responseStatus' in response:
-                                    if response['responseStatus'] == True:
-                                        if 'message' in response:
-                                            if response[
-                                                    'message'] == 'SUCCESS':
-                                                for litem in self.lease_agreement_line:
-                                                    litem.write(
-                                                        {'is_api_post': True})
+                            if datas:
+                                if datas.res:
+                                    response = json.loads(datas.res)
+                                    if 'responseStatus' in response:
+                                        if response['responseStatus']:
+                                            if 'message' in response:
+                                                if response[
+                                                        'message'] == 'SUCCESS':
+                                                    for litem in self.lease_agreement_line:
+                                                        litem.write({
+                                                            'is_api_post':
+                                                            True
+                                                        })
                         for loop in self.lease_agreement_line:
                             if loop.leaseunitpos_line_id:
                                 leaseipos_api_id = self.env[
@@ -1414,18 +1420,20 @@ class PMSLeaseAgreement(models.Model):
                                 datas = api_rauth_config.APIData.get_data(
                                     self, vals, property_id, integ_obj,
                                     leaseipos_api_id)
-                                if datas.res:
-                                    response = json.loads(datas.res)
-                                    if 'responseStatus' in response:
-                                        if response['responseStatus'] == True:
-                                            if 'message' in response:
-                                                if response[
-                                                        'message'] == 'SUCCESS':
-                                                    for lul in loop.leaseunitpos_line_id:
-                                                        lul.write({
-                                                            'is_api_post':
-                                                            True
-                                                        })
+
+                                if datas:
+                                    if datas.res:
+                                        response = json.loads(datas.res)
+                                        if 'responseStatus' in response:
+                                            if response['responseStatus']:
+                                                if 'message' in response:
+                                                    if response[
+                                                            'message'] == 'SUCCESS':
+                                                        for lul in loop.leaseunitpos_line_id:
+                                                            lul.write({
+                                                                'is_api_post':
+                                                                True
+                                                            })
                         if self.lease_rent_config_id:
                             leasers_api_id = self.env[
                                 'pms.api.integration.line'].search([
@@ -1434,16 +1442,19 @@ class PMSLeaseAgreement(models.Model):
                             datas = api_rauth_config.APIData.get_data(
                                 self, vals, property_id, integ_obj,
                                 leasers_api_id)
-                            if datas.res:
-                                response = json.loads(datas.res)
-                                if 'responseStatus' in response:
-                                    if response['responseStatus'] == True:
-                                        if 'message' in response:
-                                            if response[
-                                                    'message'] == 'SUCCESS':
-                                                for lrs in self.lease_rent_config_id:
-                                                    lrs.write(
-                                                        {'is_api_post': True})
+                            if datas:
+                                if datas.res:
+                                    response = json.loads(datas.res)
+                                    if 'responseStatus' in response:
+                                        if response['responseStatus']:
+                                            if 'message' in response:
+                                                if response[
+                                                        'message'] == 'SUCCESS':
+                                                    for lrs in self.lease_rent_config_id:
+                                                        lrs.write({
+                                                            'is_api_post':
+                                                            True
+                                                        })
         return id
 
     def lease_agreement_scheduler(self):
@@ -1464,14 +1475,15 @@ class PMSLeaseAgreement(models.Model):
             datas = api_rauth_config.APIData.get_data(lease_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if 'responseStatus' in response:
-                    if response['responseStatus'] == True:
-                        if 'message' in response:
-                            if response['message'] == 'SUCCESS':
-                                for lid in lease_ids:
-                                    lid.write({'is_api_post': True})
+            if datas:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus']:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for lid in lease_ids:
+                                        lid.write({'is_api_post': True})
 
 
 class PMSLeaseAgreementLine(models.Model):
@@ -1800,14 +1812,15 @@ class PMSLeaseAgreementLine(models.Model):
             datas = api_rauth_config.APIData.get_data(lease_line_ids, values,
                                                       property_id, integ_obj,
                                                       api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if 'responseStatus' in response:
-                    if response['responseStatus'] == True:
-                        if 'message' in response:
-                            if response['message'] == 'SUCCESS':
-                                for lid in lease_line_ids:
-                                    lid.write({'is_api_post': True})
+            if datas:
+                if datas.res:
+                    response = json.loads(datas.res)
+                    if 'responseStatus' in response:
+                        if response['responseStatus']:
+                            if 'message' in response:
+                                if response['message'] == 'SUCCESS':
+                                    for lid in lease_line_ids:
+                                        lid.write({'is_api_post': True})
 
     @api.multi
     def unlink(self):

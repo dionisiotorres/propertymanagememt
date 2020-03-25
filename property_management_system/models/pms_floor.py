@@ -46,11 +46,11 @@ class PMSFloor(models.Model):
 
     @api.multi
     def toggle_active(self):
-        if self.active == True:
+        if self.active:
             unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
                                                            self.id)])
             for unit in unit_ids:
-                if unit.active == True:
+                if unit.active:
                     raise UserError(
                         _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
                           ) % (unit.name, self.code, self.name))
@@ -99,20 +99,21 @@ class PMSFloor(models.Model):
         if id:
             property_obj = self.env['pms.properties']
             property_id = property_obj.browse(values['property_id'])
-            if property_id.api_integration == True:
+            if property_id.api_integration:
                 integ_obj = self.env['pms.api.integration'].search([])
                 api_line_ids = self.env['pms.api.integration.line'].search([
                     ('name', '=', "Floor")
                 ])
                 datas = api_rauth_config.APIData.get_data(
                     id, values, property_id, integ_obj, api_line_ids)
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    id.write({'is_api_post': True})
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        id.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -132,54 +133,56 @@ class PMSFloor(models.Model):
                 raise UserError(_("%s is already existed.") % (vals['code']))
         id = None
         id = super(PMSFloor, self).write(vals)
-        if id and self.property_id.api_integration == True:
+        if id and self.property_id.api_integration:
             property_id = self.property_id
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "Floor")
             ])
             if 'is_api_post' in vals:
-                if vals['is_api_post'] != True:
+                if vals['is_api_post']:
                     datas = api_rauth_config.APIData.get_data(
                         self, vals, property_id, integ_obj, api_line_ids)
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus'] == True:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        self.write({'is_api_post': True})
+                    if datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            self.write({'is_api_post': True})
             else:
                 datas = api_rauth_config.APIData.get_data(
                     self, vals, property_id, integ_obj, api_line_ids)
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    self.write({'is_api_post': True})
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        self.write({'is_api_post': True})
         return id
 
     @api.multi
     def unlink(self):
         if len(self) > 1:
             for line in self:
-                if line.active == True:
+                if line.active:
                     unit_ids = self.env['pms.space.unit'].search([
                         ('floor_id', '=', line.id)
                     ])
                     for unit in unit_ids:
-                        if unit.active == True:
+                        if unit.active:
                             raise UserError(
                                 _("Please Unactive of Space Unit %s with Floor Code (%s) of %s."
                                   ) % (unit.name, line.code, line.name))
         else:
-            if self.active == True:
+            if self.active:
                 unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
                                                                self.id)])
                 for unit in unit_ids:
-                    if unit.active == True:
+                    if unit.active:
                         raise UserError(
                             _("Please Unactive of Space Unit %s with Floor Code(%s) of %s."
                               ) % (unit.name, self.code, self.name))

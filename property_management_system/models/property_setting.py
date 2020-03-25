@@ -941,7 +941,7 @@ class Partner(models.Model):
                                     id.write({'is_api_post': True})
         return id
 
-    @api.multi
+    @api.one
     def write(self, vals):
         if 'name' in vals:
             crm_id = self.env['res.partner'].search([

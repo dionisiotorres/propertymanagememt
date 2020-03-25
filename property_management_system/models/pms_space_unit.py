@@ -313,13 +313,14 @@ class PMSSpaceUnit(models.Model):
                 ])
                 datas = api_rauth_config.APIData.get_data(
                     id, values, property_id, integ_obj, api_line_ids)
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus'] == True:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    id.write({'is_api_post': True})
+                if data != None:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus'] == True:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        id.write({'is_api_post': True})
                 if values['facility_line']:
                     for fl in values['facility_line'][0][2]:
                         values['create'] = True
@@ -334,14 +335,17 @@ class PMSSpaceUnit(models.Model):
                         datas = api_rauth_config.APIData.get_data(
                             id, values, property_objs, integ_objs,
                             api_type_objs)
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus'] == True:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            for fc in facility_id:
-                                                fc.write({'is_api_post': True})
+                        if data != None:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus'] == True:
+                                        if 'message' in response:
+                                            if response[
+                                                    'message'] == 'SUCCESS':
+                                                for fc in facility_id:
+                                                    fc.write(
+                                                        {'is_api_post': True})
         return id
 
     @api.multi
@@ -393,11 +397,12 @@ class PMSSpaceUnit(models.Model):
                 ])
                 datas = api_rauth_config.APIData.get_data(
                     self, val, property_ids, integ_obj, api_line_ids)
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if response['responseStatus'] == True and response[
-                            'message'] == 'SUCCESS':
-                        self.write({'is_api_post': True})
+                if data != None:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if response['responseStatus'] == True and response[
+                                'message'] == 'SUCCESS':
+                            self.write({'is_api_post': True})
                 if 'facility_line' in val:
                     if val['facility_line']:
                         for fl in val['facility_line'][0][2]:
@@ -413,14 +418,17 @@ class PMSSpaceUnit(models.Model):
                             datas = api_rauth_config.APIData.get_data(
                                 self, val, property_objs, integ_objs,
                                 api_type_objs)
-                            if datas.res:
-                                response = json.loads(datas.res)
-                                if 'responseStatus' in response:
-                                    if response['responseStatus'] == True:
-                                        if 'message' in response:
-                                            if response[
-                                                    'message'] == 'SUCCESS':
-                                                for fc in facility_id:
-                                                    fc.write(
-                                                        {'is_api_post': True})
+                            if data != None:
+                                if datas.res:
+                                    response = json.loads(datas.res)
+                                    if 'responseStatus' in response:
+                                        if response['responseStatus'] == True:
+                                            if 'message' in response:
+                                                if response[
+                                                        'message'] == 'SUCCESS':
+                                                    for fc in facility_id:
+                                                        fc.write({
+                                                            'is_api_post':
+                                                            True
+                                                        })
         return id

@@ -712,13 +712,40 @@ class PMSTownship(models.Model):
 #     name = fields.Char("State Name", required=True, track_visibility=True)
 #     code = fields.Char("State Code", required=True, track_visibility=True)
 
+# class CountryState(models.Model):
+#     _description = "Country state"
+#     _inherit = 'res.country.state'
+#     _order = 'code'
 
-class CountryState(models.Model):
-    _description = "Country state"
-    _inherit = 'res.country.state'
-    _order = 'code'
-    _sql_constraints = [('code_unique', 'unique(code)',
-                         'State Code is already existed.')]
+#     @api.model
+#     def create(self, values):
+#         if 'name' in values:
+#             state_id = self.env['res.country.state'].search([
+#                 ('name', '=', values['name']), ('code', '=', values['code']),
+#                 ('country_id', '=', values['country_id'])
+#             ])
+#             if state_id:
+#                 raise UserError(_("%s are already existed" % values['name']))
+#         result = super(CountryState, self).create(values)
+#         return result
+
+#     @api.multi
+#     def write(self, values):
+#         if 'name' in values:
+#             state_id = self.env['res.country.state'].search([('name', '=',
+#                                                               values['name'])])
+#             if state_id:
+#                 if 'code' in values:
+#                     for stid in state_id:
+#                         if values['code'] == stid.code:
+#                             if 'country_id' in values:
+#                                 if values[
+#                                         'country_id'] == state_id.country_id.id:
+#                                     raise UserError(
+#                                         _("%s are already existed" %
+#                                           values['name']))
+#         result = super(CountryState, self).write(values)
+#         return result
 
 
 class PMSCountry(models.Model):

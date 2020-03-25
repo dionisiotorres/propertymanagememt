@@ -610,6 +610,9 @@ class Company(models.Model):
                                     'category_id',
                                     track_visibility=True)
 
+    _sql_constraints = [('name_unique', 'unique(name)',
+                         'Your name is exiting in the database.')]
+
     def _get_company_address_fields(self, partner):
         return {
             'street': partner.street,
@@ -625,55 +628,55 @@ class Company(models.Model):
         for company in self:
             company.partner_id.township = company.township
 
-    @api.model
-    def create(self, vals):
-        # if vals.get('name'):
-        #     companyname = vals.get('name')
-        #     company_id = self.search([('name', '=', companyname)])
-        #     if company_id:
-        #         raise UserError(_("%s is already existed." % companyname))
-        if not vals.get('name') or vals.get('partner_id'):
-            self.clear_caches()
-            return super(Company, self).create(vals)
-        partner = self.env['res.partner'].create({
-            'name': vals['name'],
-            'is_company': True,
-            'image': vals.get('logo'),
-            'customer': False,
-            'email': vals.get('email'),
-            'phone': vals.get('phone'),
-            'website': vals.get('website'),
-            'vat': vals.get('vat'),
-        })
-        vals['partner_id'] = partner.id
-        self.clear_caches()
-        company = super(Company, self).create(vals)
-        # The write is made on the user to set it automatically in the multi company group.
-        self.env.user.write({'company_ids': [(4, company.id)]})
-        partner.write({'company_id': company.id})
+    # @api.model
+    # def create(self, vals):
+    #     # if vals.get('name'):
+    #     #     companyname = vals.get('name')
+    #     #     company_id = self.search([('name', '=', companyname)])
+    #     #     if company_id:
+    #     #         raise UserError(_("%s is already existed." % companyname))
+    #     if not vals.get('name') or vals.get('partner_id'):
+    #         self.clear_caches()
+    #         return super(Company, self).create(vals)
+    #     partner = self.env['res.partner'].create({
+    #         'name': vals['name'],
+    #         'is_company': True,
+    #         'image': vals.get('logo'),
+    #         'customer': False,
+    #         'email': vals.get('email'),
+    #         'phone': vals.get('phone'),
+    #         'website': vals.get('website'),
+    #         'vat': vals.get('vat'),
+    #     })
+    #     vals['partner_id'] = partner.id
+    #     self.clear_caches()
+    #     company = super(Company, self).create(vals)
+    #     # The write is made on the user to set it automatically in the multi company group.
+    #     self.env.user.write({'company_ids': [(4, company.id)]})
+    #     partner.write({'company_id': company.id})
 
-        # Make sure that the selected currency is enabled
-        if vals.get('currency_id'):
-            currency = self.env['res.currency'].browse(vals['currency_id'])
-            if not currency.active:
-                currency.write({'active': True})
-        return company
+    #     # Make sure that the selected currency is enabled
+    #     if vals.get('currency_id'):
+    #         currency = self.env['res.currency'].browse(vals['currency_id'])
+    #         if not currency.active:
+    #             currency.write({'active': True})
+    #     return company
 
-    @api.multi
-    def write(self, values):
-        self.clear_caches()
-        if values.get('name'):
-            companyname = values.get('name')
-            company_id = self.search([('name', '=', companyname)])
-            if company_id:
-                raise UserError(_("%s is already existed." % companyname))
-        # Make sure that the selected currency is enabled
-        if values.get('currency_id'):
-            currency = self.env['res.currency'].browse(values['currency_id'])
-            if not currency.active:
-                currency.write({'active': True})
+    # @api.multi
+    # def write(self, values):
+    #     self.clear_caches()
+    #     if values.get('name'):
+    #         companyname = values.get('name')
+    #         company_id = self.search([('name', '=', companyname)])
+    #         if company_id:
+    #             raise UserError(_("%s is already existed." % companyname))
+    #     # Make sure that the selected currency is enabled
+    #     if values.get('currency_id'):
+    #         currency = self.env['res.currency'].browse(values['currency_id'])
+    #         if not currency.active:
+    #             currency.write({'active': True})
 
-        return super(Company, self).write(values)
+    #     return super(Company, self).write(values)
 
 
 # class PMSTownship(models.Model):

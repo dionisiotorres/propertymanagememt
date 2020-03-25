@@ -169,7 +169,7 @@
             <field name="name">Zando Technology</field>
             <field name="partner_id" ref="base.main_partner"/>
             <field name="currency_id" ref="base.EUR"/>
-            <field name="image" type="base64" file="base/static/img/res_company_logo.png"/>
+            <!-- <field name="image" type="base64" file="base/static/img/res_company_logo.png"/> -->
             <field name="space_unit_code_format" ref="pms_format_id1"/>
             <field name="pos_id_format" ref="pms_format_id2"/>
             <field name="lease_agre_format_id" ref="pms_format_id3"/>

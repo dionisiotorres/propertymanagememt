@@ -8,20 +8,6 @@ from odoo import models, api
 
 
 class APIData:
-    # def __init__(self,
-    #              model_id=None,
-    #              values=None,
-    #              property_id=None,
-    #              integ_obj=None,
-    #              api_line_ids=None):
-    #     self.values = values
-    #     self.model_id = model_id
-    #     self.property_id = property_id
-    #     self.integ_obj = integ_obj
-    #     self.api_line_ids = api_line_ids
-    #     self.res = None
-    #     return self.get_data()
-
     def get_data(self, values, property_id, integ_obj, api_line_ids):
         self.values = values
         self.model_id = self

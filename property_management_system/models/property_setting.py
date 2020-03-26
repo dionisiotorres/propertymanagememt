@@ -145,7 +145,17 @@ class PMSRentSchedule(models.Model):
                                             if charge.unit_charge_line:
                                                 for ucl in charge.unit_charge_line:
                                                     if meter_amount > ucl.from_unit and meter_amount < ucl.to_unit:
-                                                        total_unit = meter_amount * ucl.rate
+                                                        total_unit += (
+                                                            meter_amount -
+                                                            ucl.from_unit -
+                                                            1) * ucl.rate
+                                                    elif meter_amount > ucl.from_unit and meter_amount > ucl.to_unit:
+                                                        total_unit += (
+                                                            ucl.to_unit -
+                                                            (ucl.from_unit +
+                                                             1)) * ucl.rate
+                                                    else:
+                                                        total_unit += total_unit
                                 else:
                                     total_unit = 0
                             if total_rate and not total_unit:

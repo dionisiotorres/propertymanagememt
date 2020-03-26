@@ -41,8 +41,6 @@ class PMSEquipment(models.Model):
         "Rollover Type",
         help='Which method will be use if equipment roll over.')
 
-    # _sql_constraints = [('name_unique', 'unique(name)', raise UserError(_('%s is already existed.' % self.name))]
-
     @api.multi
     def _get_count_facility(self):
         count = 0

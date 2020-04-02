@@ -117,6 +117,8 @@
                         <field name="end_date" />
                         <field name="extend_to" string="Extend To"/>
                         <field name="remark" />
+                        <field name="reconfig_date"/>
+                        <field name="reconfig_flag" attrs="{'invisible': [('reconfig_flag','!=', 'config')]}"/>
                       </tree>
                     </field>
                 </page>

@@ -72,6 +72,7 @@
         'views/pms_utilities_monthly_view.xml',
         'views/pms_rent_schedule.xml',
         'views/pms_lease_unit_pos_view.xml',
+        'views/unit_config_view.xml',
     ],
     'qweb': ['static/src/xml/*.xml'],
     'installable':

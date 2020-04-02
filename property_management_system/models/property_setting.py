@@ -239,9 +239,12 @@ class PMSRentSchedule(models.Model):
             ('property_id', '=', values['property_id']),
             ('unit_no', '=', values['unit_no']),
             ('lease_no', '=', values['lease_no']),
+            ('lease_agreement_line_id', '=',
+             values['lease_agreement_line_id']),
             ('charge_type', '=', values['charge_type']),
             ('start_date', '=', values['start_date']),
             ('end_date', '=', values['end_date']),
+            ('active', '=', True),
         ])
         if rentschedule_id:
             raise UserError(_("Rent Schedular is already existed."))

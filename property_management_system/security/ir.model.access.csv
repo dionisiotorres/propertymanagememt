@@ -85,3 +85,9 @@ access_pms_lease_interface_code,pms.lease.interface.code,model_pms_lease_interfa
 access_pms_lease_interface_code_manager,pms.lease.interface.code,model_pms_lease_interface_code,group_property_manager,1,1,1,1
 access_pms_unit_charge_line,pms.unit.charge.line,model_pms_unit_charge_line,group_property_user,1,1,1,1
 access_pms_unit_charge_line_manager,pms.unit.charge.line,model_pms_unit_charge_line,group_property_manager,1,1,1,1
+access_unit_config_user,unit.reconfig,model_unit_reconfig,group_property_user,1,1,1,1
+access_unit_config_manager,unit.reconfig,model_unit_reconfig,group_property_manager,1,1,1,1
+access_unit_config_expir_user,unit.reconfig.expiring,model_unit_reconfig_expiring,group_property_user,1,1,1,1
+access_unit_config_expir_manager,unit.reconfig.expiring,model_unit_reconfig_expiring,group_property_manager,1,1,1,1
+access_unit_config_new_user,unit.reconfig.new,model_unit_reconfig_new,group_property_user,1,1,1,1
+access_unit_config_new_manager,unit.reconfig.new,model_unit_reconfig_new,group_property_manager,1,1,1,1

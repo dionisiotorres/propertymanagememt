@@ -112,6 +112,10 @@ class PMSLeaseAgreement(models.Model):
     booking_date = fields.Date("Booking Date", required=True)
     booking_expdate = fields.Date("Booking ExpDate")
     is_api_post = fields.Boolean("Posted")
+    reconfig_flag = fields.Selection([("new", "N"), ("config", "C"),
+                                      ('survey', 'Y')],
+                                     default="new",
+                                     string="Reconfig Flag")
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -168,7 +172,7 @@ class PMSLeaseAgreement(models.Model):
             res['name'] = self.name
             res['lease_no'] = self.lease_no
             for line in self.lease_agreement_line:
-                if line.reconfig_flag != 'config':
+                if line.reconfig_flag not in ('config', 'survey'):
                     res['lease_agreement_line_id'] = res[
                         'lease_agreement_id'] = res['unit_no'] = res[
                             'extend_count'] = res['extend_to'] = None
@@ -209,7 +213,10 @@ class PMSLeaseAgreement(models.Model):
                                         if line.state == 'NEW':
                                             res['end_date'] = line.end_date
                                         elif line.state == 'EXTENDED':
-                                            res['end_date'] = line.extend_start
+                                            if line.start_date > line.extend_start:
+                                                res['end_date'] = line.start_date
+                                            else:
+                                                res['end_date'] = line.extend_start
                                         else:
                                             res['end_date'] = line.start_date
 
@@ -235,7 +242,10 @@ class PMSLeaseAgreement(models.Model):
                                         if line.state == 'NEW':
                                             res['end_date'] = line.end_date
                                         elif line.state == 'EXTENDED':
-                                            res['end_date'] = line.extend_start
+                                            if line.start_date > line.extend_start:
+                                                res['end_date'] = line.start_date
+                                            else:
+                                                res['end_date'] = line.extend_start
                                         else:
                                             res['end_date'] = line.start_date
                                     day, next_month_sdate = self.rent_schedule_calendar(
@@ -350,6 +360,8 @@ class PMSLeaseAgreement(models.Model):
                     res['end_date'] = res['end_date'] - relativedelta(days=1)
                     next_month_sdate = next_month_sdate + relativedelta(
                         months=1)
+                    if line.end_date <= res['end_date']:
+                        res['end_date'] = line.end_date
                     if bill_type == 'monthly':
                         res['billing_date'] = res['end_date']
                     if bill_type == 'quarterly':
@@ -428,15 +440,18 @@ class PMSLeaseAgreement(models.Model):
             elif line.state == 'EXTENDED' and line.extend_to >= res[
                     'end_date'] + relativedelta(days=2):
                 if not res['start_date']:
-                    next_month_sdate = line.extend_start + relativedelta(
-                        months=1)
+                    next_month_sdate = line.extend_start
+                    if line.start_date > line.extend_start:
+                        next_month_sdate = line.start_date
                 if next_month_sdate == line.extend_start:
                     res['start_date'] = next_month_sdate
                     res['end_date'] = next_month_sdate + relativedelta(
                         months=1)
-                    res['end_date'] = res['end_date'] - relativedelta(days=2)
+                    res['end_date'] = res['end_date'] - relativedelta(days=1)
                     next_month_sdate = next_month_sdate + relativedelta(
                         months=1)
+                    if line.extend_to > res['end_date']:
+                        res['end_date'] = line.extend_to
                     if bill_type == 'monthly':
                         res['billing_date'] = res['end_date']
                     if bill_type == 'quarterly':
@@ -448,19 +463,20 @@ class PMSLeaseAgreement(models.Model):
                     rent_scheobj.create(res)
                     day = 1
                 else:
-                    next_month_sdate = res['end_date']
                     res['start_date'] = next_month_sdate
                     res['end_date'] = next_month_sdate + relativedelta(
                         months=1)
                     res['end_date'] = res['end_date'] - relativedelta(days=1)
                     next_month_sdate = next_month_sdate + relativedelta(
                         months=1)
-                    if ctype.applicable_charge_id.billing_type == 'monthly':
+                    if line.extend_to < res['end_date']:
+                        res['end_date'] = line.extend_to
+                    if bill_type == 'monthly':
                         res['billing_date'] = res['end_date']
-                    if ctype.applicable_charge_id.billing_type == 'quarterly':
+                    if bill_type == 'quarterly':
                         res['billing_date'] = res['end_date'] + relativedelta(
                             months=2)
-                    if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                    if bill_type == 'semi-annualy':
                         res['billing_date'] = res['end_date'] + relativedelta(
                             months=5)
                     rent_scheobj.create(res)
@@ -506,6 +522,8 @@ class PMSLeaseAgreement(models.Model):
                         days=l_day - 1)
                     next_month_sdate = next_month_sdate + relativedelta(
                         days=l_day)
+                    if line.end_date <= res['end_date']:
+                        res['end_date'] = line.end_date
                     # if self.state == 'BOOKING' and res[
                     #         'end_date'] > line.end_date:
                     #     res['end_date'] = line.end_date
@@ -568,19 +586,75 @@ class PMSLeaseAgreement(models.Model):
                             months=5)
                     day = 1
                     rent_scheobj.create(res)
+            elif line.state == 'NEW' and line.extend_to:
+                if line.state == 'NEW' and line.end_date <= res[
+                        'end_date'] and line.extend_to >= res[
+                            'end_date'] + relativedelta(days=2):
+                    s_day = line.end_date.day
+                    last_day = calendar.monthrange(line.end_date.year,
+                                                   line.end_date.month)[1]
+                    if not res['start_date']:
+                        next_month_sdate = line.end_date
+                    if next_month_sdate == line.end_date:
+                        res['start_date'] = next_month_sdate + relativedelta(
+                            days=1)
+                        res['end_date'] = next_month_sdate + relativedelta(
+                            days=last_day - s_day)
+                        next_month_sdate = next_month_sdate + relativedelta(
+                            days=(last_day - s_day) + 1)
+                        if bill_type == 'monthly':
+                            res['billing_date'] = res['end_date']
+                        if bill_type == 'quarterly':
+                            res['billing_date'] = res[
+                                'end_date'] + relativedelta(months=2)
+                        if bill_type == 'semi-annualy':
+                            res['billing_date'] = res[
+                                'end_date'] + relativedelta(months=5)
+                        day = 1
+                        rent_scheobj.create(res)
+                    else:
+                        res['start_date'] = next_month_sdate
+                        l_day = calendar.monthrange(next_month_sdate.year,
+                                                    next_month_sdate.month)[1]
+                        res['end_date'] = res['end_date'] + relativedelta(
+                            days=l_day)
+                        next_month_sdate = next_month_sdate + relativedelta(
+                            days=l_day)
+                        if line.extend_to < res['end_date']:
+                            res['end_date'] = line.extend_to
+                        if bill_type == 'monthly':
+                            res['billing_date'] = res['end_date']
+                        if bill_type == 'quarterly':
+                            res['billing_date'] = res[
+                                'end_date'] + relativedelta(months=2)
+                        if bill_type == 'semi-annualy':
+                            res['billing_date'] = res[
+                                'end_date'] + relativedelta(months=5)
+                        day = 1
+                        rent_scheobj.create(res)
             elif line.state == 'EXTENDED' and line.extend_to >= res[
                     'end_date'] + relativedelta(days=2):
-                s_day = line.extend_start.day
-                last_day = calendar.monthrange(line.extend_start.year,
-                                               line.extend_start.month)[1]
+                s_day = 0
+                last_day = 0
+                line_date = False
                 if not res['start_date']:
                     next_month_sdate = line.extend_start
-                if next_month_sdate == line.extend_start:
-                    res['start_date'] = next_month_sdate
+                    line_date = line.extend_start
+                    if line.extend_start < line.start_date:
+                        next_month_sdate = line.start_date - relativedelta(
+                            days=1)
+                        line_date = line.start_date - relativedelta(days=1)
+                if next_month_sdate == line_date:
+                    res['start_date'] = next_month_sdate + relativedelta(
+                        days=1)
+                    s_day = res['start_date'].day
+                    last_day = calendar.monthrange(res['start_date'].year,
+                                                   res['start_date'].month)[1]
+                    ext_day = last_day - s_day
                     res['end_date'] = res['end_date'] + relativedelta(
-                        days=last_day - s_day)
+                        days=(ext_day) if s_day > 1 else last_day - 1)
                     next_month_sdate = next_month_sdate + relativedelta(
-                        days=(last_day - s_day) + 1)
+                        days=(ext_day) if s_day > 1 else last_day + 1)
                     if bill_type == 'monthly':
                         res['billing_date'] = res['end_date']
                     if bill_type == 'quarterly':
@@ -597,6 +671,10 @@ class PMSLeaseAgreement(models.Model):
                                                 next_month_sdate.month)[1]
                     res['end_date'] = res['end_date'] + relativedelta(
                         days=l_day)
+                    next_month_sdate = next_month_sdate + relativedelta(
+                        days=l_day)
+                    if line.extend_to < res['end_date']:
+                        res['end_date'] = line.extend_to
                     if self.state == 'BOOKING' and res[
                             'end_date'] > line.end_date:
                         res['end_date'] = line.end_date
@@ -605,12 +683,12 @@ class PMSLeaseAgreement(models.Model):
                     if self.state == 'EXTENDED' and res[
                             'end_date'] > line.extend_to:
                         res['end_date'] = line.extend_to
-                    if ctype.applicable_charge_id.billing_type == 'monthly':
+                    if bill_type == 'monthly':
                         res['billing_date'] = res['end_date']
-                    if ctype.applicable_charge_id.billing_type == 'quarterly':
+                    if bill_type == 'quarterly':
                         res['billing_date'] = res['end_date'] + relativedelta(
                             months=2)
-                    if ctype.applicable_charge_id.billing_type == 'semi-annualy':
+                    if bill_type == 'semi-annualy':
                         res['billing_date'] = res['end_date'] + relativedelta(
                             months=5)
                     rent_scheobj.create(res)
@@ -1288,7 +1366,8 @@ class PMSLeaseAgreementLine(models.Model):
                                            "Lease Unit POS")
     is_api_post = fields.Boolean("Posted")
 
-    reconfig_flag = fields.Selection([("new", "N"), ("config", "C")],
+    reconfig_flag = fields.Selection([("new", "N"), ("config", "C"),
+                                      ('survey', 'Y')],
                                      string="Reconfig Flag")
     reconfig_date = fields.Date("Reconfig Date")
 

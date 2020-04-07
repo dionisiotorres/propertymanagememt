@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.6',
+    '1.0.7',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -73,6 +73,7 @@
         'views/pms_rent_schedule.xml',
         'views/pms_lease_unit_pos_view.xml',
         'views/unit_config_view.xml',
+        'views/unit_survey_view.xml',
     ],
     'qweb': ['static/src/xml/*.xml'],
     'installable':

@@ -48,6 +48,7 @@
                   <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['EXTENDED','TERMINATED'])],'readonly':[('state','in',['EXTENDED','TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
                   <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','TERMINATED'])], 'readonly':[('state','in',['TERMINATED'])]}"/>
+                  <field name="reconfig_flag" attrs="{'invisible':[('reconfig_flag','not in',['survey'])]}"/>
               </group>
             </group>
             <notebook>

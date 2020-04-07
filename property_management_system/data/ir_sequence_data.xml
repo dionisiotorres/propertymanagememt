@@ -22,5 +22,12 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+         <record id="seq_unit_resurvey" model="ir.sequence">
+            <field name="name">Unit Resurvey</field>
+            <field name="code">unit.resurvey</field>
+            <field name="prefix">URSV/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

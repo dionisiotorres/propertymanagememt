@@ -103,8 +103,9 @@ class PMSSpaceUnit(models.Model):
     active = fields.Boolean("Active", default=True)
     is_api_post = fields.Boolean("Posted")
     meter_no = fields.Char("Meters", compute="get_meter_no", readonly=True)
-    config_flag = fields.Selection([('new', 'N'), ("config", "C")],
-                                   "Config Flag")
+    config_flag = fields.Selection([('new', 'N'), ('config', 'C'),
+                                    ('survey', 'S')], "Config Flag")
+    resurvey_date = fields.Date("Resurvey Date")
 
     @api.multi
     @api.onchange('end_date')

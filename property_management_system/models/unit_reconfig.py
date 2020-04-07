@@ -8,7 +8,7 @@ class UnitReconfig(models.Model):
         if not self.company_id:
             return self.env.user.company_id
 
-    name = fields.Char("Name", readonly=True)
+    name = fields.Char("Name", readonly=True, store=True)
     property_id = fields.Many2one("pms.properties", "Property")
     reconfig_date = fields.Date("Reconfig Date")
     remark = fields.Text("Remark")
@@ -44,7 +44,8 @@ class UnitReconfig(models.Model):
         leaseline_id = None
         leaseline_id = self.env['pms.lease_agreement.line'].search([
             ('unit_no', '=', unit.id),
-            ('state', 'not in', ['BOOKING', 'CANCELLED', 'EXPIRED'])
+            ('state', 'not in',
+             ['BOOKING', 'CANCELLED', 'EXPIRED', 'TERMINATED'])
         ])
         if leaseline_id:
             leaseline_id.write({

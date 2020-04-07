@@ -1,6 +1,6 @@
 <odoo>
     <data>
-        <record model="ir.ui.view" id="view_unit_form">
+        <record model="ir.ui.view" id="view_unit_reconfig_form">
         <field name="name">Unit Reconfig Form</field>
         <field name="model">unit.reconfig</field>
         <field name="arch" type="xml">
@@ -16,7 +16,6 @@
                             <field name="name"/>
                             <field name="property_id" options="{'no_create': True,'no_quick_edit':True, 'no_open': True}"/>
                             <field name="reconfig_date"/>
-                            <!-- <field name="lease_agreement_id" string="Reconfig Lease" options="{'no_create': True,'no_quick_edit':True, 'no_open': True}"/> -->
                             <field name="remark"/>
                             <field name="company_id" invisible="1"/>
                         </group> 

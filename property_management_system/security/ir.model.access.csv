@@ -91,3 +91,5 @@ access_unit_config_expir_user,unit.reconfig.expiring,model_unit_reconfig_expirin
 access_unit_config_expir_manager,unit.reconfig.expiring,model_unit_reconfig_expiring,group_property_manager,1,1,1,1
 access_unit_config_new_user,unit.reconfig.new,model_unit_reconfig_new,group_property_user,1,1,1,1
 access_unit_config_new_manager,unit.reconfig.new,model_unit_reconfig_new,group_property_manager,1,1,1,1
+access_unit_resurvey_user,unit.resurvey,model_unit_resurvey,group_property_user,1,1,1,1
+access_unit_resurvey_manager,unit.resurvey,model_unit_resurvey,group_property_manager,1,1,1,1

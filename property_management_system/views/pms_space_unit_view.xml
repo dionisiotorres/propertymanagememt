@@ -38,6 +38,7 @@
                   <field name="start_date"/>
                   <field name="end_date"/>
                   <field name="meter_no" invisible='1'/>
+                  <field name="resurvey_date" attrs="{'invisible':[('config_flag','not in',['survey'])]}"/>
                   <field name="active"/>
                   <field name="remark"/>
                 </group>

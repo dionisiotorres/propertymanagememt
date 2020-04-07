@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class UnitReconfig(models.Model):
     _name = "unit.reconfig"
+    _description = "Unit Reconfig"
 
     def _default_company_id(self):
         if not self.company_id:
@@ -154,6 +155,7 @@ class UnitReconfig(models.Model):
 
 class UnitReconfigExpiring(models.Model):
     _name = "unit.reconfig.expiring"
+    _description = "Unit Reconfig Expiring"
 
     unit_id = fields.Many2one("pms.space.unit", "Unit")
     floor_id = fields.Many2one("pms.floor",
@@ -183,6 +185,7 @@ class UnitReconfigExpiring(models.Model):
 
 class UnitConfigNew(models.Model):
     _name = "unit.reconfig.new"
+    _description = "Unit Reconfig New"
 
     unit_id = fields.Many2one("pms.space.unit",
                               "Unit",

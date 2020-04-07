@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class UnitResurvey(models.Model):
     _name = "unit.resurvey"
+    _description = "Unit Resurvey"
 
     def _default_company_id(self):
         if not self.company_id:

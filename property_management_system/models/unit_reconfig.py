@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class UnitReconfig(models.Model):
@@ -17,9 +18,9 @@ class UnitReconfig(models.Model):
                               ("done", "Done")],
                              string="Status",
                              default="draft")
-    unit_expring_id = fields.One2many("unit.reconfig.expiring",
-                                      "unitreconfig_id",
-                                      string="Expiring Unit")
+    unit_expiring_id = fields.One2many("unit.reconfig.expiring",
+                                       "unitreconfig_id",
+                                       string="Expiring Unit")
     unit_new_id = fields.One2many("unit.reconfig.new", "unitreconfig_id",
                                   "New Unit")
     company_id = fields.Many2one("res.company",
@@ -29,16 +30,20 @@ class UnitReconfig(models.Model):
                                          "Lease Agreement")
 
     def action_reconfig(self):
-        if self.unit_expring_id:
-            for exp in self.unit_expring_id:
+        if self.unit_expiring_id:
+            for exp in self.unit_expiring_id:
                 unit = exp.unit_id
                 end_date = exp.end_date
                 self.update_leaseitem(unit, end_date)
+        else:
+            raise UserError(_("Expiring unit must have."))
         if self.unit_new_id:
             for new in self.unit_new_id:
                 unit = new.unit_id
                 end_date = new.end_date
                 self.insert_newleaseitem(unit, end_date)
+        else:
+            raise UserError(_("New unit must have."))
         self.write({'state': 'reconfig'})
 
     def update_leaseitem(self, unit, end_date):
@@ -66,8 +71,8 @@ class UnitReconfig(models.Model):
         leaseline_id = leaseline_obj.search([('unit_no', '=', unit.id)])
         if not leaseline_id:
             exist_unit = None
-            if self.unit_expring_id:
-                for unexp in self.unit_expring_id:
+            if self.unit_expiring_id:
+                for unexp in self.unit_expiring_id:
                     exist_unit = unexp.unit_id.id
             leaseline_id = leaseline_obj.search([('unit_no', '=', exist_unit),
                                                  ('state', 'in',
@@ -77,6 +82,7 @@ class UnitReconfig(models.Model):
                     default={
                         'unit_no': unit.id,
                         'start_date': end_date,
+                        'reconfig_date': False,
                         'reconfig_flag': 'new',
                     })
                 if leaseline_id.applicable_type_line_id:
@@ -96,8 +102,8 @@ class UnitReconfig(models.Model):
     def action_done(self):
         if self.lease_agreement_id:
             for lease in self.lease_agreement_id:
-                if self.unit_expring_id:
-                    for line in self.unit_expring_id:
+                if self.unit_expiring_id:
+                    for line in self.unit_expiring_id:
                         unexp = line.unit_id.id
                         lease_exist_id = lease.lease_agreement_line.search([
                             ('unit_no', '=', unexp),
@@ -117,6 +123,19 @@ class UnitReconfig(models.Model):
                                         ('end_date', '<=',
                                          lease_exist_id.end_date)
                                     ])
+                                new_sch_id = self.env[
+                                    'pms.rent_schedule'].search([
+                                        ('unit_no', '=', unexp),
+                                        ('charge_type', '=',
+                                         charge.applicable_charge_id.id),
+                                        ('lease_agreement_line_id', '=',
+                                         lease_exist_id.id),
+                                        ('start_date', '<', line.end_date),
+                                        ('end_date', '>', line.end_date)
+                                    ])
+                                if new_sch_id:
+                                    new_sch_id.write(
+                                        {'end_date': line.end_date})
                             if lease_exist_id.state == 'EXTENDED':
                                 rent_ids = self.env[
                                     'pms.rent_schedule'].search([
@@ -127,8 +146,21 @@ class UnitReconfig(models.Model):
                                          lease_exist_id.id),
                                         ('start_date', '>=', line.end_date),
                                         ('end_date', '<=',
-                                         lease_exist_id.end_date)
+                                         lease_exist_id.extend_to)
                                     ])
+                                ext_sch_id = self.env[
+                                    'pms.rent_schedule'].search([
+                                        ('unit_no', '=', unexp),
+                                        ('charge_type', '=',
+                                         charge.applicable_charge_id.id),
+                                        ('lease_agreement_line_id', '=',
+                                         lease_exist_id.id),
+                                        ('start_date', '<', line.end_date),
+                                        ('end_date', '>', line.end_date)
+                                    ])
+                                if ext_sch_id:
+                                    ext_sch_id.write(
+                                        {'end_date': line.end_date})
                             for rent in rent_ids:
                                 rent.write({'active': False})
             lease_new_id = None
@@ -150,7 +182,17 @@ class UnitReconfig(models.Model):
             else:
                 vals['name'] = self.env['ir.sequence'].next_by_code(
                     'unit.reconfig') or _('New')
+        if 'unit_expiring_id' not in vals:
+            raise UserError(_("Expiring unit must have."))
+        if 'unit_new_id' not in vals:
+            raise UserError(_("New unit must have at least one."))
         return super(UnitReconfig, self).create(vals)
+
+    @api.multi
+    def unlink(self):
+        if self.state in ('reconfig', 'done'):
+            raise ValidationError(_("Can delete in only draft. "))
+        return super(UnitReconfig, self).unlink()
 
 
 class UnitReconfigExpiring(models.Model):
@@ -182,6 +224,13 @@ class UnitReconfigExpiring(models.Model):
             domain = {'unit_id': [('id', 'in', units)]}
         return {'domain': domain}
 
+    @api.multi
+    def unlink(self):
+        if self.unitreconfig_id:
+            if self.unitreconfig_id.state in ('reconfig', 'done'):
+                raise ValidationError(_("Can delete in only draft. "))
+            return super(UnitReconfigExpiring, self).unlink()
+
 
 class UnitConfigNew(models.Model):
     _name = "unit.reconfig.new"
@@ -201,3 +250,10 @@ class UnitConfigNew(models.Model):
     area = fields.Float("Area", related="unit_id.area", readonly=True)
     end_date = fields.Date("End Date")
     unitreconfig_id = fields.Many2one("unit.reconfig", "Unit Reconfig")
+
+    @api.multi
+    def unlink(self):
+        if self.unitreconfig_id:
+            if self.unitreconfig_id.state in ('reconfig', 'done'):
+                raise ValidationError(_("Can delete in only draft. "))
+            return super(UnitConfigNew, self).unlink()

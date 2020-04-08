@@ -55,9 +55,9 @@
                 <field name="property_id"/>
                 <field name="resurveyunit_id"/>
                 <field name="resurvey_date"/>
-                <field name="remark"/>
-                <field name="newunit_id"/>
                 <field name="unactive_date"/>
+                <field name="newunit_id"/>
+                <field name="remark"/>
                 <field name="state" invisible="1"/>
             </tree>
         </field>

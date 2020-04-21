@@ -2,7 +2,7 @@ import datetime
 from odoo import api, fields, models, tools, _
 
 
-class PMSLeaseCancelWizard(models.TransientModel):
+class PMSLeaseActivateWizard(models.TransientModel):
     _name = "pms.lease.activate.wizard"
     _description = "Activate Wizard"
 

@@ -256,6 +256,7 @@ class PMSLeaseAgreement(models.Model):
                                           ))
                     if line.property_id:
                         property_id = line.property_id
+                        leasepos_no_pre = ''
                         if property_id.is_autogenerate_posid:
                             for prop in property_id:
                                 if not prop.pos_id_format:
@@ -296,7 +297,6 @@ class PMSLeaseAgreement(models.Model):
                                                 ).strftime("%Y")
                                                 val.append(yrs)
                                     space = []
-                                    leasepos_no_pre = ''
                                     if len(val) > 0:
                                         for l in range(len(val)):
                                             leasepos_no_pre += str(val[l])

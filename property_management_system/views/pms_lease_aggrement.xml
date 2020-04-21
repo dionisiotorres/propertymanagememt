@@ -265,6 +265,15 @@
        <field name="view_id" ref="view_lease_agreement_tree"/> 
        <field name="search_view_id" ref="view_lease_agreement_filter"/>
     </record>
+    <menuitem  id="zpms_report_menu" 
+      name="Reports" 
+      parent="pms_properties_menu_root"
+      sequence="10"/>
+    <menuitem  id="lease_management_report_menu" 
+      name="Lease Report" 
+      parent="zpms_report_menu"
+      action= "action_lease_report_wizrd"
+      sequence="10"/>
     <menuitem  id="lease_management_menu_sub" 
       name="Lease Management" 
       parent="pms_properties_menu_root"

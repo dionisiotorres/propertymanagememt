@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.9',
+    '1.0.8',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -32,6 +32,7 @@
         'wizard/pms_generate_rent_schedule_view.xml',
         'wizard/pms_activate_wizard_view.xml',
         'wizard/pms_terminate_wizard_view.xml',
+        'wizard/pms_lease_report_wizard_view.xml',
         'data/pms.utilities.supply.type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
@@ -74,6 +75,8 @@
         'views/pms_lease_unit_pos_view.xml',
         'views/unit_config_view.xml',
         'views/unit_survey_view.xml',
+        'views/pms_lease_agreement_report.xml',
+        'reports/pms_lease_template.xml',
     ],
     'qweb': ['static/src/xml/*.xml'],
     'installable':

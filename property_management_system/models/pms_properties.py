@@ -225,15 +225,10 @@ class PMSProperties(models.Model):
         track_visibility=True,
     )
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
-    # company_id = fields.Many2one('res.partner',
-    #                              "Company",
-    #                              default=lambda self: self.env.user.company_id,
-    #                              readonly=True,
-    #                              required=True,
-    #                              store=True)
-
-    # next_pos_id = fields.Char("Next Pos ID")
     is_api_post = fields.Boolean("Posted")
+    api_integration_id = fields.Many2one("pms.api.integration", "API Provider")
+    meter_type = fields.Selection([('SHARED','Shared'),('NORMAL','Normal')], string="Meter Type", default="NORMAL")
+
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
@@ -304,21 +299,22 @@ class PMSProperties(models.Model):
         property_id = self.search([('api_integration', '=', True),
                                    ('is_api_post', '=', False)])
         if property_id:
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "Property")
-            ])
-            datas = api_rauth_config.APIData.get_data(property_id, values,
-                                                      property_id, integ_obj,
-                                                      api_line_ids)
-            if datas.res:
-                response = json.loads(datas.res)
-                if 'responseStatus' in response:
-                    if response['responseStatus'] == True:
-                        if 'message' in response:
-                            if response['message'] == 'SUCCESS':
-                                for pl in property_id:
-                                    pl.write({'is_api_post': True})
+            if property_id.api_integration_id:
+                integ_obj = property_id.api_integration_id
+                integ_line_obj = integ_obj.api_integration_line
+                api_line_ids = integ_line_obj.search([('name', '=', "Property")
+                                                      ])
+                datas = api_rauth_config.APIData.get_data(
+                    property_id, values, property_id, integ_obj, api_line_ids)
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus'] == True:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        for pl in property_id:
+                                            pl.write({'is_api_post': True})
 
     @api.model
     def create(self, values):
@@ -333,20 +329,22 @@ class PMSProperties(models.Model):
         if id:
             property_id = None
             if values['api_integration']:
-                integ_obj = self.env['pms.api.integration'].search([])
-                api_line_ids = self.env['pms.api.integration.line'].search([
-                    ('name', '=', "Property")
-                ])
-                datas = api_rauth_config.APIData.get_data(
-                    id, values, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        id.write({'is_api_post': True})
+                if values['api_integration_id']:
+                    integ_obj = self.env['pms.api.integration'].browse(
+                        values['api_integration_id'])
+                    integ_line_obj = integ_obj.api_integration_line
+                    api_line_ids = integ_line_obj.search([('name', '=',
+                                                           "Property")])
+                    datas = api_rauth_config.APIData.get_data(
+                        id, values, property_id, integ_obj, api_line_ids)
+                    if datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            id.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -361,12 +359,26 @@ class PMSProperties(models.Model):
         id = super(PMSProperties, self).write(vals)
         if id and self.api_integration == True:
             property_id = self
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "Property")
-            ])
-            if 'is_api_post' in vals:
-                if vals['is_api_post']:
+            if self.api_integration_id:
+                integ_obj = self.api_integration_id
+                integ_line_obj = integ_obj.api_integration_line
+                api_line_ids = integ_line_obj.search([('name', '=', "Property")
+                                                      ])
+                if 'is_api_post' in vals:
+                    if vals['is_api_post']:
+                        datas = api_rauth_config.APIData.get_data(
+                            self, vals, property_id, integ_obj, api_line_ids)
+                        if datas:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus']:
+                                        if 'message' in response:
+                                            if response[
+                                                    'message'] == 'SUCCESS':
+                                                self.write(
+                                                    {'is_api_post': True})
+                else:
                     datas = api_rauth_config.APIData.get_data(
                         self, vals, property_id, integ_obj, api_line_ids)
                     if datas:
@@ -377,16 +389,5 @@ class PMSProperties(models.Model):
                                     if 'message' in response:
                                         if response['message'] == 'SUCCESS':
                                             self.write({'is_api_post': True})
-            else:
-                datas = api_rauth_config.APIData.get_data(
-                    self, vals, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        self.write({'is_api_post': True})
 
         return super(PMSProperties, self).write(vals)

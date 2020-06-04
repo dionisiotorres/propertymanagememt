@@ -201,30 +201,32 @@ class PMSRentSchedule(models.Model):
 
     def rent_schedule_schedular(self):
         values = None
-        property_ids = []
-        property_id = self.env['pms.properties'].search([('api_integration',
-                                                          '=', True)])
-        for pro in property_id:
-            property_ids.append(pro.id)
-        lease_ids = self.search([('is_api_post', '=', False),
-                                 ('property_id', 'in', property_ids)])
-        if lease_ids:
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "RentSchedule")
-            ])
-            datas = api_rauth_config.APIData.get_data(lease_ids, values,
-                                                      property_id, integ_obj,
-                                                      api_line_ids)
-            if datas:
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus']:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    for lid in lease_ids:
-                                        lid.write({'is_api_post': True})
+        property_id = None
+        property_ids = self.env['pms.properties'].search([
+            ('api_integration', '=', True), ('api_integration_id', '!=', False)
+        ])
+        for pro in property_ids:
+            property_id = pro
+            lease_ids = self.search([('is_api_post', '=', False),
+                                    ('property_id', '=', property_id.id)])
+            if lease_ids:
+                integ_obj = property_id.api_integration_id
+                integ_line_obj = integ_obj.api_integration_line
+                api_line_ids = integ_line_obj.search([
+                    ('name', '=', "RentSchedule")
+                ])
+                datas = api_rauth_config.APIData.get_data(lease_ids, values,
+                                                        property_id, integ_obj,
+                                                        api_line_ids)
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        for lid in lease_ids:
+                                            lid.write({'is_api_post': True})
 
     @api.multi
     def toggle_active(self):
@@ -908,6 +910,7 @@ class Partner(models.Model):
             partner_id.append(cpid.partner_id.id)
         crmaccount_ids = self.search([('is_api_post', '=', False),
                                       ('is_company', '=', True),
+                                      ('company_channel_type', '!=', False),
                                       ('id', 'not in', partner_id)])
         if crmaccount_ids:
             integ_obj = self.env['pms.api.integration'].search([])
@@ -938,20 +941,21 @@ class Partner(models.Model):
         id = super(Partner, self).create(values)
         if id and id.is_company:
             property_id = None
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "CRMAccount")
-            ])
-            datas = api_rauth_config.APIData.get_data(id, values, property_id,
-                                                      integ_obj, api_line_ids)
-            if datas:
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus']:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    id.write({'is_api_post': True})
+            if id.company_channel_type:
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "CRMAccount")
+                ])
+                datas = api_rauth_config.APIData.get_data(
+                    id, values, property_id, integ_obj, api_line_ids)
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        id.write({'is_api_post': True})
         return id
 
     @api.one
@@ -967,14 +971,14 @@ class Partner(models.Model):
                             _("%s is already existed" % vals['name']))
         id = None
         id = super(Partner, self).write(vals)
-        if self.is_company:
+        if self.is_company and self.company_channel_type:
             property_id = None
             integ_obj = self.env['pms.api.integration'].search([])
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
             if 'is_api_post' in vals:
-                if vals['is_api_post']:
+                if not vals['is_api_post']:
                     datas = api_rauth_config.APIData.get_data(
                         self, vals, property_id, integ_obj, api_line_ids)
                     if datas:
@@ -985,6 +989,8 @@ class Partner(models.Model):
                                     if 'message' in response:
                                         if response['message'] == 'SUCCESS':
                                             self.write({'is_api_post': True})
+                else:
+                    datas = None
             else:
                 datas = api_rauth_config.APIData.get_data(
                     self, vals, property_id, integ_obj, api_line_ids)

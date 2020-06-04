@@ -1,0 +1,51 @@
+ <!-- <group>
+              <group>
+                 <field name="web_site_url" widget="url"/>
+                 <field name="api_url" widget="url"/>
+                 <field name="ws_url" widget="url"/>
+                 <field name="currency_id"/>
+              </group>
+              <group>
+                  <div style="width:100%;">
+                   <group colspan="2">
+                    <field name="auto_generate_posid"/>
+                    <field name="next_pos_id"/>
+                    <field name="mobile_start_reading_date"/>
+                  </group>
+                  </div>
+                  <group colspan="2">
+                  <div style="width:100%;">
+                  <div class="check_box_container">
+                    <div>
+                      <field name="wm_type" style="display:inline-block;"/>
+                      <div style="display:inline-block;">
+                        <label for="sub_type" string="WM" style="display:inline-block;"/>
+                      </div>  
+                    </div>
+                    <div>
+                      <field name="gm_type" style="display:inline-block;"/>
+                     <div style="display:inline-block;">
+                        <label for="sub_type" string="GM" style="display:inline-block;"/>
+                     </div>  
+                    </div>
+                    <div>
+                      <field name="epc_type" style="display:inline-block;"/>
+                      <div style="display:inline-block;">
+                        <label for="sub_type" string="EPC" style="display:inline-block;"/>
+                      </div>                      
+                    </div>
+                    <div>
+                      <field name="sub_type" style="display:inline-block;"/>
+                      <div style="display:inline-block;">
+                        <label for="sub_type" string="SUB" style="display:inline-block;"/>
+                      </div>
+                    </div>
+                    <div>
+                      <field name="gen_type" style="display:inline-block;"/>
+                      <label for="gen_type" string="GEN" style="display:inline-block;"/>
+                    </div>
+                  </div>
+                  </div>
+                </group>
+              </group>
+            </group> -->

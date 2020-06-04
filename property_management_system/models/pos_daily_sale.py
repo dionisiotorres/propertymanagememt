@@ -45,7 +45,7 @@ class POSDailySale(models.Model):
                 code = sid['propertyCode']
                 currency_id = self.env['res.currency'].search([
                     ('name', '=', sid['currency'])
-                ]).id
+                ]).name
                 b_date = str(sid['businessDate'][0] + sid['businessDate'][1] +
                              sid['businessDate'][2] + sid['businessDate'][3]
                              ) + '-' + str(sid['businessDate'][4] +

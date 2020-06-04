@@ -114,32 +114,37 @@ class PMSLeaseUnitPos(models.Model):
         values = None
         property_id = None
         leaseposids = []
-        leaseipos_ids = self.search([('is_api_post', '=', False),
-                                     ('leaseagreementitem_id', '!=', None)])
-        for lp in leaseipos_ids:
-            if lp.leaseagreementitem_id.property_id.api_integration == True:
-                property_id = lp.leaseagreementitem_id.property_id
-                leaseposids.append(lp.id)
-        print(leaseposids)
-        leaseipos_api_id = self.search([('is_api_post', '=', False),
-                                        ('id', 'in', leaseposids)])
-        if leaseipos_api_id:
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "Leaseunitpos")
-            ])
-            datas = api_rauth_config.APIData.get_data(leaseipos_api_id, values,
-                                                      property_id, integ_obj,
-                                                      api_line_ids)
-            if datas:
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus']:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    for lup in leaseipos_api_id:
-                                        lup.write({'is_api_post': True})
+        property_ids = self.env['pms.properties'].search([
+            ('api_integration', '=', True), ('api_integration_id', '!=', False)
+        ])
+        for pro in property_ids:
+            leaseipos_ids = self.search([('is_api_post', '=', False),
+                                         ('leaseagreementitem_id', '!=', None),
+                                         ('property_id', '=', pro.id)])
+            if leaseipos_ids:
+                for lp in leaseipos_ids:
+                    property_id = lp.leaseagreementitem_id.property_id
+                    leaseposids.append(lp.id)
+                leaseipos_api_id = self.search([('is_api_post', '=', False),
+                                                ('id', 'in', leaseposids)])
+                if leaseipos_api_id:
+                    integ_obj = property_id.api_integration_id
+                    integ_line_obj = integ_obj.api_integration_line
+                    api_line_ids = integ_line_obj.search([('name', '=',
+                                                           "Leaseunitpos")])
+                    datas = api_rauth_config.APIData.get_data(
+                        leaseipos_api_id, values, property_id, integ_obj,
+                        api_line_ids)
+                    if datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            for lup in leaseipos_api_id:
+                                                lup.write(
+                                                    {'is_api_post': True})
 
 
 class PMSLeaseInterfaceCode(models.Model):

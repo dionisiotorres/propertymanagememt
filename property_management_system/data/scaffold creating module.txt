@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Odoo 12.0\python\python.exe" "C:\Program Files (x86)\Odoo 12.0\server\odoo-bin" scaffold module testing "D:\odoo-12.0.post20190313"

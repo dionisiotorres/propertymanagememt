@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.8',
+    '1.0.9',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -78,7 +78,10 @@
         'views/pms_lease_agreement_report.xml',
         'reports/pms_lease_template.xml',
     ],
-    'qweb': ['static/src/xml/*.xml'],
+    'qweb': [
+        'static/src/xml/datepicker.xml',
+        # 'static/src/xml/property_menu_template.xml',
+        ],
     'installable':
     True,
     'application':

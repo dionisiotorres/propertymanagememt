@@ -232,26 +232,27 @@ class PMSSpaceUnit(models.Model):
         property_id = self.env['pms.properties'].search([('api_integration',
                                                           '=', True)])
         for pro in property_id:
-            property_ids.append(pro.id)
-        spaceunit_ids = self.search([('is_api_post', '=', False),
-                                     ('property_id', 'in', property_ids)])
-        if spaceunit_ids:
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "SpaceUnit")
-            ])
-            datas = api_rauth_config.APIData.get_data(spaceunit_ids, values,
-                                                      property_id, integ_obj,
-                                                      api_line_ids)
-            if datas:
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus']:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    for fc in spaceunit_ids:
-                                        fc.write({'is_api_post': True})
+            property_ids = pro
+            spaceunit_ids = self.search([('is_api_post', '=', False),
+                                         ('property_id', '=', property_ids.id)
+                                         ])
+            if spaceunit_ids:
+                integ_obj = property_ids.api_integration_id
+                integ_line_obj = integ_obj.api_integration_line
+                api_line_ids = integ_line_obj.search([('name', '=',
+                                                       "SpaceUnit")])
+                datas = api_rauth_config.APIData.get_data(
+                    spaceunit_ids, values, property_id, integ_obj,
+                    api_line_ids)
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        for fc in spaceunit_ids:
+                                            fc.write({'is_api_post': True})
 
     @api.model
     def create(self, values):
@@ -310,45 +311,47 @@ class PMSSpaceUnit(models.Model):
             property_obj = self.env['pms.properties']
             property_id = property_obj.browse(values['property_id'])
             if property_id.api_integration:
-                integ_obj = self.env['pms.api.integration'].search([])
-                api_line_ids = self.env['pms.api.integration.line'].search([
-                    ('name', '=', "SpaceUnit")
-                ])
-                datas = api_rauth_config.APIData.get_data(
-                    id, values, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        id.write({'is_api_post': True})
-                if values['facility_line']:
-                    for fl in values['facility_line'][0][2]:
-                        values['create'] = True
-                        facility_id = self.env['pms.facilities'].browse(fl)
-                        property_objs = self.env['pms.properties'].browse(
-                            facility_id.property_id.id)
-                        integ_objs = self.env['pms.api.integration'].search([])
-                        api_type_objs = api_line_ids = self.env[
-                            'pms.api.integration.line'].search([
-                                ('name', '=', "SpaceUnitFacilities")
-                            ])
-                        datas = api_rauth_config.APIData.get_data(
-                            id, values, property_objs, integ_objs,
-                            api_type_objs)
-                        if datas:
-                            if datas.res:
-                                response = json.loads(datas.res)
-                                if 'responseStatus' in response:
-                                    if response['responseStatus']:
-                                        if 'message' in response:
-                                            if response[
-                                                    'message'] == 'SUCCESS':
-                                                for fc in facility_id:
-                                                    fc.write(
-                                                        {'is_api_post': True})
+                if property_id.api_integration_id:
+                    integ_obj = property_id.api_integration_id
+                    integ_line_obj = integ_obj.api_integration_line
+                    api_line_ids = integ_line_obj.search([('name', '=',
+                                                           "SpaceUnit")])
+                    datas = api_rauth_config.APIData.get_data(
+                        id, values, property_id, integ_obj, api_line_ids)
+                    if datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            id.write({'is_api_post': True})
+                    if values['facility_line']:
+                        for fl in values['facility_line'][0][2]:
+                            values['create'] = True
+                            facility_id = self.env['pms.facilities'].browse(fl)
+                            property_objs = self.env['pms.properties'].browse(
+                                facility_id.property_id.id)
+                            integ_objs = property_objs.api_integration_id
+                            integ_line_obj = integ_obj.api_integration_line
+                            api_type_objs = api_line_ids = integ_line_obj.search(
+                                [('name', '=', "SpaceUnitFacilities")])
+                            datas = api_rauth_config.APIData.get_data(
+                                id, values, property_objs, integ_objs,
+                                api_type_objs)
+                            if datas:
+                                if datas.res:
+                                    response = json.loads(datas.res)
+                                    if 'responseStatus' in response:
+                                        if response['responseStatus']:
+                                            if 'message' in response:
+                                                if response[
+                                                        'message'] == 'SUCCESS':
+                                                    for fc in facility_id:
+                                                        fc.write({
+                                                            'is_api_post':
+                                                            True
+                                                        })
         return id
 
     @api.multi
@@ -394,44 +397,49 @@ class PMSSpaceUnit(models.Model):
             property_obj = self.env['pms.properties']
             property_ids = property_obj.browse(property_id)
             if property_ids.api_integration:
-                integ_obj = self.env['pms.api.integration'].search([])
-                api_line_ids = self.env['pms.api.integration.line'].search([
-                    ('name', '=', "SpaceUnit")
-                ])
-                datas = api_rauth_config.APIData.get_data(
-                    self, val, property_ids, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if response['responseStatus'] and response[
-                                'message'] == 'SUCCESS':
-                            self.write({'is_api_post': True})
-                if 'facility_line' in val:
-                    if val['facility_line']:
-                        for fl in val['facility_line'][0][2]:
-                            facility_id = self.env['pms.facilities'].browse(fl)
-                            property_objs = self.env['pms.properties'].browse(
-                                facility_id.property_id.id)
-                            integ_objs = self.env[
-                                'pms.api.integration'].search([])
-                            api_type_objs = api_line_ids = self.env[
-                                'pms.api.integration.line'].search([
-                                    ('name', '=', "SpaceUnitFacilities")
-                                ])
-                            datas = api_rauth_config.APIData.get_data(
-                                self, val, property_objs, integ_objs,
-                                api_type_objs)
-                            if datas:
-                                if datas.res:
-                                    response = json.loads(datas.res)
-                                    if 'responseStatus' in response:
-                                        if response['responseStatus']:
-                                            if 'message' in response:
-                                                if response[
-                                                        'message'] == 'SUCCESS':
-                                                    for fc in facility_id:
-                                                        fc.write({
-                                                            'is_api_post':
-                                                            True
-                                                        })
+                if property_ids.api_integration_id:
+                    integ_obj = property_ids.api_integration_id
+                    integ_line_obj = integ_obj.api_integration_line
+                    api_line_ids = integ_line_obj.search([('name', '=',
+                                                           "SpaceUnit")])
+                    datas = None
+                    if 'is_api_post' in val:
+                        if not val['is_api_post']:
+                            datas = api_rauth_config.APIData.get_data(self, val, property_ids, integ_obj, api_line_ids)
+                        else:
+                            datas = None
+                    if datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if response['responseStatus'] and response[
+                                    'message'] == 'SUCCESS':
+                                self.write({'is_api_post': True})
+                    if 'facility_line' in val:
+                        if val['facility_line']:
+                            for fl in val['facility_line'][0][2]:
+                                facility_id = self.env[
+                                    'pms.facilities'].browse(fl)
+                                property_objs = self.env[
+                                    'pms.properties'].browse(
+                                        facility_id.property_id.id)
+                                integ_objs = property_objs.api_integration_id
+                                integ_line_obj = integ_objs.api_integration_line
+                                api_type_objs = api_line_ids = integ_line_obj.search(
+                                    [('name', '=', "SpaceUnitFacilities")])
+                                datas = api_rauth_config.APIData.get_data(
+                                    self, val, property_objs, integ_objs,
+                                    api_type_objs)
+                                if datas:
+                                    if datas.res:
+                                        response = json.loads(datas.res)
+                                        if 'responseStatus' in response:
+                                            if response['responseStatus']:
+                                                if 'message' in response:
+                                                    if response[
+                                                            'message'] == 'SUCCESS':
+                                                        for fc in facility_id:
+                                                            fc.write({
+                                                                'is_api_post':
+                                                                True
+                                                            })
         return id

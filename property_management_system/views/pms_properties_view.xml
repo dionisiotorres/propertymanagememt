@@ -1,15 +1,17 @@
 <odoo>
   <data>
-  <!-- <template id="asset_backend" inherit_id="web.assets_backend"> 
-     <xpath expr="." position="inside">
-         <link rel="stylesheet" href="/property_management_system/static/src/css/custom.css"/> 
-     </xpath>        
-  </template> -->
     <menuitem id="pms_properties_menu_root"
             name="ZPMS"
             web_icon="property_management_system,static/description/icon.png"
             sequence="-2"
             groups="group_property_user,group_property_manager"/>
+
+    <!-- <template id="assets_backend" name="web_example_assets" inherit_id="web.assets_backend">
+      <xpath expr="." position="inside">
+          <script type="text/javascript" src="/property_management_system/static/src/js/property_menu.js"/>
+          <link rel="stylesheet" type="text/scss" href="/property_management_system/static/src/scss/property_menu.scss"/>
+      </xpath>
+    </template> -->
     <record model="ir.ui.view" id="view_pms_properties_form">
       <field name="name">Properites Form</field>
       <field name="model">pms.properties</field>
@@ -49,6 +51,7 @@
                 <field name="net_lett_able_area" placeholder="Net-Lett-able Area"/>
                 <field name="web_site_url" widget="url" placeholder="http://www.zandotech.com"/>
                 <field name="is_autogenerate_posid"/>
+                <field name="meter_type"/>
               </group>
             </group>
             <notebook>
@@ -172,8 +175,13 @@
                   <group string="Define Rent Schedule Type">
                     <field name="rentschedule_type"/>
                   </group>
-                   <group string="API Information">
-                    <field name="api_integration" string="MIMS Integration"/>
+                </group>
+              </page>
+              <page name="API Information" string="API Information">
+                <group>
+                  <group>
+                    <field name="api_integration" string="Is integration?"/>
+                    <field name="api_integration_id" attrs="{'invisible':[('api_integration','!=',True)]}"/>
                   </group>
                 </group>
               </page>

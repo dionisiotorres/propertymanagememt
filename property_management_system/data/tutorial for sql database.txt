@@ -1,0 +1,1 @@
+Tutorial: Design your first relational database in Azure SQL Database using SSMS | Microsoft Docs

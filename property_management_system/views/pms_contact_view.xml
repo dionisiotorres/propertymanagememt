@@ -250,7 +250,7 @@
                                 <group>
                                     <field name="partner_id" readonly="1" required="0" groups="base.group_no_one"/>
                                     <label for="street" string="Address"/>
-                                    <div class="o_address_format">
+                                    <!-- <div class="o_address_format">
                                         <field name="street" placeholder="Street..." class="o_address_street"/>
                                         <field name="street2" placeholder="Street 2..." class="o_address_street"/>
                                         <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True}'/>
@@ -258,7 +258,7 @@
                                         <field name="city_id" placeholder="City" class="o_address_country" options='{"no_open": True}'/>
                                         <field name="township" class="o_address_country" placeholder="Township" options='{"no_open": True}'/>
                                         <field name="zip" placeholder="ZIP" class="o_address_country"/>
-                                    </div>
+                                    </div> -->
                                 </group>
                                 <group>
                                     <field name="company_type" widget="many2many_tags" />

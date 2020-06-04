@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.1.0',
+    '1.1.1',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -26,6 +26,7 @@
         'data/ir_sequence_data.xml',
         'data/pms_lease_schedular_data.xml',
         'data/pos_run_schedule_data_view.xml',
+        'data/pms_property_data.xml',
         'wizard/pms_cancel_wizard_view.xml',
         'wizard/pms_extend_wizard_view.xml',
         'wizard/pms_invoice_wizard_view.xml',

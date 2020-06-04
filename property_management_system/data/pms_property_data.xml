@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id ="propertytype_id" model="pms.property.type">
+        <field name="name">Retail</field> 
+        <field name="active">True</field>
+    </record>
+    <record id="area_category_id" model="uom.category">
+        <field name="name">Area</field>
+    </record>
+    <record id="square_feet_id" model="uom.uom">
+        <field name="name">sqft</field>
+        <field name="category_id" ref="area_category_id"/>
+    </record>
+    <record id="res_partner_title_id" model="res.partner.title">
+        <field name="name">U</field>
+    </record>
+    <record id="res_partner_title_id" model="res.partner.title">
+        <field name="name">Mr.</field>
+    </record>
+</odoo>

@@ -21,22 +21,22 @@ class PMSProperties(models.Model):
     _description = 'Property Management System'
     _order = "code"
 
-    # def get_uom_id(self):
-    #     uom_id = uom_category_id = None
-    #     uom_id = self.env['uom.uom'].search([('name', '=', "sqft")])
-    #     if not uom_id:
-    #         uom_category_id = self.env['uom.category'].search([('name', '=',
-    #                                                             'Area')])
-    #         if not uom_category_id:
-    #             uom_category_id = self.env['uom.category'].create(
-    #                 {'name': 'Area'})
-    #         uom_id = self.env['uom.uom'].create({
-    #             'name':
-    #             'sqft',
-    #             'category_id':
-    #             uom_category_id.id
-    #         })
-    #     return uom_id
+    def _default_propertytype(self):
+        pro_type = None
+        if not self.propertytype_id:
+            pro_type = self.env["pms.property.type"].search([('name','=',"Retail")]) or self.env["pms.property.type"].search([])
+            if len(pro_type)>1:
+                pro_type = pro_type[0]
+        return pro_type
+
+    def _default_uom_id(self):
+        uom_ids = None
+        if not self.uom_id:
+            categ_ids = self.env[('uom.category')].search([('name','=','Area')]).id
+            uom_ids = self.env["uom.uom"].search([('name','=',"sqft"),('category_id','=',categ_ids)]) or self.env["uom.uom"].search([])
+            if len(uom_ids)>1:
+                uom_ids = uom_ids[0]
+        return uom_ids
 
     def default_get_curency(self):
         mmk_currency_id = self.env['res.currency'].search([('name', '=', 'MMK')
@@ -63,12 +63,14 @@ class PMSProperties(models.Model):
         "Property Type",
         required=True,
         track_visibility=True,
+        default =_default_propertytype,
         help="The properties's type is set the specific type.")
     uom_id = fields.Many2one("uom.uom",
                              "UOM",
                              required=True,
                              domain=[('category_id.name', '=', 'Area')],
                              track_visibility=True,
+                             default=_default_uom_id,
                              help="Unit Of Measure is need to set for Area.")
     bank_id = fields.Many2one('res.bank',
                               "Bank Information",
@@ -80,11 +82,13 @@ class PMSProperties(models.Model):
                                domain="[('city_id', '=?', city_id)]")
     city_id = fields.Many2one("pms.city",
                               string='City',
+                              related="township.city_id",
                               ondelete='restrict',
                               track_visibility=True,
                               domain="[('state_id', '=?', state_id)]")
     state_id = fields.Many2one("res.country.state",
                                string='State',
+                               related="city_id.state_id",
                                ondelete='restrict',
                                track_visibility=True,
                                domain="[('country_id', '=?', country_id)]")
@@ -98,6 +102,7 @@ class PMSProperties(models.Model):
                                  string='Country',
                                  default=default_get_country,
                                  readonly=False,
+                                 related="state_id.country_id",
                                  requried=True,
                                  track_visibility=True,
                                  ondelete='restrict')

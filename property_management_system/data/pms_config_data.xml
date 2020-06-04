@@ -150,7 +150,7 @@
             <field name="value">5</field>
         </record>
         <record model="pms.leaseterms" id="pms_leaseterms_id1">
-            <field name="name">New Lease Term</field>
+            <field name="name">NLT Month(N-5|min-12|max-24)</field>
             <field name="lease_period_type">month</field>
             <field name="min_time_period">12</field>
             <field name="max_time_period">24</field>
@@ -158,7 +158,7 @@
             <field name="active">1</field>  
         </record>
         <record model="pms.leaseterms" id="pms_leaseterms_id2">
-            <field name="name">Extend Lease Term</field>
+            <field name="name">ELT Month(N-3|min-6|max-12)</field>
             <field name="lease_period_type">month</field>
             <field name="min_time_period">6</field>
             <field name="max_time_period">12</field>

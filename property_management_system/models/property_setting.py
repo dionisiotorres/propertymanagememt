@@ -611,6 +611,8 @@ class Company(models.Model):
                               "City Name",
                               compute='_compute_address',
                               inverse='_inverse_city',
+                              related="township.city_id",
+                              readonly=False,
                               track_visibility=True,
                               ondelete='cascade')
     township = fields.Many2one("pms.township",
@@ -619,6 +621,19 @@ class Company(models.Model):
                                inverse='_inverse_township',
                                track_visibility=True,
                                ondelete='cascade')
+    state_id = fields.Many2one("res.country.state",
+                               string='State',
+                               related="city_id.state_id",
+                               ondelete='restrict',
+                               track_visibility=True,
+                               domain="[('country_id', '=?', country_id)]")
+    country_id = fields.Many2one('res.country',
+                                 string='Country',
+                                 readonly=False,
+                                 related="state_id.country_id",
+                                 requried=True,
+                                 track_visibility=True,
+                                 ondelete='restrict')
     company_type = fields.Many2many('pms.company.category',
                                     "res_company_type_rel",
                                     'company_id',

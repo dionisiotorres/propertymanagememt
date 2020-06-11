@@ -577,11 +577,27 @@ class Bank(models.Model):
                          help="Sometimes called BIC or Swift.")
     city_id = fields.Many2one("pms.city",
                               "City Name",
+                              readonly=False,
+                              related="township.city_id",
+                              store=True,
                               track_visibility=True,
                               ondelete='cascade')
     township = fields.Many2one("pms.township",
                                "Township",
+                               store=True,
                                track_visibility=True)
+    state_id = fields.Many2one("res.country.state",
+                               "State Name",
+                               readonly=False,
+                               related="city_id.state_id",
+                               store=True,
+                               track_visibility=True)
+    country_id = fields.Many2one('res.country',
+                                 string='Country',
+                                 readonly=False,
+                                 related="state_id.country_id",
+                                 track_visibility=True,
+                                 ondelete='restrict')
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
@@ -846,7 +862,6 @@ class PMSCompanyCategory(models.Model):
 class Partner(models.Model):
     _inherit = "res.partner"
 
-    city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
     company_type = fields.Selection(
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
@@ -854,11 +869,6 @@ class Partner(models.Model):
         inverse='_write_company_type',
         track_visibility=True,
     )
-    # type = fields.Selection(
-    #     [('contact', 'Contact'), ('invoice', 'Invoice')],
-    #     string='Address Type',
-    #     default='contact',
-    # )
     child_ids = fields.One2many('res.partner',
                                 'parent_id',
                                 string='Contacts',
@@ -868,20 +878,15 @@ class Partner(models.Model):
                                             string="CRM Type",
                                             track_visibility=True)
     township = fields.Many2one('pms.township',
-                               "Township",
-                               track_visibility=True)
+                               "Township", ondelete='restrict', track_visibility=True)
+    city_id = fields.Many2one("pms.city", "City Name", ondelete='restrict', related="township.city_id", readonly=False, store=True, track_visibility=True)
+    state_id = fields.Many2one("res.country.state", string='State', ondelete='restrict',related="city_id.state_id", readonly=False, store=True, domain="[('country_id', '=?', country_id)]")
+    country_id = fields.Many2one('res.country', string='Country', related="state_id.country_id", readonly=False, store=True, ondelete='restrict')
     is_tanent = fields.Boolean('Is Tanent',
                                compute="get_tanent",
                                readonly=False,
                                store=True,
                                track_visibility=True)
-    # partner_contact_id = fields.Many2many(
-    #     "res.partner",
-    #     "company_partner_contact_rel",
-    #     "company_id",
-    #     "partner_id",
-    #     domain="[('is_company', '!=', True)]",
-    #     store=True)
     trade_id = fields.Many2one("pms.trade_category",
                                "Trade",
                                track_visibility=True)
@@ -952,26 +957,27 @@ class Partner(models.Model):
                                   ('is_company', '=', True)])
             if crm_id:
                 raise UserError(_("%s is already existed" % values['name']))
-        id = None
-        id = super(Partner, self).create(values)
-        if id and id.is_company:
-            property_id = None
-            if id.company_channel_type:
-                integ_obj = self.env['pms.api.integration'].search([])
-                api_line_ids = self.env['pms.api.integration.line'].search([
-                    ('name', '=', "CRMAccount")
-                ])
-                datas = api_rauth_config.APIData.get_data(
-                    id, values, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        id.write({'is_api_post': True})
-        return id
+        return super(Partner, self).create(values)
+        # id = None
+        # id = super(Partner, self).create(values)
+        # if id and id.is_company:
+        #     property_id = None
+        #     if id.company_channel_type:
+        #         integ_obj = self.env['pms.api.integration'].search([])
+        #         api_line_ids = self.env['pms.api.integration.line'].search([
+        #             ('name', '=', "CRMAccount")
+        #         ])
+        #         datas = api_rauth_config.APIData.get_data(
+        #             id, values, property_id, integ_obj, api_line_ids)
+        #         if datas:
+        #             if datas.res:
+        #                 response = json.loads(datas.res)
+        #                 if 'responseStatus' in response:
+        #                     if response['responseStatus']:
+        #                         if 'message' in response:
+        #                             if response['message'] == 'SUCCESS':
+        #                                 id.write({'is_api_post': True})
+        # return id
 
     @api.one
     def write(self, vals):
@@ -992,32 +998,35 @@ class Partner(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
-            if 'is_api_post' in vals:
-                if not vals['is_api_post']:
-                    datas = api_rauth_config.APIData.get_data(
-                        self, vals, property_id, integ_obj, api_line_ids)
-                    if datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus']:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            self.write({'is_api_post': True})
-                else:
-                    datas = None
-            else:
-                datas = api_rauth_config.APIData.get_data(
-                    self, vals, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if 'res' in datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus']:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            self.write({'is_api_post': True})
+            # if 'is_api_post' in vals:
+            #     if not vals['is_api_post']:
+            #         datas = api_rauth_config.APIData.get_data(
+            #             self, vals, property_id, integ_obj, api_line_ids)
+            #         if datas:
+            #             if datas.res:
+            #                 response = json.loads(datas.res)
+            #                 if 'responseStatus' in response:
+            #                     if response['responseStatus']:
+            #                         if 'message' in response:
+            #                             if response['message'] == 'SUCCESS':
+            #                                 self.write({'is_api_post': True})
+            #     else:
+            #         datas = None
+            # else:
+                # if self.is_api_post:
+            datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
+            # else:
+            #     datas = api_rauth_config.APIData.get_data(
+            #         self, vals, property_id, integ_obj, api_line_ids)
+            if datas:
+                if 'res' in datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        self.write({'is_api_post': True})
         return id
 
     @api.multi

@@ -382,7 +382,6 @@ class PMSSpaceUnit(models.Model):
                         self.property_id.name)
         if 'facility_line' in val:
             for fl in val['facility_line']:
-                print(fl[2])
                 if fl[2]:
                     fac_id = self.env['pms.facilities'].browse(fl[2])
                     fac_id.write({'status': True})
@@ -408,6 +407,9 @@ class PMSSpaceUnit(models.Model):
                             datas = api_rauth_config.APIData.get_data(self, val, property_ids, integ_obj, api_line_ids)
                         else:
                             datas = None
+                    else:
+                        if self.is_api_post:
+                            datas = api_rauth_config.APIData.get_data(self, val, property_ids, integ_obj, api_line_ids)
                     if datas:
                         if datas.res:
                             response = json.loads(datas.res)

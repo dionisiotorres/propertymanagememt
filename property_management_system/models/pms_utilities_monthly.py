@@ -37,29 +37,30 @@ class UtilitiesMonthly(models.Model):
             for datas in list(api_integ.items()):
                 utmdatas.append(datas[1])
             utmonthly_datas = utmdatas[1]
-            for mid in utmonthly_datas:
-                utilityml_ids = self.search([
-                    ('utilities_no', '=', mid['meterNo']),
-                    ('utilities_source_type', '=', mid['transactionType']),
-                    ('name', '=', mid['leaseNo']),
-                    ('start_reading_date', '=', mid['startDate']),
-                    ('end_reading_date', '=', mid['endDate'])
-                ])
-                if not utilityml_ids:
-                    vals = {
-                        'name': mid['leaseNo'],
-                        'property_code': mid['propertyCode'],
-                        'batchcode': mid['batchCode'],
-                        'utilities_supply_type': mid['utilityType'],
-                        'utilities_source_type': mid['transactionType'],
-                        'utilities_no': mid['meterNo'],
-                        'end_value': mid['endValue'],
-                        'start_value': mid['startValue'],
-                        'start_reading_date': mid['startDate'],
-                        'end_reading_date': mid['endDate']
-                    }
-                    monthlydata_id = super(UtilitiesMonthly, self).create(vals)
-                updatedata.append({'importBatchCode': mid['batchCode']})
+            if len(utmonthly_datas) > 0:
+                for mid in utmonthly_datas:
+                    utilityml_ids = self.search([
+                        ('utilities_no', '=', mid['meterNo']),
+                        ('utilities_source_type', '=', mid['transactionType']),
+                        ('name', '=', mid['leaseNo']),
+                        ('start_reading_date', '=', mid['startDate']),
+                        ('end_reading_date', '=', mid['endDate'])
+                    ])
+                    if not utilityml_ids:
+                        vals = {
+                            'name': mid['leaseNo'],
+                            'property_code': mid['propertyCode'],
+                            'batchcode': mid['batchCode'],
+                            'utilities_supply_type': mid['utilityType'],
+                            'utilities_source_type': mid['transactionType'],
+                            'utilities_no': mid['meterNo'],
+                            'end_value': mid['endValue'],
+                            'start_value': mid['startValue'],
+                            'start_reading_date': mid['startDate'],
+                            'end_reading_date': mid['endDate']
+                        }
+                        monthlydata_id = super(UtilitiesMonthly, self).create(vals)
+                    updatedata.append({'importBatchCode': mid['batchCode']})
             property_id = None
             uniq = []
             [uniq.append(x) for x in updatedata if x not in uniq]

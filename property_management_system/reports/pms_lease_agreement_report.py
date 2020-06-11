@@ -19,15 +19,15 @@ class ReportPMSLeaseReport(models.AbstractModel):
         end_date = report_data['to_date']
         state = report_data['state']
         if state:
-            lease_ids = self.env["pms.lease_agreement"].search([('property_id', '=', property_id), ('start_date', '>=', start_date), ('start_date', '<=', end_date), ('state', '=', state)])
+            lease_ids = self.env["pms.lease_agreement"].search([('property_id', '=', property_id), ('start_date', '>=', start_date), ('start_date', '<=', end_date), ('state', '=', state)], order='start_date')
         else:
-            lease_ids = self.env["pms.lease_agreement"].search([('property_id', '=', property_id), ('start_date', '>=', start_date), ('start_date', '<=', end_date)])
+            lease_ids = self.env["pms.lease_agreement"].search([('property_id', '=', property_id), ('start_date', '>=', start_date), ('start_date', '<=', end_date)], order='start_date')
         docs = []
         logo = self.env.user.company_id.logo
         lang = self.env.user.company_id.partner_id.lang
         if lease_ids:
-            datas = {}
             for lid in lease_ids:
+                datas = {}
                 datas['company_tanent_id'] = lid.company_tanent_id
                 datas['property'] = lid.property_id.code
                 datas['shop'] = lid.name

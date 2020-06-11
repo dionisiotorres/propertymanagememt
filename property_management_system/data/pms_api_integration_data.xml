@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="pms_api_integration_id" model="pms.api.integration">
+         <field name="name">MIMS Provider</field>
+            <field name="base_url">http://192.168.100.11</field>
+            <field name="auth_url">http://192.168.100.11/connect/token</field>
+            <field name="username">APIUSER</field>
+            <field name="password">5E817517-7D9D-430C-A0B3-905298EA741C</field>
+            <field name="active">True</field>            
+        </record>
+        <record id="pms_api_integration_line_1" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">Property</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/property/importproperty</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_2" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">Floor</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/floor/importfloorinfo</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_3" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">SpaceUnit</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/SpaceUnit/importspaceunitinfo</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_4" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">SpaceUnitFacilities</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/SpaceUnitFacility/importsufinfo</field>
+            <field name="active">True</field>
+        </record> <record id="pms_api_integration_line_5" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">CRMAccount</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/CRMAccount/importcrmaccount</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_6" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">LeaseAgreement</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/LeaseAgreement/leaseimport</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_7" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">Leaseunititem</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/LeaseAgreementItem/importleaseunit</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_8" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">Leaseunitpos</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/LeaseAgreementItem/importleaseunitpos</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_9" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">RentSchedule</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/RentSchedule/importrentschedule</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_10" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">POSDailySale</field>
+            <field name="http_method_type">get</field>
+            <field name="api_url">api/possale/getPOSSalesDaily</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_11" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">UtilitiesMonthlySale</field>
+            <field name="http_method_type">get</field>
+            <field name="api_url">api/utilitymonthly/getUtilityMonthlyForFileExport</field>
+            <field name="active">True</field>
+        </record>
+        <record id="pms_api_integration_line_12" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">UpdatePOSDailySale</field>
+            <field name="http_method_type">get</field>
+            <field name="api_url">api/PosSale/updatePosSalesDailyList</field>
+            <field name="active">True</field>
+        </record>
+         <record id="pms_api_integration_line_13" model="pms.api.integration.line">
+            <field name="api_integration_id" ref="pms_api_integration_id"/>
+            <field name="name">UpdateUtilitiesMonthlySale</field>
+            <field name="http_method_type">post</field>
+            <field name="api_url">api/utilitymonthly/updateUtilityMonthlyStatusList</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

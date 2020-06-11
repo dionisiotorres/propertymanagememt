@@ -42,7 +42,7 @@
                 <field name="actual_opening_date"/>
                 <field name="currency_id" 
                 required="1" options="{'no_create_edit': True, 'no_create':True, 'no_open':True}"/>
-                <field name="timezone"/>
+                <field name="timezone" required="1"/>
               </group>
               <group>
                 <field name="uom_id"/>

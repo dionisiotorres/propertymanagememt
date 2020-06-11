@@ -7,7 +7,7 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button name="%(action_activate_wiz)d" string="Activate" type="action" states="BOOKING"/>
+            <button name="%(action_activate_wiz)d" string="Activate" class="oe_highlight" type="action" states="BOOKING"/>
             <button name="%(action_cancel_wiz)d" states="BOOKING" type="action" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
             <button name="%(action_extend_wiz)d" states="NEW,EXTENDED" type="action" string="Extend" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>

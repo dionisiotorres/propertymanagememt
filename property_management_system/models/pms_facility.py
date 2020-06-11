@@ -142,10 +142,10 @@ class PMSFacilities(models.Model):
         for pro in property_ids:
             property_id = pro
             facility_ids = self.search([('is_api_post', '=', False),
-                                        ('property_id', 'in', property_id.id)])
+                                        ('property_id', '=', property_id.id)])
             if facility_ids:
                 integ_obj = property_id.api_integration_id
-                integ_line_obj = property_id.api_integration_line
+                integ_line_obj = integ_obj.api_integration_line
                 api_line_ids = integ_line_obj.search([('name', '=',
                                                        "SpaceUnitFacilities")])
                 datas = api_rauth_config.APIData.get_data(

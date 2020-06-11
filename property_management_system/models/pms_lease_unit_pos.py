@@ -119,8 +119,7 @@ class PMSLeaseUnitPos(models.Model):
         ])
         for pro in property_ids:
             leaseipos_ids = self.search([('is_api_post', '=', False),
-                                         ('leaseagreementitem_id', '!=', None),
-                                         ('property_id', '=', pro.id)])
+                                         ('leaseagreementitem_id', '!=', None)])
             if leaseipos_ids:
                 for lp in leaseipos_ids:
                     property_id = lp.leaseagreementitem_id.property_id

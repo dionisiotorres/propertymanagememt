@@ -80,7 +80,8 @@ class PMSRentSchedule(models.Model):
                                     if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
                                         total_rate = apl.rate
                                 elif ccm_name == 'Area':
-                                    total_rate = lagl.unit_no.area * apl.rate
+                                    # total_rate = lagl.unit_no.area * apl.rate
+                                    total_rate = apl.total_amount
                                 elif ccm_name == 'Percentage':
                                     percent_amount = 0
                                     if pcm_name == ccm_name:

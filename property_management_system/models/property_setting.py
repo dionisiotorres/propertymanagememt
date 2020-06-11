@@ -593,7 +593,7 @@ class Bank(models.Model):
                                store=True,
                                track_visibility=True)
     country_id = fields.Many2one('res.country',
-                                 string='Country',
+                                 string='Country Name',
                                  readonly=False,
                                  related="state_id.country_id",
                                  track_visibility=True,

@@ -4,7 +4,7 @@
        <report id="action_pms_lease_report" 
         model="pms.lease_agreement"
         string="Lease Report" 
-        report_type="qweb-pdf"
+        report_type="qweb-html"
         name="property_management_system.lease_report"
         file="property_management_system.lease_report"
         menu="False" />

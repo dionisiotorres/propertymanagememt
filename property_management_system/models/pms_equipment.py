@@ -37,7 +37,7 @@ class PMSEquipment(models.Model):
     count_facility = fields.Integer("Count Unit",
                                     compute="_get_count_facility")
     roll_over_type = fields.Selection(
-        [('normal', 'Normal'), ('kwtomw', 'KW to MW')],
+        [('DIGITROLLOVER', 'Digit RollOver'), ('UNITROLLOVER', 'Unit RollOver')],
         "Rollover Type",
         help='Which method will be use if equipment roll over.')
 

@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.1.4',
+    '1.1.5',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',

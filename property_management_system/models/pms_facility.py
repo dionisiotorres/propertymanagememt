@@ -65,19 +65,6 @@ class PMSFacilities(models.Model):
         track_visibility=True,
     )
 
-    # @api.onchange('utilities_type_id')
-    # def onchange_utilities_type_id(self):
-    #     parent_id = []
-    #     domain = {}
-    #     utilities_id = None
-    #     if self.utilities_type_id != None:
-    #         utilities_ids = self.env['pms.utilities.source.type'].search([
-    #             ('utilities_type_id', '=', self.utilities_type_id.id)
-    #         ])
-    #         for loop in utilities_ids:
-    #             parent_id.append(loop.id)
-    #         domain = {'source_type_id': [('id', 'in', parent_id)]}
-    #     return {'domain': domain}
 
     @api.multi
     def _get_count_unit(self):

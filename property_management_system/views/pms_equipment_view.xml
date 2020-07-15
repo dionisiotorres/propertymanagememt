@@ -26,10 +26,36 @@
             </group>
             <group>
                 <field name="manufacturer"/>
-                <field name="digit"/>
                 <field name="ref_code"/>
+                <field name="meter_template_id"/>
             </group>
           </group>
+          <notebook>
+            <page name="Configuration" string="Configuration">
+            <group>
+            <group>
+              <field name='utilities_type'/>
+              <field name="utilities_code" invisible="1"/>
+              <field name='power_system' widget="radio" options="{'horizontal':'1'}" attrs="{'invisible':[('utilities_code','!=','UNITROLLOVER')]}"/>
+              <field name='current_unit_type' widget="radio" options="{'horizontal':'1'}"  attrs="{'invisible':[('roll_over_type','!=','UNITROLLOVER')]}"/>
+            </group>
+            <group>
+                <field name='digit'/>
+                <field name='meter_type' widget="radio" options="{'horizontal':'1'}"  />
+                
+              </group>
+            </group>              
+            <notebook>
+              <page name="Supplies" string="Supplies">
+                <field name="equipment_line">
+                  <tree editable="buttom">
+                    <field name="utilities_supply_id"/>
+                  </tree>
+                </field >
+              </page>
+            </notebook>
+            </page>
+          </notebook>
           </sheet>
           <div class="oe_chatter">
               <field name="message_follower_ids" widget="mail_followers"/>

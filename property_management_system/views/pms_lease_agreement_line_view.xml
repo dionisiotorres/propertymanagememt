@@ -7,7 +7,7 @@
         <form>
             <header>
                 <button name="%(action_invoice_wiz)d" states="NEW,EXTENDED" type="action" string="Create Invoice" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
-                <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
+                <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,PRE-TERMINATED,EXPIRED"/>
             </header>
             <sheet>
             <!-- <div class="oe_button_box" name="button_box" attrs="{'invisible': [('invoice_count','&lt;=',0)]}">
@@ -28,6 +28,7 @@
                         <field name="property_id"/>
                         <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>   
                         <field name="company_tanent_id"/>
+                        <!-- <field name="shop_id" /> -->
                     </group>
                     <group>
                         <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
@@ -44,6 +45,8 @@
                             <field name="applicable_charge_id"/>
                             <field name="charge_type_id"/>
                             <field name="calculation_method_id"/>
+                            <!-- <field name="base_type_ids" invisible='1'/>
+                            <field name="base_type_id" domain="[('id','in',base_type_ids)]"/> -->
                             <field name="start_date"/>
                             <field name="end_date"/>
                             <field name="rate" />

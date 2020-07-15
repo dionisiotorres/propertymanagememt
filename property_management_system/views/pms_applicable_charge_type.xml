@@ -22,13 +22,14 @@
                     <field name="charge_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
                     <field name="calculate_method_ids" invisible='1'/>
                     <field name="calculation_method_id" domain="[('id', '=', calculate_method_ids)]" options="{'no_create_edit': True,'no_quick_create':True,'no_create':True,'no_open':True}"/>
+                    <!-- <field name="base_type_id"/> -->
                     <field name="source_type_id" attrs="{'invisible':[('is_meter','!=',True)]}"/>
                     <field name='use_formula' attrs="{'invisible':[('is_meter','!=',True)]}"/>
                     <field name="rate" attrs="{'invisible':['|',('is_meter','!=',True), ('use_formula','=',True)]}"/>
                 </group>
                 <group>
                     <field name='is_apply_tax'/>
-                    <field name='tax'/>
+                    <field name='tax_id'/>
                     <field name="billing_type"/>
                     <field name='is_meter' invisible='1'/>
                 </group>
@@ -53,12 +54,12 @@
       <field name="model">pms.applicable.charge.type</field>
       <field name="arch" type="xml">
         <tree>
-          <!-- <field name="code"/> -->
+          <field name="sequence" widget="handle"/>
           <field name="name"/>
           <field name="charge_type_id"/>
           <field name="calculation_method_id"/>
           <field name='is_apply_tax'/>
-          <field name='tax'/>
+          <field name='tax_id'/>
           <field name="billing_type"/>
         </tree>
       </field>

@@ -20,7 +20,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id1">
             <field name="format_id" ref="pms_format_id1"/>
             <field name="name">Floor</field>
-            <field name="position_order">1</field>
+            <field name="sequence">1</field>
             <field name="value_type">dynamic</field>
             <field name="fix_value"></field>
             <field name="digit_value">0</field>
@@ -31,7 +31,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id2">
             <field name="format_id" ref="pms_format_id1"/>
             <field name="name">Fix Char</field>
-            <field name="position_order">2</field>
+            <field name="sequence">2</field>
             <field name="value_type">fix</field>
             <field name="fix_value">-</field>
             <field name="digit_value">0</field>
@@ -42,7 +42,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id3">
             <field name="format_id" ref="pms_format_id1"/>
             <field name="name">Digit Char</field>
-            <field name="position_order">3</field>
+            <field name="sequence">3</field>
             <field name="value_type">digit</field>
             <field name="fix_value"></field>
             <field name="digit_value">5</field>
@@ -53,7 +53,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id4">
             <field name="format_id" ref="pms_format_id2"/>
             <field name="name">Property</field>
-            <field name="position_order">1</field>
+            <field name="sequence">1</field>
             <field name="value_type">dynamic</field>
             <field name="fix_value"></field>
             <field name="digit_value">0</field>
@@ -64,7 +64,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id5">
             <field name="format_id" ref="pms_format_id2"/>
             <field name="name">Fix Char</field>
-            <field name="position_order">3</field>
+            <field name="sequence">3</field>
             <field name="value_type">fix</field>
             <field name="fix_value">-POS-</field>
             <field name="digit_value">0</field>
@@ -75,7 +75,7 @@
          <record model="pms.format.detail" id="pms_format_detail_id8">
             <field name="format_id" ref="pms_format_id2"/>
             <field name="name">Digit Char</field>
-            <field name="position_order">6</field>
+            <field name="sequence">6</field>
             <field name="value_type">digit</field>
             <field name="fix_value"></field>
             <field name="digit_value">6</field>
@@ -86,7 +86,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id9">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">Fix Char</field>
-            <field name="position_order">1</field>
+            <field name="sequence">1</field>
             <field name="value_type">fix</field>
             <field name="fix_value">LA-</field>
             <field name="digit_value">0</field>
@@ -97,7 +97,7 @@
          <record model="pms.format.detail" id="pms_format_detail_id10">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">Property</field>
-            <field name="position_order">2</field>
+            <field name="sequence">2</field>
             <field name="value_type">dynamic</field>
             <field name="fix_value"></field>
             <field name="digit_value">0</field>
@@ -108,7 +108,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id11">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">Fix Char</field>
-            <field name="position_order">3</field>
+            <field name="sequence">3</field>
             <field name="value_type">fix</field>
             <field name="fix_value">-</field>
             <field name="digit_value">0</field>
@@ -119,7 +119,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id12">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">DateTime Char</field>
-            <field name="position_order">4</field>
+            <field name="sequence">4</field>
             <field name="value_type">datetime</field>
             <field name="fix_value"></field>
             <field name="digit_value">0</field>
@@ -130,7 +130,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id13">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">Fix Char</field>
-            <field name="position_order">5</field>
+            <field name="sequence">5</field>
             <field name="value_type">fix</field>
             <field name="fix_value">/</field>
             <field name="digit_value">0</field>
@@ -141,7 +141,7 @@
         <record model="pms.format.detail" id="pms_format_detail_id14">
             <field name="format_id" ref="pms_format_id3"/>
             <field name="name">Digit Char</field>
-            <field name="position_order">6</field>
+            <field name="sequence">6</field>
             <field name="value_type">digit</field>
             <field name="fix_value"></field>
             <field name="digit_value">5</field>
@@ -168,7 +168,7 @@
         <record id="base.main_company" model="res.company">
             <field name="name">Zando Technology</field>
             <field name="partner_id" ref="base.main_partner"/>
-            <field name="currency_id" ref="base.EUR"/>
+            <field name="currency_id" ref="base.MMK"/>
             <!-- <field name="image" type="base64" file="base/static/img/res_company_logo.png"/> -->
             <field name="space_unit_code_format" ref="pms_format_id1"/>
             <field name="pos_id_format" ref="pms_format_id2"/>

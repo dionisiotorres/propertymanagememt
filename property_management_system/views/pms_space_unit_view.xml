@@ -6,11 +6,17 @@
       <field name="arch" type="xml">
         <form>
           <sheet>
-            <!-- <div class="oe_button_box" name="button_box">
-              <button type="object" class="oe_stat_button" icon="fa-archive">
-                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-              </button>
-            </div> -->
+              <div class="oe_button_box" name="button_box">
+                <!-- <button type="object" class="oe_stat_button" icon="fa-archive">
+                    <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                </button> -->
+                <button name="active_action_lease" type="object" class="oe_stat_button" icon="fa-font" attrs="{'invisible': [('active_lease', '=', 0)]}">
+                    <field name="active_lease" widget="statinfo" string="Active"/>
+                </button>
+                <button name="history_action_lease" type="object" class="oe_stat_button" icon="fa-table" attrs="{'invisible': [('history_lease', '=', 0)]}">
+                    <field name="history_lease" widget="statinfo" string="History"/>
+                </button>
+              </div>
               <div class="oe_title">
                 <label for="name" class="oe_edit_only" readonly="1" string="Unit No"/>
                 <h1  class="mt0">
@@ -19,6 +25,7 @@
                       <field name="unit_code" readonly="1" class="oe_inline"/>
                       <field name="unit_no" 
                       required="1"
+                      readonly="1"
                        class="oe_inline"/>
                   </div>
                 </h1>
@@ -27,14 +34,13 @@
                 <group> 
                   <field name="property_id" options="{'no_create': True, 'no_create_edit':True}"/>
                   <field name="floor_id" options="{'no_create': True, 'no_create_edit':True}"/>
+                  <field name="unit_no" required="1" string="Unit Code"/>
                   <field name="spaceunittype_id"/>
                   <field name="uom"/>
                   <field name="config_flag" invisible="1"/>
                 </group>
                 <group> 
                   <field name="area"/>
-                  <field name="min_rate" string="Min Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
-                  <field name="max_rate" string="Max Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
                   <field name="start_date"/>
                   <field name="end_date"/>
                   <field name="meter_no" invisible='1'/>
@@ -44,15 +50,48 @@
                 </group>
               </group>
               <notebook>
-                <page string="Facilities" >
-                  <field name="facility_line" widget="many2many" domain="[('status', '=', False)]">
+                <!-- <page string="Facilities" >
+                  <field name="facility_line" widget="many2many" domain="[('inuse', '=', False)]">
                     <tree>
                       <field name="utilities_type_id" options="{'no_create_edit': True}"/>
                       <field name="interface_type" options="{'no_create_edit': True}"/>
                       <field name="utilities_no" options="{'no_create_edit': True}"/>
-                      <field name="status" options="{'no_create_edit': True}"/>
+                      <field name="inuse" options="{'no_create_edit': True}"/>
                     </tree>
                   </field>
+                </page> -->
+                <page string="Facilities" >
+                  <button type="object" name="generate_facilities" string="Add"/>
+                  <field name="space_facility_line" options="{'no_create':True}">
+                    <tree editable="buttom" create="false">
+                      <field name="facility_id"/>
+                      <field name="source_type_id" options="{'no_create_edit': True}"/>
+                      <field name="lmr_value" />
+                      <field name="lmr_date"/>
+                      <field name="end_date"/>
+                    </tree>
+                  </field>
+                </page>
+                <page string="Job" >
+                  <field name="job_ids">
+                    <tree editable="buttom">
+                      <field name="name"/>
+                      <field name="description"/>
+                      <field name="engineer_id"/>
+                      <field name="recommend_by"/>
+                      <field name="remark"/>
+                    </tree>
+                  </field>
+                </page>
+                <page string="Others" >
+                  <group>
+                    <group>
+                      <field name="min_rate" string="Min Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
+                      <field name="max_rate" string="Max Rate($/sqft)" t-options='{"widget": "monetary", "display_currency": "currency"}'/>
+                    </group>
+                    <group>
+                    </group>
+                  </group>
                 </page>
               </notebook>
           </sheet>
@@ -96,11 +135,6 @@
             <templates>
                 <t t-name="kanban-box">
                     <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_pms_partner_kanban">
-                        <!-- <t t-if="record.id.raw_value">
-                          <div class="o_kanban_image_fill_left d-none d-md-block" t-attf-style="background-image:url('#{kanban_image('pms.lease_agreement', 'image_medium', record.id.raw_value)}')">
-                              <img alt="Logo" class="o_kanban_image_inner_pic" t-att-src="kanban_image('pms.lease_agreement', 'image_small',record.id.raw_value)"/>
-                          </div>
-                        </t> -->
                         <t t-if="record.id.raw_value">
                             <img alt="Logo" t-att-src='_s + "/property_management_system/static/src/image/units.jpg"'/>
                         </t>

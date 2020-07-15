@@ -20,3 +20,5 @@ from . import pms_calculation_method
 from . import pms_lease_unit_pos
 from . import unit_reconfig
 from . import unit_resurvey
+from . import pms_space_unit_facility_lines
+from . import pms_meter_template

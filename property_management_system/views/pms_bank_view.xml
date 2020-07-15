@@ -78,6 +78,9 @@
               <field name="bic" position="before">
                 <field name="branch"/>
               </field>
+              <field name="country" position="replace">
+                <field name="country_id"/>
+              </field>
             </field>
         </record>
     <menuitem  id="bank_menu_root" 

@@ -1,0 +1,8 @@
+id,name,code,sequence,active
+space_type_1,Retail Space,RSC,1,TRUE
+space_type_2,Store Room,SRC,2,TRUE
+space_type_3,Location,LC,3,TRUE
+space_type_4,Open Space,OSC,4,TRUE
+space_type_5,KIOS,KOS,5,TRUE
+space_type_6,ATM,AC,6,TRUE
+space_type_7,Residential Space,RSC,7,TRUE

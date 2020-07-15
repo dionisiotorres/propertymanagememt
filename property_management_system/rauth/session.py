@@ -20,7 +20,7 @@ from .utils import (absolute_url, CaseInsensitiveDict, OAuth1Auth, OAuth2Auth,
 
 from requests.sessions import Session
 
-OAUTH1_DEFAULT_TIMEOUT = OAUTH2_DEFAULT_TIMEOUT = OFLY_DEFAULT_TIMEOUT = 300
+OAUTH1_DEFAULT_TIMEOUT = OAUTH2_DEFAULT_TIMEOUT = OFLY_DEFAULT_TIMEOUT = 30
 
 random = SystemRandom().random
 

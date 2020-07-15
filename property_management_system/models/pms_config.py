@@ -39,7 +39,7 @@ class PmsFormat(models.Model):
                     f_val.append(fl.fix_value)
                 if fl.value_type == 'digit' and fl.digit_value:
                     for d in range(fl.digit_value):
-                        f_val.append(str('x'))
+                        f_val.append(str(d+1))
                 if fl.value_type == 'dynamic' and fl.dynamic_value:
                     f_val.append(fl.dynamic_value)
                 if fl.value_type == 'datetime' and fl.datetime_value:
@@ -75,7 +75,7 @@ class PmsFormat(models.Model):
 class PmsFormatDetail(models.Model):
     _name = "pms.format.detail"
     _description = "Property Formats Details"
-    _order = "position_order"
+    _order = "sequence"
 
     @api.one
     @api.depends(
@@ -97,10 +97,10 @@ class PmsFormatDetail(models.Model):
 
     name = fields.Char("Name", default="New")
     format_id = fields.Many2one("pms.format", "Format")
-    position_order = fields.Integer("Position Order",
-                                    compute='_get_line_numbers',
-                                    store=True,
-                                    readonly=False)
+    # position_order = fields.Integer("Position Order",
+    #                                 compute='_get_line_numbers',
+    #                                 store=True,
+    #                                 readonly=False)
     value_type = fields.Selection([('fix', "Fix"), ('dynamic', 'Dynamic'),
                                    ('digit', 'Digit'),
                                    ('datetime', 'Datetime')],
@@ -120,33 +120,27 @@ class PmsFormatDetail(models.Model):
                                       string="Date Value",
                                       store=True)
     value = fields.Char("Value", compute='get_value_type')
+    sequence = fields.Integer()
+    index = fields.Integer(compute='_compute_index')
 
     @api.one
-    def _get_line_numbers(self):
-        for fmt in self.mapped('format_id'):
-            line_no = 1
-            for line in fmt.format_line_id:
-                line.position_order = line_no
-                line_no += 1
-
-    @api.model
-    def default_get(self, fields_list):
-        res = super(PmsFormatDetail, self).default_get(fields_list)
-        res.update({
-            'position_order':
-            len(self._context.get('format_line_id', [])) + 1
-        })
-        return res
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
 
 class Users(models.Model):
     _inherit = "res.users"
+
+    def _get_property(self):
+        return self.env.user.property_id
 
     property_id = fields.Many2many("pms.properties",
                                    'property_id',
                                    'user_id',
                                    "pms_property_user_rel",
                                    "Property",
+                                   default=_get_property,
                                    store=True,
                                    track_visibility=True)
 
@@ -165,6 +159,10 @@ class Company(models.Model):
     def _default_lease_agreement_format(self):
         if not self.lease_agre_format_id:
             return self.env.ref('base.main_company').lease_agre_format_id
+    
+    def _default_prospect_format(self):
+        if not self.lease_agre_format_id:
+            return self.env.ref('base.main_company').prospect_format_id
 
     def _default_new_lease_term(self):
         if not self.new_lease_term:
@@ -180,7 +178,7 @@ class Company(models.Model):
     floor_code_len = fields.Integer('Floor Code Length',
                                     track_visibility=True,
                                     default=15)
-    space_unit_code_len = fields.Integer('Space Unit Code Length', default=30)
+    # space_unit_code_len = fields.Integer('Space Unit Code Length', default=30)
     space_unit_code_format = fields.Many2one(
         'pms.format',
         'Space Unit Format',
@@ -215,6 +213,10 @@ class Company(models.Model):
     pre_notice_terminate_term = fields.Integer("Pre-Terminate Term(Days)",
                                                default=30,
                                                track_visibility=True)
+    prospect_format_id = fields.Many2one(
+        'pms.format',
+        'Prospect Format',
+        readonly=False)
 
 
 class ResConfigSettings(models.TransientModel):
@@ -231,10 +233,10 @@ class ResConfigSettings(models.TransientModel):
     floor_code_len = fields.Integer('Floor Code Length',
                                     related='company_id.floor_code_len',
                                     readonly=False)
-    space_unit_code_len = fields.Integer(
-        'Space Unit Code Length',
-        related="company_id.space_unit_code_len",
-        readonly=False)
+    # space_unit_code_len = fields.Integer(
+    #     'Space Unit Code Length',
+    #     related="company_id.space_unit_code_len",
+    #     readonly=False)
     space_unit_code_format = fields.Many2one(
         'pms.format',
         'Space Unit Format',
@@ -271,6 +273,11 @@ class ResConfigSettings(models.TransientModel):
     pre_notice_terminate_term = fields.Integer(
         "Pre-Terminate Term(Days)",
         related="company_id.pre_notice_terminate_term",
+        readonly=False)
+    prospect_format_id = fields.Many2one(
+        'pms.format',
+        'Prospect Format',
+        related="company_id.prospect_format_id",
         readonly=False)
 
     @api.onchange('pre_notice_terminate_term')
@@ -313,10 +320,10 @@ class ResConfigSettings(models.TransientModel):
         if self.floor_code_len:
             self.company_id.floor_code_len = self.floor_code_len
 
-    @api.onchange('space_unit_code_len')
-    def onchange_space_unit_code_len(self):
-        if self.space_unit_code_len:
-            self.company_id.space_unit_code_len = self.space_unit_code_len
+    # @api.onchange('space_unit_code_len')
+    # def onchange_space_unit_code_len(self):
+    #     if self.space_unit_code_len:
+    #         self.company_id.space_unit_code_len = self.space_unit_code_len
 
     @api.onchange('space_unit_code_format')
     def onchange_space_unit_code_format(self):
@@ -335,6 +342,8 @@ class PMSLeaseTerms(models.Model):
     _order = "name"
 
     name = fields.Char("Description", required=True, track_visibility=True)
+    term_type = fields.Selection([('newlt',"New Leaseterm"),('extlt',"Extend Leaseterm")])
+    sample = fields.Char("Sample",compute="_compute_sample_format", store=True)
     lease_period_type = fields.Selection([('month', "Month"),
                                           ('year', "Year")],
                                          string="Lease Period Type",
@@ -345,6 +354,14 @@ class PMSLeaseTerms(models.Model):
                                    track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
 
+    @api.multi
+    def name_get(self):
+        result = []
+        for record in self:
+            sample = record.sample
+            result.append((record.id, sample))
+        return result
+    
     @api.model
     def create(self, values):
         format_id = self.search([('name', '=', values['name'])])
@@ -360,3 +377,42 @@ class PMSLeaseTerms(models.Model):
             if sample_id:
                 raise UserError(_("%s is already existed." % vals['name']))
         return super(PMSLeaseTerms, self).write(vals)
+    
+
+    @api.depends('term_type','lease_period_type','min_time_period','max_time_period','notify_period')
+    def _compute_sample_format(self):
+        format = ""
+        if self.term_type =="newlt":
+            format = "NLT"
+        if self.term_type =="extlt":
+            format = "ELT"
+        if self.lease_period_type == "month":
+            format += " Month("
+            if self.notify_period:
+                format += "N-"
+                format += str(self.notify_period)
+                format += "|"
+            if self.min_time_period:
+                format += "Min-"
+                format += str(self.min_time_period)
+                format += "|"
+            if self.max_time_period:
+                format += "Max-"
+                format += str(self.max_time_period)
+            format += ")"
+        if self.lease_period_type == "year":
+            format += " Year("
+            if self.notify_period:
+                format += "N-"
+                format += str(self.notify_period)
+                format += "|"
+            if self.min_time_period:
+                format += "Min-"
+                format += str(self.min_time_period)
+                format += "|"
+            if self.max_time_period:
+                format += "Max-"
+                format += str(self.max_time_period)
+            format += ")"
+        self.sample = format
+        

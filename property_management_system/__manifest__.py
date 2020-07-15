@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.1.5',
+    '1.0.5',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -35,12 +35,14 @@
         'wizard/pms_activate_wizard_view.xml',
         'wizard/pms_terminate_wizard_view.xml',
         'wizard/pms_lease_report_wizard_view.xml',
-        'data/pms.utilities.supply.type.csv',
+        'wizard/pms_alert_message_box_view.xml',
+        'data/pms.utilities.type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
         'data/pms.township.csv',
         'data/pms.calculation.method.csv',
         'data/pms.charge_types.csv',
+        # 'data/pms.space.type.csv',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',
@@ -78,9 +80,12 @@
         'views/unit_config_view.xml',
         'views/unit_survey_view.xml',
         'views/pms_lease_agreement_report.xml',
+        'views/pms_meter_template_view.xml',
+        'views/pms_space_jobs_view.xml',
         'reports/pms_lease_template.xml',
     ],
     'qweb': [
+        'static/src/xml/facilities.xml',
         'static/src/xml/datepicker.xml',
         # 'static/src/xml/property_menu_template.xml',
         ],

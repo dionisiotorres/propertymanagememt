@@ -13,7 +13,7 @@ class PMSLeaseReportlWizard(models.TransientModel):
     state = fields.Selection([('NEW', "New"), ('EXTENDED', "Extended"),
                               ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
-                              ('TERMINATED', 'Terminated'),
+                              ('PRE-TERMINATED', 'Pre-Terminated'),
                               ('EXPIRED', "Expired")],
                              string="Status",
                              default="NEW",

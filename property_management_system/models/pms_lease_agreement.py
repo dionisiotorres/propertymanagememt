@@ -1,12 +1,45 @@
 import json
 import datetime
 import calendar
+import logging
 from calendar import monthrange
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from odoo.addons.property_management_system.models import api_rauth_config
+_logger = logging.getLogger(__name__)
+
+class IrSequence(models.Model):
+    _inherit = 'ir.sequence'
+
+    property_id = fields.Many2one("pms.properties", "Property",store=True)
+    
+    @api.model
+    def next_by_code(self, sequence_code):
+        self.check_access_rights('read')
+        force_company = self._context.get('force_company')
+        force_property = self._context.get('force_property')
+        if not force_company:
+            force_company = self.env.user.company_id.id
+        if len(self.env.user.property_id) >= 1:
+            for pro in self.env.user.property_id:
+                if not force_property:
+                    force_property = pro.id
+                seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False]),('property_id','=',[force_property,False])], order='company_id')
+                if not seq_ids:
+                    _logger.debug("No ir.sequence has been found for code '%s'. Please make sure a sequence is set for current company." % sequence_code)
+                    return False
+                seq_id = seq_ids[0]
+        else:
+            seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False])], order='company_id')
+            if not seq_ids:
+                _logger.debug("No ir.sequence has been found for code '%s'. Please make sure a sequence is set for current company." % sequence_code)
+                return False
+            seq_id = seq_ids[0]   
+        return seq_id._next()
+
+
 
 
 class PMSLeaseAgreement(models.Model):
@@ -26,6 +59,7 @@ class PMSLeaseAgreement(models.Model):
                                         track_visibility=True,
                                         domain=[('company_channel_type.name',
                                                  '=', "Tenant")])
+    company_channel_type_id = fields.Selection([('TENANT',"Tenant"),("NON-TENANT","POS Vendor")],string="Channel Type")
     start_date = fields.Date("Start Date",
                              required=True,
                              track_visibility=True)
@@ -33,7 +67,7 @@ class PMSLeaseAgreement(models.Model):
     extend_to = fields.Date("Extend End", track_visibility=True)
     vendor_type = fields.Char("Vendor Type", track_visibility=True)
     company_vendor_id = fields.Many2one('res.partner',
-                                        "Vendor",
+                                        "POS Vendor",
                                         required=True,
                                         track_visibility=True,
                                         domain=[('company_channel_type.name',
@@ -69,12 +103,11 @@ class PMSLeaseAgreement(models.Model):
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
                               ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
-                              ('TERMINATED', 'Terminated'),
+                              ('PRE-TERMINATED', 'Pre-Terminated'),
                               ('EXPIRED', "Expired")],
                              string="Status",
                              default="BOOKING",
                              track_visibility=True)
-    # active = fields.Boolean(default=True, track_visibility=True)
     lease_agreement_line = fields.One2many("pms.lease_agreement.line",
                                            "lease_agreement_id",
                                            "Lease Agreement Units",
@@ -91,7 +124,6 @@ class PMSLeaseAgreement(models.Model):
     extend_count = fields.Integer("Extend Times",
                                   store=True,
                                   track_visibility=True)
-    # is_terminate = fields.Boolean("Is Terminate", track_visibility=True)
     terminate_period = fields.Date("Terminate Date", track_visibility=True)
     unit_no = fields.Char("Unit",
                           default='',
@@ -116,6 +148,9 @@ class PMSLeaseAgreement(models.Model):
                                       ('survey', 'Y')],
                                      default="new",
                                      string="Reconfig Flag")
+    booking_ref_code = fields.Char("Booking Ref Code", store=True, track_visibility=True)
+    shop_ids = fields.One2many('res.partner', "lease_id",  string='Shop', readonly=False, store=True, track_visibility=True, index=True)
+    # shop_id = fields.Many2one("res.partner","Shop", store=True, track_visibility=True)
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -136,7 +171,27 @@ class PMSLeaseAgreement(models.Model):
                         self.name += str(unit.name) + ')'
                         self.unit_no += str(unit.name)
                 count += 1
+        if self.lease_no == "New":
+            if self.booking_ref_code:
+                self.name += " | " + self.booking_ref_code
+        elif self.lease_no != "New" and self.lease_no:
+            self.name += " | " + self.lease_no
+        else:
+            self.name = self.name
             # return self.name or 'New'
+
+    @api.onchange("company_tanent_id")
+    def onchange_company_tanent_id(self):
+        if self.company_tanent_id.shop_ids:
+            shop = []
+            if len(self.company_tanent_id.shop_ids) >=1:
+                for ts in self.company_tanent_id.shop_ids:
+                    shop.append(ts.id)
+                return {'domain':{'shop_ids':[('id','=',shop)]}}
+        else:
+            self.shop_ids = self.company_tanent_id
+            return {'domain':{'shop_ids':[('id','=',0)]}}
+
 
     @api.multi
     @api.onchange('start_date')
@@ -155,15 +210,64 @@ class PMSLeaseAgreement(models.Model):
                     years=prop.new_lease_term.min_time_period) - relativedelta(
                         days=1)
 
-    # @api.multi
-    # def toggle_active(self):
-    #     for la in self:
-    #         if not la.active:
-    #             la.active = self.active
-    #     super(PMSLeaseAgreement, self).toggle_active()
+   
+
+    def format_generate(self,property,format):
+        formats = None
+        for prop in property:
+            if not format:
+                raise UserError(
+                    _("Please set Your Format in the property setting."
+                        ))
+            if format and format.format_line_id:
+                val = []
+                formats = format.sample
+                for ft in format.format_line_id:
+                    if ft.value_type == 'dynamic':
+                        if property.code and ft.dynamic_value == 'property code':
+                            val.append(property.code)
+                    if ft.value_type == 'fix':
+                        val.append(ft.fix_value)
+                    if ft.value_type == 'digit':
+                        sequent_ids = self.env['ir.sequence'].search([
+                            ('name', '=', 'Lease Agreement'),('property_id','=',property.id), ('code','=',formats)
+                        ])
+                        if not sequent_ids:
+                            sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':property.id,'code': formats})
+                        sequent_ids.write({'padding': ft.digit_value})
+                    if ft.value_type == 'datetime':
+                        mon = yrs = ''
+                        if ft.datetime_value == 'MM':
+                            mon = datetime.today().month
+                            val.append(mon)
+                        if ft.datetime_value == 'MMM':
+                            mon = datetime.today().strftime('%b')
+                            val.append(mon)
+                        if ft.datetime_value == 'YY':
+                            yrs = datetime.today().strftime("%y")
+                            val.append(yrs)
+                        if ft.datetime_value == 'YYYY':
+                            yrs = datetime.today().strftime("%Y")
+                            val.append(yrs)
+                space = []
+                fromat_no_pre = ''
+                if len(val) > 0:
+                    for l in range(len(val)):
+                        fromat_no_pre += str(val[l])
+        format_no = ''
+        sequent_ids = self.env['ir.sequence'].search([('name', '=', 'Lease Agreement'),('property_id','=',property.id),('code','=',formats)])
+        if not sequent_ids:
+            sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':property.id,'code': formats})
+
+        format_no += str(self.env['ir.sequence'].with_context(
+            force_company=self.env.user.company_id.id,force_property = property.id).next_by_code(formats))
+        return fromat_no_pre + format_no
 
     @api.multi
-    def action_activate(self):
+    def action_activate(self):        
+        if self.property_id and self.lease_no == 'New':
+            if self.property_id.lease_format:
+                self.lease_no = self.format_generate(self.property_id,self.property_id.lease_format)
         if not self.lease_agreement_line:
             raise UserError(_("Lease Unit Item does not exist."))
         if self.lease_agreement_line:
@@ -182,10 +286,6 @@ class PMSLeaseAgreement(models.Model):
                     res['extend_count'] = line.extend_count
                     res['extend_to'] = line.extend_to
                     for unit in line.unit_no:
-                        # if unit.status == 'occupied' and line.state == 'BOOKING':
-                        # raise UserError(
-                        #     _("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit."
-                        #       % unit.unit_no))
                         if unit.status == 'occupied' and line.state == 'BOOKING' and unit.config_flag != 'config':
                             raise UserError(
                                 _("Unit(%s)'s status is Occupied that are using in a lease. Please set anthor unit."
@@ -797,8 +897,8 @@ class PMSLeaseAgreement(models.Model):
                 #     months=self.property_id.extend_lease_term.notify_period)
                 # extend_lease_ids = self.search([('extend_to', '=', notify_date)])
         else:
-            self.state == 'TERMINATED'
-            noti = 'Terminated'
+            self.state == 'PRE-TERMINATED'
+            noti = 'Pre-Terminated'
             notify_date = self.end_date.strftime('%Y-%m-%d')
         for val in par_id:
             email_from = val.email
@@ -944,7 +1044,7 @@ class PMSLeaseAgreement(models.Model):
         for ter in lease_ids:
             if ter.terminate_period:
                 if ter.terminate_period == today_date or ter.terminate_period <= today_date:
-                    ter.write({'state': 'TERMINATED'})
+                    ter.write({'state': 'PRE-TERMINATED'})
                     rent_schedule_ids = self.env['pms.rent_schedule'].search([
                         ('unit_no', '=', ter.unit_no),
                         ('lease_no', '=', ter.lease_no),
@@ -953,7 +1053,7 @@ class PMSLeaseAgreement(models.Model):
                     if rent_schedule_ids:
                         for rentid in rent_schedule_ids:
                             rentid.write({
-                                'state': 'terminated',
+                                'state': 'pre-terminated',
                                 'active': False
                             })
                             if rentid.start_date < ter.terminate_period and rentid.end_date > ter.terminate_period:
@@ -963,27 +1063,14 @@ class PMSLeaseAgreement(models.Model):
                                     'end_date': ter.terminate_period
                                 })
 
-    # @api.multi
-    # def action_terminate(self, date):
-    #     if self.terminate_period:
-    #         for line in self:
-    #             rent_schedule_ids = self.env['pms.rent_schedule'].search([
-    #                 ('unit_no', '=', line.unit_no),
-    #                 ('lease_no', '=', line.lease_no),
-    #                 ('start_date', '>=', self.terminate_period)
-    #             ])
-    #             for rentid in rent_schedule_ids:
-    #                 rentid.write({'state': 'terminated', 'active': False})
-    #         terminated = self.write({'state': 'TERMINATED'})
-    #     return terminated
-                    ter.write({'state': 'TERMINATED'})
+                    ter.write({'state': 'PRE-TERMINATED'})
                     rent_schedule_ids = self.env['pms.rent_schedule'].search([
                         ('unit_no', '=', ter.unit_no),
                         ('lease_no', '=', ter.lease_no),
                         ('start_date', '>=', ter.terminate_period)
                     ])
                     for rentid in rent_schedule_ids:
-                        rentid.write({'state': 'terminated'})
+                        rentid.write({'state': 'pre-terminated'})
 
     @api.multi
     def action_terminate(self):
@@ -996,8 +1083,8 @@ class PMSLeaseAgreement(models.Model):
                         ('start_date', '>=', self.terminate_period)
                     ])
                     for rentid in rent_schedule_ids:
-                        rentid.write({'state': 'terminated'})
-                return self.write({'state': 'TERMINATED'})
+                        rentid.write({'state': 'pre-terminated'})
+                return self.write({'state': 'PRE-TERMINATED'})
             else:
                 raise UserError(
                     _("Today date (%s) must be greater than or equal Tarminate date (%s)"
@@ -1005,7 +1092,7 @@ class PMSLeaseAgreement(models.Model):
         else:
             raise UserError(
                 _("Please click is Terminate to set terminate date."))
-        terminated = self.write({'state': 'TERMINATED'})
+        terminated = self.write({'state': 'PRE-TERMINATED'})
         if terminated:
             for line in self:
                 rent_schedule_ids = self.env['pms.rent_schedule'].search([
@@ -1013,7 +1100,7 @@ class PMSLeaseAgreement(models.Model):
                     ('lease_no', '=', line.lease_no),
                     ('start_date', '>=', self.terminate_period)
                 ])
-                rent_schedule_ids.write({'state': 'terminated'})
+                rent_schedule_ids.write({'state': 'pre-terminated'})
         return terminated
 
     @api.multi
@@ -1033,64 +1120,9 @@ class PMSLeaseAgreement(models.Model):
 
     @api.model
     def create(self, values):
-        property_id = None
-        if 'lease_no' in values:
-            lease_id = self.search([('lease_no', '=', values['lease_no'])])
-            if lease_id:
-                raise UserError(
-                    _("%s is already existed." % values['lease_no']))
-        if values['property_id']:
-            property_id = self.env['pms.properties'].browse(
-                values['property_id'])
-            if property_id:
-                for prop in property_id:
-                    if not prop.lease_format:
-                        raise UserError(
-                            _("Please set Your Lease Format in the property setting."
-                              ))
-                    if prop.lease_format and prop.lease_format.format_line_id:
-                        val = []
-                        for ft in prop.lease_format.format_line_id:
-                            if ft.value_type == 'dynamic':
-                                if property_id.code and ft.dynamic_value == 'property code':
-                                    val.append(property_id.code)
-                            if ft.value_type == 'fix':
-                                val.append(ft.fix_value)
-                            if ft.value_type == 'digit':
-                                sequent_ids = self.env['ir.sequence'].search([
-                                    ('name', '=', 'Lease Agreement')
-                                ])
-                                sequent_ids.write({'padding': ft.digit_value})
-                            if ft.value_type == 'datetime':
-                                mon = yrs = ''
-                                if ft.datetime_value == 'MM':
-                                    mon = datetime.today().month
-                                    val.append(mon)
-                                if ft.datetime_value == 'MMM':
-                                    mon = datetime.today().strftime('%b')
-                                    val.append(mon)
-                                if ft.datetime_value == 'YY':
-                                    yrs = datetime.today().strftime("%y")
-                                    val.append(yrs)
-                                if ft.datetime_value == 'YYYY':
-                                    yrs = datetime.today().strftime("%Y")
-                                    val.append(yrs)
-                        space = []
-                        lease_no_pre = ''
-                        if len(val) > 0:
-                            for l in range(len(val)):
-                                lease_no_pre += str(val[l])
-        lease_no = ''
-        if 'company_id' not in values:
-            values['company_id'] = self.env.user.company_id.id
-        lease_no += self.env['ir.sequence'].with_context(
-            force_company=values['company_id']).next_by_code(
-                'pms.lease_agreement')
-        values['lease_no'] = lease_no_pre + lease_no
         if values['start_date'] and values['end_date']:
             termend_date = prop = setdate = termdate = None
-            prop = property_id
-            print(values['start_date'], values['end_date'])
+            prop = self.env['pms.properties'].search([('id','=',values['property_id'])])
             sdate = datetime.strptime(str(values['start_date']), '%Y-%m-%d')
             edate = datetime.strptime(str(values['end_date']), '%Y-%m-%d')
             if not prop.new_lease_term:
@@ -1103,6 +1135,7 @@ class PMSLeaseAgreement(models.Model):
                 termend_date = sdate + relativedelta(
                     years=prop.new_lease_term.min_time_period) - relativedelta(
                         days=1)
+            values['booking_ref_code'] = self.format_generate(prop,prop.prospect_format_id)
             setdate = edate - sdate
             termdate = termend_date - sdate
             year = self.find_years(termdate.days)
@@ -1163,58 +1196,27 @@ class PMSLeaseAgreement(models.Model):
                       (dyear)))
         id = None
         id = super(PMSLeaseAgreement, self).write(vals)
+        if id:
+            self.send_data_import(vals)
+        return id
+    
+    def send_data_import(self, vals):
         if 'state' in vals and id:
             if 'BOOKING' not in vals or 'CANCELLED' not in vals:
-                if self.lease_rent_config_id:
-                    property_id = self.env['pms.properties'].browse(
-                        vals['property_id']
-                    ) if 'property_id' in vals else self.property_id
-                    if property_id.api_integration == True and property_id.api_integration_id:
-                        integ_obj = property_id.api_integration_id
-                        integ_line_obj = integ_obj.api_integration_line
-                        rent_ids = integ_line_obj.search([('name', '=',
-                                                           "LeaseAgreement")])
-                        datas = api_rauth_config.APIData.get_data(
-                            self, vals, property_id, integ_obj, rent_ids)
-                        if datas:
-                            if datas.res:
-                                response = json.loads(datas.res)
-                                if 'responseStatus' in response:
-                                    if response['responseStatus']:
-                                        if 'message' in response:
-                                            if response[
-                                                    'message'] == 'SUCCESS':
-                                                self.write(
-                                                    {'is_api_post': True})
-                        if self.lease_agreement_line:
-                            leaseitem_api_id = integ_line_obj.search([
-                                ('name', '=', "Leaseunititem")
-                            ])
-                            datas = api_rauth_config.APIData.get_data(
-                                self, vals, property_id, integ_obj,
-                                leaseitem_api_id)
-                            if datas:
-                                if datas.res:
-                                    response = json.loads(datas.res)
-                                    if 'responseStatus' in response:
-                                        if response['responseStatus']:
-                                            if 'message' in response:
-                                                if response[
-                                                        'message'] == 'SUCCESS':
-                                                    for litem in self.lease_agreement_line:
-                                                        litem.write({
-                                                            'is_api_post':
-                                                            True
-                                                        })
-                        for loop in self.lease_agreement_line:
-                            if loop.leaseunitpos_line_id:
-                                leaseipos_api_id = integ_line_obj.search([
-                                    ('name', '=', "Leaseunitpos")
-                                ])
+                if self.lease_agreement_line:
+                    for lal in self.lease_agreement_line:
+                        imported = lal.unit_no.spaceunittype_id.space_type_id.is_import
+                        if imported:
+                            property_id = self.env['pms.properties'].browse(
+                                vals['property_id']
+                            ) if 'property_id' in vals else self.property_id
+                            if property_id.api_integration == True and property_id.api_integration_id:
+                                integ_obj = property_id.api_integration_id
+                                integ_line_obj = integ_obj.api_integration_line
+                                rent_ids = integ_line_obj.search([('name', '=',
+                                                                "LeaseAgreement")])
                                 datas = api_rauth_config.APIData.get_data(
-                                    self, vals, property_id, integ_obj,
-                                    leaseipos_api_id)
-
+                                    self, vals, property_id, integ_obj, rent_ids)
                                 if datas:
                                     if datas.res:
                                         response = json.loads(datas.res)
@@ -1223,32 +1225,75 @@ class PMSLeaseAgreement(models.Model):
                                                 if 'message' in response:
                                                     if response[
                                                             'message'] == 'SUCCESS':
-                                                        for lul in loop.leaseunitpos_line_id:
-                                                            lul.write({
-                                                                'is_api_post':
-                                                                True
-                                                            })
-                        if self.lease_rent_config_id:
-                            leasers_api_id = integ_line_obj.search([
-                                ('name', '=', "RentSchedule")
-                            ])
-                            datas = api_rauth_config.APIData.get_data(
-                                self, vals, property_id, integ_obj,
-                                leasers_api_id)
-                            if datas:
-                                if datas.res:
-                                    response = json.loads(datas.res)
-                                    if 'responseStatus' in response:
-                                        if response['responseStatus']:
-                                            if 'message' in response:
-                                                if response[
-                                                        'message'] == 'SUCCESS':
-                                                    for lrs in self.lease_rent_config_id:
-                                                        lrs.write({
+                                                        self.write(
+                                                            {'is_api_post': True})
+                                # if self.lease_agreement_line:
+                                leaseitem_api_id = integ_line_obj.search([
+                                    ('name', '=', "Leaseunititem")
+                                ])
+                                datas = api_rauth_config.APIData.get_data(
+                                    self, vals, property_id, integ_obj,
+                                    leaseitem_api_id)
+                                if datas:
+                                    if datas.res:
+                                        response = json.loads(datas.res)
+                                        if 'responseStatus' in response:
+                                            if response['responseStatus']:
+                                                if 'message' in response:
+                                                    if response[
+                                                            'message'] == 'SUCCESS':
+                                                        # for litem in self.lease_agreement_line:
+                                                        lal.write({
                                                             'is_api_post':
                                                             True
                                                         })
-        return id
+                                # for loop in self.lease_agreement_line:
+                                if lal.leaseunitpos_line_id:
+                                    leaseipos_api_id = integ_line_obj.search([
+                                        ('name', '=', "Leaseunitpos")
+                                    ])
+                                    datas = api_rauth_config.APIData.get_data(
+                                        self, vals, property_id, integ_obj,
+                                        leaseipos_api_id)
+
+                                    if datas:
+                                        if datas.res:
+                                            response = json.loads(datas.res)
+                                            if 'responseStatus' in response:
+                                                if response['responseStatus']:
+                                                    if 'message' in response:
+                                                        if response[
+                                                                'message'] == 'SUCCESS':
+                                                            for lul in lal.leaseunitpos_line_id:
+                                                                lul.write({
+                                                                    'is_api_post':
+                                                                    True
+                                                                })
+                                if self.lease_rent_config_id:
+                                    if lal.applicable_charge_id:
+                                        for chline in lal.applicable_charge_id:
+                                            if chline.applicable_charge_id.charge_type_id:
+                                                imported = chline.applicable_charge_id.charge_type_id.is_import
+                                                if imported:
+                                                    leasers_api_id = integ_line_obj.search([
+                                                        ('name', '=', "RentSchedule")
+                                                    ])
+                                                    datas = api_rauth_config.APIData.get_data(
+                                                        self, vals, property_id, integ_obj,
+                                                        leasers_api_id)
+                                                    if datas:
+                                                        if datas.res:
+                                                            response = json.loads(datas.res)
+                                                            if 'responseStatus' in response:
+                                                                if response['responseStatus']:
+                                                                    if 'message' in response:
+                                                                        if response[
+                                                                                'message'] == 'SUCCESS':
+                                                                            for lrs in self.lease_rent_config_id:
+                                                                                lrs.write({
+                                                                                    'is_api_post':
+                                                                                    True
+                                                                                })
 
     def lease_agreement_scheduler(self):
         values = None
@@ -1293,10 +1338,6 @@ class PMSLeaseAgreementLine(models.Model):
         if self._context.get('end_date') != False:
             return self._context.get('end_date')
 
-    # def get_property_id(self):
-    #     if not self.property_id:
-    #         return self.lease_agreement_id.property_id or None
-
     name = fields.Char("Name", compute="compute_name", track_visibility=True)
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
                                          "Lease Agreement",
@@ -1336,7 +1377,7 @@ class PMSLeaseAgreementLine(models.Model):
     state = fields.Selection([('BOOKING', 'Booking'), ('NEW', "New"),
                               ('EXTENDED', "Extended"), ('RENEWED', 'Renewed'),
                               ('CANCELLED', "Cancelled"),
-                              ('TERMINATED', 'Terminated'),
+                              ('Pre-TERMINATED', 'Pre-Terminated'),
                               ('EXPIRED', "Expired")],
                              related="lease_agreement_id.state",
                              string='Status',
@@ -1363,11 +1404,25 @@ class PMSLeaseAgreementLine(models.Model):
                                            'leaseagreementitem_id',
                                            "Lease Unit POS")
     is_api_post = fields.Boolean("Posted")
-
     reconfig_flag = fields.Selection([("new", "N"), ("config", "C"),
                                       ('survey', 'Y')],
                                      string="Reconfig Flag")
     reconfig_date = fields.Date("Reconfig Date")
+    shop_ids = fields.One2many('res.partner', "lease_line_id", string='Shop', related="company_tanent_id.shop_ids", readonly=False, store=True, track_visibility=True, index=True)
+    shop_id = fields.Many2one("res.partner","Shop", store=True, track_visibility=True)
+
+    # @api.onchange('shop_ids')
+    # def domain_lease_tanent_id(self):
+    #     if self.shop_ids: 
+    #         shop = []
+    #         if len(self.shop_ids) >1:
+    #             for ts in self.shop_ids:
+    #                 shop.append(ts.id)
+    #             return {'domain':{'shop_id':[('id','in',shop)]}}
+    #         if len(self.shop_ids) == 1:
+    #             self.shop_id = self.lease_agreement_id.company_tanent_id
+    #     else:
+    #         self.shop_id = self.lease_agreement_id.company_tanent_id
 
     @api.one
     @api.depends('unit_no', 'lease_no')
@@ -1381,7 +1436,7 @@ class PMSLeaseAgreementLine(models.Model):
             self.name = self.unit_no.name
         else:
             self.name = 'New'
-
+    
     @api.one
     def get_interfacecode(self, val):
         posints = []
@@ -1492,7 +1547,8 @@ class PMSLeaseAgreementLine(models.Model):
                             rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
                             'name':
-                            _(l.charge_type.name),
+                            _(l.unit_no.name),
+                            'description':l.charge_type.name,
                             'account_id':
                             account_id,
                             'price_unit':
@@ -1545,8 +1601,8 @@ class PMSLeaseAgreementLine(models.Model):
                             area = 1
                             rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'name':
-                            _(l.charge_type.name),
+                            'unit_no':_(l.unit_no.name),
+                            'charge_type_id':l.charge_type.name,
                             'account_id':
                             account_id,
                             'price_unit':
@@ -1635,17 +1691,32 @@ class PMSLeaseAgreementLine(models.Model):
 class PMSChargeTypes(models.Model):
     _name = 'pms.charge_types'
     _description = "Charge Types"
-    _order = 'ordinal_no,name'
+    _order = 'sequence,name'
 
     name = fields.Char("Charge Type", required=True, track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No", required=True)
     calculate_method_ids = fields.Many2many("pms.calculation.method",
                                             "pms_charge_type_calculation",
                                             "charge_id", "calc_method_id",
                                             "Calculate Methods")
     active = fields.Boolean(default=True, track_visibility=True)
+    description = fields.Char("Description", track_visibility=True)
+    sequence = fields.Integer()
+    index = fields.Integer(compute='_compute_index')
+    space_type_ids = fields.Many2many("pms.space.type","pms_charge_type_space_type","charge_id", "space_id","Space Type")
+    base = fields.Selection([('per-item','Per/Item'),('per-area',"Per/Area"),('per-chargetype',"Per/ChargeType")])
+    charge_method_type = fields.Selection([('fix','Fix'),('$-area',"$/sqft")],"Charge Method type")
+    calculate_period = fields.Selection([('hourly',"Hourly"),('daily',"Daily"),('weekly',"Weekly"),('monthly',"Monthly"),('quaterly',"Quarterly"),('yearly',"Yearly")],"Calculate Peroid")
+    billing_frequency = fields.Selection([('minthly','Monthly'),('quarter',"Quarterly"),('yearly','Yearly')],"Billing Frequency")
+    is_import = fields.Boolean("Import?")
+    remark = fields.Text("Remark")
+    
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Charge Type is already existed.')]
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def toggle_active(self):

@@ -27,7 +27,7 @@ class PMSLeaseTerminateWizard(models.TransientModel):
                             days=pro.terminate_days)
         return date or None
 
-    date = fields.Date("Terminated Date", default=_get_date)
+    date = fields.Date("Pre Terminated Date", default=_get_date)
 
     @api.multi
     def action_terminate_wiz(self):
@@ -48,7 +48,7 @@ class PMSLeaseTerminateWizard(models.TransientModel):
                                 days=pro.terminate_days)
                 if self.date < date:
                     raise UserError(
-                        _("Termination date'%s' should not be earlier than the terminated term date'%s'."
+                        _("Termination date'%s' should not be earlier than the pre terminated term date'%s'."
                           % (self.date, date)))
                 lease_ids.write({'terminate_period': date})
         else:

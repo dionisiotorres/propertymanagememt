@@ -5,11 +5,19 @@ from odoo.exceptions import UserError
 class PMSSpaceType(models.Model):
     _name = 'pms.space.type'
     _description = 'Space Type'
-    _order = 'ordinal_no,name'
+    _order = 'sequence,name'
 
     name = fields.Char("Space Type", required=True, track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No", required=True)
+    code = fields.Char("Space Code", required=True, track_visibility=True)
     active = fields.Boolean(default=True)
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+    is_import = fields.Boolean("Is Import?")
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def toggle_active(self):

@@ -5,18 +5,22 @@ from odoo.exceptions import UserError
 class PMSApplicableSpaceType(models.Model):
     _name = 'pms.applicable.space.type'
     _description = 'Applicable Space Type'
-    _order = 'ordinal_no,name'
+    _order = 'sequence,name'
 
     name = fields.Char("Space Type", required=True, track_visibility=True)
     space_type_id = fields.Many2one("pms.space.type",
                                     "Main Space Type",
                                     required=True)
-    chargeable = fields.Boolean("IsChargable", track_visibility=True)
-    divisible = fields.Boolean("Manageable", track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No",
-                                required=True,
-                                help='To display order as prefer')
+    chargeable = fields.Boolean("Chargable", default=True, track_visibility=True)
+    divisible = fields.Boolean("Merge-Split", default=True, track_visibility=True)
     active = fields.Boolean(default=True)
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def toggle_active(self):

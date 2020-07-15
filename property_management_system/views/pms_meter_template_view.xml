@@ -1,0 +1,73 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_meter_template_form">
+      <field name="name">Meter Templates Form</field>
+      <field name="model">pms.meter.template</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <div class="oe_title">
+            <label for="name" string="Meter Templates"/>
+            <h1>
+                <field name="name" placeholder="Meter Templates"/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name='utilities_type'/>
+              <field name='power_system' widget="radio"/>
+              <field name='meter_type' widget="radio"/>
+              <field name="current_unit_type" widget="radio"/>
+              <field name='digit'/>
+            </group>
+          </group>
+          <notebook>
+            <page name="Supplies" string="Supplies">
+              <field name="template_line">
+                <tree editable="buttom">
+                  <field name="utilities_supply_id"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_meter_template_tree">
+      <field name="name">Meter Templates list</field>
+      <field name="model">pms.meter.template</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name='utilities_type'/>
+          <field name='power_system'/>
+          <field name='meter_type'/>
+          <field name='digit'/>
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_meter_template_filter">
+      <field name="name">Meter Templates list</field>
+      <field name="model">pms.meter.template</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name='utilities_type'/>
+        </search>
+      </field>
+    </record>
+     <record id="action_meter_template" model="ir.actions.act_window">
+       <field name="name">Meter Templates</field>
+       <field name="res_model">pms.meter.template</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_meter_template_tree"/> 
+    </record> 
+    <menuitem  id="meter_template_menu_root" 
+      name="Meter Tempalate" 
+      parent="property_management_menu_sub"
+      action="action_meter_template"
+      sequence="110"/>
+  </data>
+</odoo>

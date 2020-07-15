@@ -19,11 +19,13 @@
             </div>
             <group>
               <group>
-              <field name="lease_period_type" />
-              <field name="min_time_period" />
-              <field name="max_time_period" />
+                <field name="sample"/>
+                <field name="term_type"/>
+                <field name="lease_period_type" />
               </group>
               <group>
+              <field name="min_time_period" />
+                <field name="max_time_period" />
                 <field name="notify_period"/>
               </group>
             </group>
@@ -37,6 +39,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
+           <field name="sample"/>
           <field name="lease_period_type"/> 
           <field name="min_time_period"/> 
           <field name="max_time_period"/>  

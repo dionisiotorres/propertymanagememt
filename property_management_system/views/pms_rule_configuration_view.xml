@@ -38,7 +38,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-12 col-lg-4 o_setting_box">
+                    <!-- <div class="col-12 col-lg-4 o_setting_box">
                       <div class="o_setting_right_pane">
                         <span class="o_form_label">Maximum Space Unit Code Length</span>
                         <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
@@ -51,7 +51,7 @@
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                   <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Format Definition</h4>
                   <div class="row mt16 o_settings_container">
@@ -85,16 +85,30 @@
                         </div>
                       </div>
                     </div>
-                      <div class="col-12 col-lg-4 o_setting_box">
+                    <div class="col-12 col-lg-4 o_setting_box">
                       <div class="o_setting_right_pane">
-                        <span class="o_form_label">Lease Agreement No Format</span>
+                        <span class="o_form_label">Prospect Format</span>
                         <div class="text-muted">
-                          Define lease agreement no format to apply when create a lease.
+                          Define Prospect format to apply when create a lease at the booking state.
                         </div>
                         <div class="content-group">
-                         <div class="mt16">
-                            <field name="lease_agre_format_id"  style="width: 100%;"  />
+                          <div class="mt16">
+                              <field name="prospect_format_id"  style="width: 100%;"/>
+                          </div>
+                        </div> 
+                      </div>
+                    </div>
+                    <div class="col-12 col-lg-4 o_setting_box">
+                      <div class="o_setting_right_pane">
+                        <span class="o_form_label">Space Unit Code Format</span>
+                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                        <div class="text-muted">
+                          Set the space unit code format with the default
                         </div>
+                        <div class="content-group">
+                          <div class="mt16">
+                            <field name="space_unit_code_format"  style="width: 100%;" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -145,7 +159,7 @@
                       <div class="o_setting_right_pane">
                         <span class="o_form_label">Extend Count</span>
                         <div class="text-muted">
-                          Define extend count term to apply when extend a lease.
+                          Max extension number count.
                         </div>
                         <div class="content-group">
                         <div class="mt16">

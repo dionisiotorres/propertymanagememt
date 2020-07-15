@@ -1,8 +1,8 @@
 <odoo>
   <data>
     <record model="ir.ui.view" id="view_utilities_supply_type_form">
-      <field name="name">Utilities Supply Type Form</field>
-      <field name="model">pms.utilities.supply.type</field>
+      <field name="name">Utilities Type Form</field>
+      <field name="model">pms.utilities.type</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
@@ -12,15 +12,18 @@
               </button>
             </div>
             <div class="oe_title">
-            <label for="name" string="Utilities Supply Type"/>
+            <label for="name" string="Utilities Type"/>
             <h1>
-                <field name="name" placeholder="Utilities Supply Type"/>
+              <field name="name" placeholder="Utilities Type"/>
             </h1>
           </div>
           <group>
             <group>
-                <!-- <field name="property_id"/> -->
-                <field name="code" placeholder="Utilities Supply Code"/>
+                <field name="code" placeholder="Utilities Code"/>
+                <field name="export_utilities_type" placeholder="Export Utilities Type"/>
+            </group>
+            <group>
+              <field name="description"/>
             </group>
           </group>
           </sheet>
@@ -28,20 +31,22 @@
       </field>
     </record>
     <record model="ir.ui.view" id="view_utilities_supply_type_tree">
-      <field name="name">Utilities Supply Type list</field>
-      <field name="model">pms.utilities.supply.type</field>
+      <field name="name">Utilities Type list</field>
+      <field name="model">pms.utilities.type</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="sequence" widget="handle"/>
           <field name="code"/>
           <field name="name"/>
+          <field name="export_utilities_type" placeholder="Export Utilities Type"/>
+          <field name="description"/>
         </tree>
       </field>
     </record>
      <record model="ir.ui.view" id="view_utilities_supply_type_filter">
-      <field name="name">Utilities Supply Type list</field>
-      <field name="model">pms.utilities.supply.type</field>
+      <field name="name">Utilities Type list</field>
+      <field name="model">pms.utilities.type</field>
       <field name="arch" type="xml">
-      
         <search>
           <field name="code"/>
           <field name="name"/>
@@ -49,33 +54,37 @@
       </field>
     </record>
      <record id="action_utilities_supply_type_all" model="ir.actions.act_window">
-       <field name="name">Utilities Supply Types</field>
-       <field name="res_model">pms.utilities.supply.type</field>
+       <field name="name">Utilities Types</field>
+       <field name="res_model">pms.utilities.type</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_utilities_supply_type_tree"/> 
     </record>
     <record model="ir.ui.view" id="view_pms_utilities_source_type_form">
-      <field name="name">Utilities Source Type Form</field>
-      <field name="model">pms.utilities.source.type</field>
+      <field name="name">Utilities Supply Form</field>
+      <field name="model">pms.utilities.supply</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
-            <div class="oe_button_box" name="button_box">
+            <!-- <div class="oe_button_box" name="button_box">
               <button type="object" class="oe_stat_button" icon="fa-archive">
-                  <!-- <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/> -->
+                  <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
               </button>
-            </div>
+            </div> -->
             <div class="oe_title">
-            <label for="name" string="Utilities Source Type"/>
+            <label for="name" string="Utilities Supply"/>
             <h1>
-                <field name="name" placeholder="Utilities Source Type"/>
+                <field name="name" placeholder="Utilities Supply"/>
             </h1>
           </div>
           <group>
             <group> 
                 <field name="code" placeholder="GEN"/>
                 <field name="utilities_type_id" placeholder="PM"/>
+                <field name="export_supply_type" placeholder="Export Supply Type"/>                
+            </group>
+            <group>
+              <field name="description"/>
             </group>
           </group>
           </sheet>
@@ -83,19 +92,22 @@
       </field>
     </record>
     <record model="ir.ui.view" id="view_pms_utilities_source_type_tree">
-      <field name="name">Utilities Source Type list</field>
-      <field name="model">pms.utilities.source.type</field>
+      <field name="name">Utilities Supply list</field>
+      <field name="model">pms.utilities.supply</field>
       <field name="arch" type="xml">
         <tree>
-            <field name="code"/>
-            <field name="name"/>
-            <field name="utilities_type_id"/>
+          <field name="sequence" widget="handle"/>
+          <field name="code"/>
+          <field name="name"/>
+          <field name="utilities_type_id"/>
+          <field name="export_supply_type" placeholder="Export Supply Type"/>
+          <field name="description"/>
         </tree>
       </field>
     </record>
      <record model="ir.ui.view" id="view_pms_utilities_source_type_filter">
-      <field name="name">Utilities Source Type list</field>
-      <field name="model">pms.utilities.source.type</field>
+      <field name="name">Utilities Supply list</field>
+      <field name="model">pms.utilities.supply</field>
       <field name="arch" type="xml">
         <search>
             <field name="code"/>
@@ -105,19 +117,19 @@
       </field>
     </record>
     <record id="action_utilities_source_type_all" model="ir.actions.act_window">
-       <field name="name">Utilities Source Types</field>
-       <field name="res_model">pms.utilities.source.type</field>
+       <field name="name">Utilities Supply</field>
+       <field name="res_model">pms.utilities.supply</field>
        <field name="view_type">form</field>
        <field name="view_mode">tree,form</field>
        <field name="view_id" ref="view_pms_utilities_source_type_tree"/> 
     </record>
     <menuitem  id="utilities_type_menu_root" 
-        name="Utilities Supply Type" 
+        name="Utilities Type" 
         parent="property_management_menu_sub"
         groups="base.group_system"
         action="action_utilities_supply_type_all"/>
     <menuitem  id="utilities_source_type_menu_root" 
-        name="Utilities Source Type" 
+        name="Utilities Supply" 
         parent="property_management_menu_sub"
         action="action_utilities_source_type_all"/>
   </data> 

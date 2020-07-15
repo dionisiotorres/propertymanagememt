@@ -43,7 +43,7 @@ class PMSRentSchedule(models.Model):
                               track_visibility=True)
 
     state = fields.Selection([('draft', "Draft"), ('generated', "Generated"),
-                              ('terminated', "Terminated")],
+                              ('pre-terminated', "Pre-Terminated")],
                              "Status",
                              default="draft")
     billing_date = fields.Date(string="Billing Date", required=True)
@@ -80,7 +80,6 @@ class PMSRentSchedule(models.Model):
                                     if pct_name == cct_name and apl.start_date <= line.start_date and apl.end_date >= line.end_date and pcm_name == ccm_name:
                                         total_rate = apl.rate
                                 elif ccm_name == 'Area':
-                                    # total_rate = lagl.unit_no.area * apl.rate
                                     total_rate = line.amount
                                 elif ccm_name == 'Percentage':
                                     percent_amount = 0
@@ -257,13 +256,21 @@ class PMSRentSchedule(models.Model):
 class PMSPropertyType(models.Model):
     _name = 'pms.property.type'
     _description = 'Property Types'
+    _order = 'sequence, name'
 
     name = fields.Char("Property Type", required=True, track_visibility=True)
+    description = fields.Text("Description", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-    # property_id = fields.Many2one("pms.properties", "Property")
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
 
     _sql_constraints = [('name_unique', 'unique(name)',
                          'Your name is exiting in the database.')]
+    
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def name_get(self):
@@ -281,23 +288,31 @@ class PMSPropertyType(models.Model):
         super(PMSPropertyType, self).toggle_active()
 
 
-class PMSUtilitiesSourceType(models.Model):
-    _name = "pms.utilities.source.type"
-    _description = "Utilities Source Types"
+class PMSUtilitiesSupply(models.Model):
+    _name = "pms.utilities.supply"
+    _description = "Utilities Supply"
+    _order = "sequence,name"
 
-    name = fields.Char("Utilities Source Type",
+    name = fields.Char("Utilities supply",
                        required=True,
                        track_visibility=True)
-    code = fields.Char("Utilities Source Code",
+    code = fields.Char("Utilities Supply Code",
                        required=True,
                        track_visibility=True)
-    utilities_type_id = fields.Many2one('pms.utilities.supply.type',
-                                        "Utilities Supply Type",
+    utilities_type_id = fields.Many2one('pms.utilities.type',
+                                        "Utilities Type",
                                         required=True,
                                         track_visibility=True)
+    export_supply_type = fields.Char("Export Supply Type")
+    description = fields.Text("Description",track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-    # _sql_constraints = [('code_unique', 'unique(code)',
-    #                      'Your name/code is exiting in the database.')]
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+    
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def name_get(self):
@@ -312,14 +327,14 @@ class PMSUtilitiesSourceType(models.Model):
         for st in self:
             if not st.active:
                 st.active = self.active
-        super(PMSUtilitiesSourceType, self).toggle_active()
+        super(PMSUtilitiesSupply, self).toggle_active()
 
     @api.model
     def create(self, values):
         soruc_id = self.search([('code', '=', values['code'])])
         if soruc_id:
             raise UserError(_("%s is already existed" % values['code']))
-        return super(PMSUtilitiesSourceType, self).create(values)
+        return super(PMSUtilitiesSupply, self).create(values)
 
     @api.multi
     def write(self, vals):
@@ -327,54 +342,47 @@ class PMSUtilitiesSourceType(models.Model):
             soruc_id = self.search([('code', '=', vals['code'])])
             if soruc_id:
                 raise UserError(_("%s is already existed" % vals['code']))
-        return super(PMSUtilitiesSourceType, self).write(vals)
+        return super(PMSUtilitiesSupply, self).write(vals)
 
 
-class PMSUtilitiesSupplyType(models.Model):
-    _name = "pms.utilities.supply.type"
-    _description = "Utilities Supply Types"
-    _order = 'ordinal_no,name'
+class PMSUtilitiesType(models.Model):
+    _name = "pms.utilities.type"
+    _description = "Utilities Type"
+    _order = 'sequence,name'
 
-    name = fields.Char("Utilities Supply Type",
+    name = fields.Char("Utilities Type",
                        required=True,
                        track_visibility=True)
-    code = fields.Char("Utilities Supply Code",
+    code = fields.Char("Utilities Type Code",
                        required=True,
                        track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No")
+    export_utilities_type = fields.Char("Export Utilities Type")
+    description = fields.Text("Description", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Code is already existed.')]
 
-    # @api.model
-    # def create(self, values):
-    #     supp_id = self.search([('code', '=', values['code'])])
-    #     if supp_id:
-    #         raise UserError(_("%s is already existed" % values['code']))
-    #     return super(PMSUtilitiesSupplyType, self).create(values)
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     # @api.multi
-    # def write(self, vals):
-    #     if 'code' in vals:
-    #         supp_id = self.search([('code', '=', vals['code'])])
-    #         if supp_id:
-    #             raise UserError(_("%s is already existed" % vals['code']))
-    #     return super(PMSUtilitiesSupplyType, self).write(vals)
-
-    @api.multi
-    def name_get(self):
-        result = []
-        for record in self:
-            code = record.code
-            result.append((record.id, code))
-        return result
+    # def name_get(self):
+    #     result = []
+    #     for record in self:
+    #         code = record.code
+    #         result.append((record.id, code))
+    #     return result
 
     @api.multi
     def toggle_active(self):
         for pt in self:
             if not pt.active:
                 pt.active = self.active
-        super(PMSUtilitiesSupplyType, self).toggle_active()
+        super(PMSUtilitiesType, self).toggle_active()
 
 
 class PMSFacilitiesline(models.Model):
@@ -388,14 +396,12 @@ class PMSFacilitiesline(models.Model):
     facility_id = fields.Many2one("pms.facilities",
                                   "Facilities",
                                   track_visibility=True)
-    source_type_id = fields.Many2one('pms.utilities.source.type',
-                                     "Utilities Source Type",
+    source_type_id = fields.Many2one('pms.utilities.supply',
+                                     "Utilities Supply",
                                      required=True,
                                      track_visibility=True)
-    # install_date = fields.Date("Install Date", track_visibility=True)
     lmr_date = fields.Date("Last Reading Date", track_visibility=True)
     lmr_value = fields.Float("Last Reading Value", track_visibility=True)
-    # digit = fields.Integer("Digit", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
@@ -410,7 +416,7 @@ class PMSFacilitiesline(models.Model):
         uti_ids = lst = []
         domain = {}
         if self.facility_id.utilities_type_id:
-            utilities_ids = self.env['pms.utilities.source.type'].search([
+            utilities_ids = self.env['pms.utilities.supply'].search([
                 ('utilities_type_id', '=',
                  self.facility_id.utilities_type_id.id)
             ])
@@ -418,20 +424,6 @@ class PMSFacilitiesline(models.Model):
                 uti_ids.append(uti.id)
             domain = {'source_type_id': [('id', 'in', uti_ids)]}
         return {'domain': domain}
-
-    # @api.model
-    # def create(self, values):
-    #     id = None
-    #     id = super(PMSFacilitiesline, self).create(values)
-    #     if id:
-    #         property_obj = self.env['pms.properties'].browse(
-    #             values['property_id'])
-    #         integ_obj = self.env['pms.api.integration']
-    #         api_type_obj = self.env['pms.api.type'].search([('name', '=',
-    #                                                          "FacilitieLine")])
-    #         datas = api_rauth_config.APIData(id, values, property_obj,
-    #                                          integ_obj, api_type_obj)
-    #     return id
 
 
 class PMSSpaceUntiManagement(models.Model):
@@ -495,21 +487,6 @@ class PMSDisplayType(models.Model):
         return result
 
 
-# class PMSMeterType(models.Model):
-#     _name = "pms.meter.type"
-#     _description = 'Meter Type'
-
-#     name = fields.Char("Meter No")
-#     utilities_id = fields.Many2one("pms.utilities.type", "utilities Type")
-#     display_type = fields.Many2one('pms.display.type', 'Display Type')
-#     digit = fields.Selection([('3', '3'), ('4', '4'), ('5', '5'), ('6', '6'),
-#                               ('7', '7'), ('8', '8'), ('9', '9')],
-#                              "Display Digits")
-#     charge_type = fields.Selection([('fixed', 'Fixed'),
-#                                     ('variable', 'Variable')],
-#                                    string="Charge Type")
-
-
 class PMSTerms(models.Model):
     _name = "pms.terms"
     _description = 'Terms'
@@ -532,8 +509,8 @@ class PMSTerms(models.Model):
     property_code_len = fields.Integer("Property Code Len",
                                        track_visibility=True)
     floor_code_len = fields.Integer("Floor Code Len", track_visibility=True)
-    space_unit_code_len = fields.Integer("Space Unit Code Len",
-                                         track_visibility=True)
+    # space_unit_code_len = fields.Integer("Space Unit Code Len",
+    #                                      track_visibility=True)
     active = fields.Boolean("Active", default=True, track_visibility=True)
 
     @api.multi
@@ -542,28 +519,6 @@ class PMSTerms(models.Model):
             if not pt.active:
                 pt.active = self.active
         super(PMSTerms, self).toggle_active()
-
-
-# class PMSBank(models.Model):
-#     _name = 'pms.bank'
-#     _description = "Bank"
-
-#     country = fields.Many2one("pms.country",
-#                               "Country Name",
-#                               track_visibility=True)
-#     city_id = fields.Many2one("pms.city", "City Name", track_visibility=True)
-#     state_id = fields.Many2one("pms.state",
-#                                "State Name",
-#                                track_visibility=True)
-#     name = fields.Char("Name", track_visibility=True)
-#     bic = fields.Char("Bank Identifier Code", track_visibility=True)
-#     phone = fields.Char("Phone", track_visibility=True)
-#     email = fields.Char("Email", track_visibility=True)
-#     no = fields.Char("No", track_visibility=True)
-#     street = fields.Char("Street", track_visibility=True)
-#     zip_code = fields.Char("Zip", track_visibility=True)
-#     active = fields.Char(default=True, track_visibility=True)
-
 
 class Bank(models.Model):
     _inherit = 'res.bank'
@@ -576,6 +531,11 @@ class Bank(models.Model):
                          index=True,
                          track_visibility=True,
                          help="Sometimes called BIC or Swift.")
+                         
+    township = fields.Many2one("pms.township",
+                               "Township",
+                               store=True,
+                               track_visibility=True)
     city_id = fields.Many2one("pms.city",
                               "City Name",
                               readonly=False,
@@ -583,10 +543,6 @@ class Bank(models.Model):
                               store=True,
                               track_visibility=True,
                               ondelete='cascade')
-    township = fields.Many2one("pms.township",
-                               "Township",
-                               store=True,
-                               track_visibility=True)
     state_id = fields.Many2one("res.country.state",
                                "State Name",
                                readonly=False,
@@ -675,66 +631,6 @@ class Company(models.Model):
         for company in self:
             company.partner_id.township = company.township
 
-    # @api.model
-    # def create(self, vals):
-    #     # if vals.get('name'):
-    #     #     companyname = vals.get('name')
-    #     #     company_id = self.search([('name', '=', companyname)])
-    #     #     if company_id:
-    #     #         raise UserError(_("%s is already existed." % companyname))
-    #     if not vals.get('name') or vals.get('partner_id'):
-    #         self.clear_caches()
-    #         return super(Company, self).create(vals)
-    #     partner = self.env['res.partner'].create({
-    #         'name': vals['name'],
-    #         'is_company': True,
-    #         'image': vals.get('logo'),
-    #         'customer': False,
-    #         'email': vals.get('email'),
-    #         'phone': vals.get('phone'),
-    #         'website': vals.get('website'),
-    #         'vat': vals.get('vat'),
-    #     })
-    #     vals['partner_id'] = partner.id
-    #     self.clear_caches()
-    #     company = super(Company, self).create(vals)
-    #     # The write is made on the user to set it automatically in the multi company group.
-    #     self.env.user.write({'company_ids': [(4, company.id)]})
-    #     partner.write({'company_id': company.id})
-
-    #     # Make sure that the selected currency is enabled
-    #     if vals.get('currency_id'):
-    #         currency = self.env['res.currency'].browse(vals['currency_id'])
-    #         if not currency.active:
-    #             currency.write({'active': True})
-    #     return company
-
-    # @api.multi
-    # def write(self, values):
-    #     self.clear_caches()
-    #     if values.get('name'):
-    #         companyname = values.get('name')
-    #         company_id = self.search([('name', '=', companyname)])
-    #         if company_id:
-    #             raise UserError(_("%s is already existed." % companyname))
-    #     # Make sure that the selected currency is enabled
-    #     if values.get('currency_id'):
-    #         currency = self.env['res.currency'].browse(values['currency_id'])
-    #         if not currency.active:
-    #             currency.write({'active': True})
-
-    #     return super(Company, self).write(values)
-
-
-# class PMSTownship(models.Model):
-#     _name = "pms.township"
-#     _description = "Township"
-
-#     city_id = fields.Many2one("pms.city","City Name",required=True)
-#     name = fields.Char("Township Name", required=True)
-#     code = fields.Char("Township Code", required=True)
-
-
 class PMSTownship(models.Model):
     _name = "pms.township"
     _description = "Township"
@@ -749,53 +645,6 @@ class PMSTownship(models.Model):
                               track_visibility=True)
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Township Code is already existed.')]
-
-
-# class PMSState(models.Model):
-#     _name = "pms.state"
-#     _description = "State"
-
-#     country_id = fields.Many2one("pms.country",
-#                                  "Country Name",
-#                                  required=True,
-#                                  track_visibility=True)
-#     name = fields.Char("State Name", required=True, track_visibility=True)
-#     code = fields.Char("State Code", required=True, track_visibility=True)
-
-# class CountryState(models.Model):
-#     _description = "Country state"
-#     _inherit = 'res.country.state'
-#     _order = 'code'
-
-#     @api.model
-#     def create(self, values):
-#         if 'name' in values:
-#             state_id = self.env['res.country.state'].search([
-#                 ('name', '=', values['name']), ('code', '=', values['code']),
-#                 ('country_id', '=', values['country_id'])
-#             ])
-#             if state_id:
-#                 raise UserError(_("%s are already existed" % values['name']))
-#         result = super(CountryState, self).create(values)
-#         return result
-
-#     @api.multi
-#     def write(self, values):
-#         if 'name' in values:
-#             state_id = self.env['res.country.state'].search([('name', '=',
-#                                                               values['name'])])
-#             if state_id:
-#                 if 'code' in values:
-#                     for stid in state_id:
-#                         if values['code'] == stid.code:
-#                             if 'country_id' in values:
-#                                 if values[
-#                                         'country_id'] == state_id.country_id.id:
-#                                     raise UserError(
-#                                         _("%s are already existed" %
-#                                           values['name']))
-#         result = super(CountryState, self).write(values)
-#         return result
 
 
 class PMSCountry(models.Model):
@@ -845,12 +694,18 @@ class PMSDepartment(models.Model):
 class PMSCompanyCategory(models.Model):
     _name = "pms.company.category"
     _description = "Company Categorys"
-    _order = 'ordinal_no,code,name'
+    _order = 'sequence,code,name'
 
     name = fields.Char("Description", required=True, track_visibility=True)
     code = fields.Char("Code", track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.multi
     def toggle_active(self):
@@ -895,6 +750,12 @@ class Partner(models.Model):
                                    "Sub Trade",
                                    track_visibility=True)
     is_api_post = fields.Boolean("Posted")
+    is_company = fields.Boolean(string='Is a Company', default=True, help="Check if the contact is a company, otherwise it is a person")
+    is_shop = fields.Boolean(string='Is a shop', help="Check if the contact is a company or branch, otherwise it is a person")
+    shop_ids = fields.One2many('res.partner', "parent_id", string='Shop', domain=[('is_shop', '=', True)], track_visibility=True, index=True)
+    lease_id = fields.Many2one("pms.lease.agreement", "Lease")
+    lease_line_id = fields.Many2one("pms.lease.agreement", "Lease")
+
 
     @api.one
     @api.depends('company_channel_type')
@@ -906,6 +767,17 @@ class Partner(models.Model):
                     category.append(cat.name)
                 if 'Tenant' in category:
                     self.is_tanent = True
+        if not self.company_channel_type:
+            if 'default_code' in self.company_channel_type._context:
+                if self.company_channel_type._context.get('default_code') in ('TENANT','NON-TENANT'):
+                    code = self.company_channel_type._context.get('default_code')
+                    self.company_channel_type = self.company_channel_type.search([('code','=',code)])
+                for comp in self.company_channel_type:
+                    for cat in comp:
+                        category.append(cat.name)
+                    if 'Tenant' in category:
+                        self.is_tanent = True
+
 
     @api.depends('is_company')
     def _compute_company_type(self):
@@ -917,9 +789,6 @@ class Partner(models.Model):
             else:
                 partner.company_type = 'person'
 
-    # def _write_company_type(self):
-    #     for partner in self:
-    #         partner.is_company = partner.company_type = 'company'
 
     def crm_scheduler(self):
         values = None
@@ -959,26 +828,6 @@ class Partner(models.Model):
             if crm_id:
                 raise UserError(_("%s is already existed" % values['name']))
         return super(Partner, self).create(values)
-        # id = None
-        # id = super(Partner, self).create(values)
-        # if id and id.is_company:
-        #     property_id = None
-        #     if id.company_channel_type:
-        #         integ_obj = self.env['pms.api.integration'].search([])
-        #         api_line_ids = self.env['pms.api.integration.line'].search([
-        #             ('name', '=', "CRMAccount")
-        #         ])
-        #         datas = api_rauth_config.APIData.get_data(
-        #             id, values, property_id, integ_obj, api_line_ids)
-        #         if datas:
-        #             if datas.res:
-        #                 response = json.loads(datas.res)
-        #                 if 'responseStatus' in response:
-        #                     if response['responseStatus']:
-        #                         if 'message' in response:
-        #                             if response['message'] == 'SUCCESS':
-        #                                 id.write({'is_api_post': True})
-        # return id
 
     @api.one
     def write(self, vals):
@@ -999,26 +848,7 @@ class Partner(models.Model):
             api_line_ids = self.env['pms.api.integration.line'].search([
                 ('name', '=', "CRMAccount")
             ])
-            # if 'is_api_post' in vals:
-            #     if not vals['is_api_post']:
-            #         datas = api_rauth_config.APIData.get_data(
-            #             self, vals, property_id, integ_obj, api_line_ids)
-            #         if datas:
-            #             if datas.res:
-            #                 response = json.loads(datas.res)
-            #                 if 'responseStatus' in response:
-            #                     if response['responseStatus']:
-            #                         if 'message' in response:
-            #                             if response['message'] == 'SUCCESS':
-            #                                 self.write({'is_api_post': True})
-            #     else:
-            #         datas = None
-            # else:
-                # if self.is_api_post:
             datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
-            # else:
-            #     datas = api_rauth_config.APIData.get_data(
-            #         self, vals, property_id, integ_obj, api_line_ids)
             if datas:
                 if 'res' in datas:
                     if datas.res:
@@ -1198,127 +1028,3 @@ class PMSGenerateRentSchedule(models.Model):
                     'invoice_line_ids': [(6, 0, invoice_lines)],
                 })
         return True
-
-    # @api.multi
-    # def action_view_invoice(self):
-    #     invoices = self.env['account.invoice'].search([('lease_no','=',self.lease_agreement_id.lease_no)])
-    #     action = self.env.ref('account.action_invoice_tree1').read()[0]
-    #     if len(invoices) > 2:
-    #         action['domain'] = [('id', 'in', invoices[1])]
-    #     elif len(invoices) == 2:
-    #         action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
-    #         action['res_id'] = invoices[1].id
-    #     else:
-    #         action = {'type': 'ir.actions.act_window_close'}
-    #     return action
-    # def action_invoice(self, vals):
-    #     invoice_month = invoices = None
-    #     sch_ids = start_date = end_date = []
-    #     if vals[0][0] and vals[0][1]:
-    #         invoice_month = str(calendar.month_name[vals[0][0]]) + ' - ' + str(vals[0][1])
-    #     invoices = self.env['account.invoice'].search([('lease_items', '=', self.name), ('inv_month', '=', invoice_month)])
-    #     if invoices:
-    #         raise UserError(_("Already create invoice for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
-    #     else:
-    #         invoice_lines = []
-    #         payment_term = self.env['account.payment.term'].search([('name', '=', 'Immediate Payment')])
-    #         product_name = product_id = prod_ids = prod_id = product_tmp_id = None
-    #         for l in self.rent_schedule_line:
-    #             product_name = l.lease_agreement_line_id.unit_no.name
-    #             prod_ids = self.env['product.template'].search([('name', 'ilike', product_name)])
-    #             prod_id = self.env['product.product'].search([('product_tmpl_id', '=', prod_ids.id)])
-    #             if inv_type == 'MONTHLY' and vals:
-    #                 area = rent = 0
-    #                 if l.start_date.month == vals[0][0] and l.start_date.year == vals[0][1]:
-    #                     if not prod_ids:
-    #                         val = {'name': product_name,
-    #                             'sale_ok': False,
-    #                             'is_unit': True}
-    #                         product_tmp_id = self.env['product.template'].create(val)
-    #                         product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
-    #                         if not product_tmp_ids:
-    #                             product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
-    #                         product_id = product_tmp_ids or product_id
-    #                     else:
-    #                         product_id = prod_id
-    #                     account_id = False
-    #                     if product_id.id:
-    #                         account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
-    #                     taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
-    #                     unit = self.lease_agreement_id.lease_no
-    #                     if l.charge_type.calcuation_method.name == 'area':
-    #                         area = 1
-    #                         rent = l.amount
-    #                     elif l.charge_type.calcuation_method.name == 'meter_unit':
-    #                         area = 1
-    #                         rent = l.amount
-    #                     else:
-    #                         area = 1
-    #                         rent = l.amount
-    #                     inv_line_id = self.env['account.invoice.line'].create({
-    #                         'name': _(l.charge_type.name),
-    #                         'account_id': account_id,
-    #                         'price_unit': rent,
-    #                         'quantity': area,
-    #                         'uom_id': self.unit_no.uom.id,
-    #                         'product_id': product_id.id,
-    #                         'invoice_line_tax_ids': [(6, 0, taxes.ids)],
-    #                     })
-    #                     invoice_lines.append(inv_line_id.id)
-    #             if inv_type == 'INITIAL_PAYMENT' and vals:
-    #                 area = rent = 0
-    #                 if l.start_date in start_date:
-    #                     if not prod_ids:
-    #                         val = {'name': product_name,
-    #                             'sale_ok': False,
-    #                             'is_unit': True}
-    #                         product_tmp_id = self.env['product.template'].create(val)
-    #                         product_tmp_ids = self.env['product.product'].search([('product_tmpl_id', '=', product_tmp_id.id)])
-    #                         if not product_tmp_ids:
-    #                             product_id = self.env['product.product'].create({'product_tmpl_id': product_tmp_id.id})
-    #                         product_id = product_tmp_ids or product_id
-    #                     else:
-    #                         product_id = prod_id
-    #                     account_id = False
-    #                     if product_id.id:
-    #                         account_id = product_id.property_account_income_id.id or product_id.categ_id.property_account_income_categ_id.id
-    #                     taxes = product_id.taxes_id.filtered(lambda r: not self.lease_agreement_id.company_id or r.company_id == self.lease_agreement_id.company_id)
-    #                     unit = self.lease_agreement_id.lease_no
-    #                     if l.charge_type.calcuation_method.name == 'area':
-    #                         area = 1
-    #                         rent = l.amount
-    #                     elif l.charge_type.calcuation_method.name == 'meter_unit':
-    #                         area = 1
-    #                         rent = l.amount
-    #                     else:
-    #                         area = 1
-    #                         rent = l.amount
-    #                     inv_line_id = self.env['account.invoice.line'].create({
-    #                         'name': _(l.charge_type.name),
-    #                         'account_id': account_id,
-    #                         'price_unit': rent,
-    #                         'quantity': area,
-    #                         'uom_id': self.unit_no.uom.id,
-    #                         'product_id': product_id.id,
-    #                         'invoice_line_tax_ids': [(6, 0, taxes.ids)],
-    #                     })
-    #                     invoice_lines.append(inv_line_id.id)
-    #         if not invoice_lines and vals:
-    #             raise UserError(_("No have Invoice Line for %s in %s." %(calendar.month_name[vals[0][0]], vals[0][1])))
-    #         inv_ids = self.env['account.invoice'].create({
-    #             'lease_items':self.name,
-    #             'lease_no': self.lease_agreement_id.lease_no,
-    #             'unit_no': self.lease_agreement_id.unit_no,
-    #             'inv_month': invoice_month,
-    #             'partner_id': self.lease_agreement_id.company_tanent_id.id,
-    #             'property_id': self.lease_agreement_id.property_id.id,
-    #             'company_id': self.lease_agreement_id.company_id.id,
-    #             'payment_term_id': payment_term.id,
-    #             'invoice_line_ids': [(6, 0, invoice_lines)],
-    #             })
-    #         self.invoice_count += 1
-    #         inv_ids.action_invoice_open()
-    #         is_email =  self.env.user.company_id.invoice_is_email
-    #         template_id =self.env.ref('account.email_template_edi_invoice', False)
-    #         composer = self.env['mail.compose.message'].create({'composition_mode': 'comment'})
-    #         return inv_ids

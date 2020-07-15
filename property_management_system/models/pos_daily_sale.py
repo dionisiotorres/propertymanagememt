@@ -8,7 +8,6 @@ class POSDailySale(models.Model):
     _name = "pos.daily.sale"
     _description = 'POS Daily Sale'
 
-    # property_id = fields.Many2one("pms.properties", "Mall", store=True)
     property_code = fields.Char("PropertyCode", store=True)
     pos_interface_code = fields.Char("POSInterfaceCode")
     pos_receipt_date = fields.Date("POSReceiptDate")
@@ -39,9 +38,6 @@ class POSDailySale(models.Model):
             sale_id = posdatas[1]
             for sid in sale_id:
                 currency_id = code = business_date = None
-                # code = self.env['pms.properties'].search([
-                #     ('code', '=', sid['propertyCode'])
-                # ]).code
                 code = sid['propertyCode']
                 currency_id = self.env['res.currency'].search([
                     ('name', '=', sid['currency'])

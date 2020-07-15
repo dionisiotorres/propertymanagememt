@@ -78,7 +78,7 @@ class UnitResurvey(models.Model):
         leaseitem_id = leaseitem_obj.search([
             ('unit_no', '=', self.resurveyunit_id.id),
             ('state', 'not in', ('BOOKING', 'CANCELLED', 'EXPIRED',
-                                 'TERMINATED'))
+                                 'PRE-TERMINATED'))
         ])
         if leaseitem_id:
             leaseitem_id.write({

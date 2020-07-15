@@ -156,6 +156,18 @@
                                 </form>
                             </field>
                         </page>
+                         <page name='shop' string="Shop" attrs="{'invisible': [('is_company', '!=', True)]}">
+                            <field name="shop_ids" context="{'default_parent_id': active_id, 'default_is_shop':True,'default_is_company':False}">
+                                <tree editable="buttom">
+                                    <field name="name"/>
+                                    <field name="email"/>
+                                    <field name="parent_id"/>
+                                    <field name="is_shop"/>
+                                    <field name="phone"/>
+                                    <field name="mobile"/>
+                                </tree>                  
+                            </field>
+                        </page>
                         <page name='internal_notes'  attrs="{'invisible': [('is_company', '=', True)]}" string="Internal Notes">
                             <field name="comment" placeholder="Internal note..."/>
                         </page>
@@ -198,16 +210,20 @@
                     <attribute name="invisible">1</attribute>
                </field>
                 <field name="name" position="after">
+                    <field name="parent_id" domain="[('is_shop','=',True)]" operator="child_of"/>
                     <field name='company_channel_type'/>
                     <field name='trade_id'/>
                     <field name='sub_trade_id'/>
+                    <separator/>
+                    <filter string="Shops" name="type_shop" domain="[('is_shop','=',True)]"/>
                </field>
                 <field name="phone" position="attributes">
                     <attribute name="invisible">1</attribute>
                </field>
                  <group name="group_by" position="replace">
                     <group expand="0" name="group_by" string="Group By">
-                      <!-- <filter name="company_channel_type" string="Tenant" context="{'group_by': 'company_channel_type'}"/> -->
+                      <filter name="shop" string="Shop" domain="[('is_shop','=',True)]" context="{'group_by': 'parent_id'}"/>
+                      <filter name="group_company" string="Company" context="{'group_by': 'parent_id'}"/>
                       <filter name="trade_id" string="Trade" context="{'group_by': 'trade_id'}"/>
                       <filter name="sub_trade_id" string="Sub Trade" context="{'group_by': 'sub_trade_id'}"/>                     
                     </group>

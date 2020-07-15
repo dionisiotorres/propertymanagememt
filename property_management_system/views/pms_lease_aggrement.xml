@@ -13,7 +13,7 @@
             <button name="%(action_extend_wiz)d" states="NEW,EXTENDED" type="action" string="Extend" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
             <button name="action_renew" states="NEW,EXTENDED" type="object" string="Renew"/>
             <button name="%(action_terminate_wiz)d" states="NEW,EXTENDED" type="action" string="TERMINATE"/>
-            <field name="state" widget="statusbar" statusbar_visible="BOOKING,NEW,EXTENDED,RENEWED,CANCELLED,TERMINATED,EXPIRED"/>
+            <field name="state" widget="statusbar" statusbar_visible="BOOKING,NEW,EXTENDED,RENEWED,CANCELLED,PRE-TERMINATED,EXPIRED"/>
           </header>
           <sheet>
           <div class="oe_button_box" name="button_box">
@@ -23,7 +23,7 @@
                 string="New"  attrs="{'invisible': [('state','not in', ['RENEWED'])]}">
             </button>
           </div>
-            <div class="oe_title" >
+            <div class="oe_title" style="width:650px;">
                 <h1>
                     <field name="name" placeholder="Description"/>
                 </h1>
@@ -31,23 +31,22 @@
             <group>
               <group>
                 <field name="property_id" 
-                  attrs="{'readonly': [('state','in', ['TERMINATED'])],'required':[('state','in',['BOOKING'])]}"
+                  attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])],'required':[('state','in',['BOOKING'])]}"
                 />
-                <field name="company_tanent_id" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                <field name="company_vendor_id" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                <field name="currency_id" attrs="{'readonly': [('state','in', ['TERMINATED'])]}" />
+                <field name="company_tanent_id" context="{'default_code':'TENANT'}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                <field name="company_vendor_id" context="{'default_code':'NON-TENANT'}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                <field name="currency_id" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}" />
                 <field name="unit_no" invisible="1"/>
-                <field name="lease_no" readonly="1"/>
-                <field name="old_lease_no" readonly="1" attrs="{'invisible': ['|',('old_lease_no','=',''),('old_lease_no','=', 'New')]}"/>
+                <field name="shop_ids" widget="many2many_tags"  options="{'no_create_edit': True, 'no_create':True, 'no_open':True}"/>
               </group>
               <group>
-                  <field name="booking_date"  attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                  <field name="booking_expdate"  attrs="{'invisible': [('state','not in', ['BOOKING'])]}"/>
-                  <field name="start_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                  <field name="end_date"  attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                  <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['EXTENDED','TERMINATED'])],'readonly':[('state','in',['EXTENDED','TERMINATED'])]}" />
+                  <field name="booking_date"  attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                  <field name="booking_expdate"  attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                  <field name="start_date"  attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                  <field name="end_date"  attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                  <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['EXTENDED','PRE-TERMINATED'])],'readonly':[('state','in',['EXTENDED','PRE-TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
-                  <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','TERMINATED'])], 'readonly':[('state','in',['TERMINATED'])]}"/>
+                  <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','PRE-TERMINATED'])], 'readonly':[('state','in',['PRE-TERMINATED'])]}"/>
                   <field name="reconfig_flag" attrs="{'invisible':[('reconfig_flag','not in',['survey'])]}"/>
               </group>
             </group>
@@ -56,13 +55,15 @@
                     <field name="lease_agreement_line" context="{'start_date': start_date,'end_date':end_date}">
                     <form>
                       <header>
-                        <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,TERMINATED,EXPIRED"/>
+                        <field name="state" widget="statusbar" statusbar_visible="NEW,EXTENDED,CANCELLED,PRE-TERMINATED,EXPIRED"/>
                       </header>
                       <sheet>
                         <group attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                           <group>
                             <field name="lease_agreement_id" invisible="1"/>
                             <field name="unit_no" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                            <field name="shop_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="shop_id" domain="[('id','in',shop_ids)]"  options="{'no_create_edit': True, 'no_create':True, 'no_open':True}"/>
                           </group>
                           <group>
                             <field name="start_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
@@ -73,7 +74,7 @@
                         </group>
                       <notebook>
                           <page string="Lease Unit Charges">
-                            <field name="applicable_type_line_id" attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}" context="{'active_id': active_id}">
+                            <field name="applicable_type_line_id" attrs="{'readonly': [('parent.state','in', ['PRE-TERMINATED','CANCELLED'])]}" context="{'active_id': active_id}">
                               <form>
                                 <group>
                                     <group>
@@ -114,6 +115,7 @@
                     </form>
                       <tree attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
                         <field name="unit_no"/>
+                        <field name="shop_id"/>
                         <field name="start_date" />
                         <field name="end_date" />
                         <field name="extend_to" string="Extend To"/>
@@ -126,15 +128,15 @@
                 <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
                   <group>
                     <group colspan="2">
-                      <field name="pos_submission" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                      <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>                
-                      <field name="sale_data_type" widget="radio"   options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                      <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/> 
+                      <field name="pos_submission" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>                
+                      <field name="sale_data_type" widget="radio"   options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/> 
                     </group>
                     <group>   
-                      <field name="reset_gp_flat" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                      <field name="reset_date" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
-                      <field name="remark" attrs="{'readonly': [('state','in', ['TERMINATED'])]}"/>
+                      <field name="reset_gp_flat" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="reset_date" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="remark" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
                     </group>
                   </group>
                 </page>
@@ -197,6 +199,7 @@
           <field name="unit_no"/>
           <field name="lease_no"/>
           <field name="old_lease_no"/>
+          <field name="booking_ref_code"/>
           <!-- <field name="booking_date" attrs="{'invisible':[('state','not in',['BOOKING'])]}"/>
           <field name="booking_expdate" attrs="{'invisible':[('state','not in',['BOOKING'])]}"/> -->
           <field name="start_date" />
@@ -216,6 +219,7 @@
             <field name="company_tanent_id"/>
             <field name="unit_no"/>
             <field name="lease_no"/>
+            <field name="booking_ref_code"/>
             <field name="start_date" />
             <field name="state"/>
             <templates>
@@ -230,6 +234,7 @@
                             <ul>
                                 <li t-if="record.property_id.raw_value"><field name="property_id"/></li>
                                 <li t-if="record.lease_no.raw_value"><field name="lease_no"/></li>
+                                <li t-if="record.booking_ref_code"><field name="booking_ref_code"/></li>
                                 <li t-if="record.state.raw_value"><field name="state"/></li>
                             </ul>
                             <div class="oe_kanban_partner_links"/>
@@ -247,6 +252,7 @@
         <search>
           <field name="unit_no"/>
           <field name="lease_no"/>
+          <field name="booking_ref_code"/>
           <field name="old_lease_no"/>
           <field name="property_id"/>
           <field name="company_tanent_id"/>
@@ -424,17 +430,23 @@
               </button>
             </div>
             <div class="oe_title">
-                <label for="name" string="Charge Type"/>
-                <h1>
-                    <field name="name" placeholder="Charge Type"/>
-                </h1>
+              <h1>
+                <field name="name" placeholder="Charge Type"/>
+              </h1>
             </div>
             <group>
                 <group>
-                    <field name="calculate_method_ids" widget="many2many_tags"/>
-                    <field name="ordinal_no"/> 
+                  <field name="calculate_method_ids" widget="many2many_tags"/>
+                  <field name="description" placeholder="Descripton"/>
+                  <field name="is_import" />
+                  <field name="remark" placeholder="Remark"/>
                 </group>
                 <group>
+                  <field name="space_type_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit':True, 'no_open':True}"/>
+                  <field name="base"/>
+                  <field name="charge_method_type"/>
+                  <field name="calculate_period"/>
+                  <field name="billing_frequency"/>
                 </group>
             </group>
           </sheet>
@@ -446,9 +458,12 @@
       <field name="model">pms.charge_types</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="sequence" widget="handle"/>
           <field name="name"/>
+          <field name="description"/>
           <field name="calculate_method_ids" widget="many2many_tags"/>
-          <field name="ordinal_no"/>
+          <field name="space_type_ids"/>
+          <field name="is_import" />    
         </tree>
       </field>
     </record>

@@ -1,4 +1,4 @@
-id,ordinal_no,code,name
+id,sequence,code,name
 pms_company_cate_1,1,TENANT,Tenant
 pms_company_cate_2,2,NON-TENANT,POS Vendor
 pms_company_cate_3,3,CMO,CMO Office

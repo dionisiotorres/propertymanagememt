@@ -2,6 +2,8 @@ import json
 import pytz
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
+from datetime import datetime,date, timedelta
+from dateutil.relativedelta import relativedelta
 from odoo.addons.property_management_system.models import api_rauth_config
 
 _tzs = [
@@ -156,11 +158,6 @@ class PMSProperties(models.Model):
                                               'partner_id',
                                               track_visibility=True,
                                               string='Managements')
-    # leaseterms_line_id = fields.Many2many("pms.leaseterms",
-    #                                       "pms_properties_leaseterms_rel",
-    #                                       "properties_id",
-    #                                       "leaseterm_id",
-    #                                       string="LeaseTerms")
     image = fields.Binary(
         "Image",
         attachment=True,
@@ -179,10 +176,10 @@ class PMSProperties(models.Model):
         "Property Code Length",
         track_visibility=True,
         default=lambda self: self.env.user.company_id.property_code_len)
-    unit_code_len = fields.Integer(
-        "Unit Code Length",
-        track_visibility=True,
-        default=lambda self: self.env.user.company_id.space_unit_code_len)
+    # unit_code_len = fields.Integer(
+    #     "Unit Code Length",
+    #     track_visibility=True,
+    #     default=lambda self: self.env.user.company_id.space_unit_code_len)
     floor_code_len = fields.Integer(
         "Floor Code Length",
         track_visibility=True,
@@ -202,6 +199,8 @@ class PMSProperties(models.Model):
         "POS ID  Format",
         track_visibility=True,
         default=lambda self: self.env.user.company_id.pos_id_format.id)
+    prospect_format_id = fields.Many2one('pms.format',"Booking Format", track_visibility=True,
+        default=lambda self: self.env.user.company_id.prospect_format_id.id)
     new_lease_term = fields.Many2one(
         "pms.leaseterms",
         "New Lease Term",
@@ -233,6 +232,17 @@ class PMSProperties(models.Model):
     is_api_post = fields.Boolean("Posted")
     api_integration_id = fields.Many2one("pms.api.integration", "API Provider")
     meter_type = fields.Selection([('SHARED','Shared'),('NORMAL','Normal')], string="Meter Type", default="NORMAL")
+    billing_circle_from = fields.Char("Billing Circle From")
+    billing_circle_to = fields.Char("Billing Circle To")
+    utilities_lines = fields.One2many("pms.utilities.lines",'property_id',"Utilities")
+    utilities_type_ids = fields.Many2many("pms.utilities.type", string="Utilities")
+    utilities_supply_ids = fields.Many2many("pms.utilities.supply", string="Utilities Supply")
+    vacant_unit = fields.Integer("Vacant Unit", compute="_get_vacant_unit")
+    occupy_unit = fields.Integer('Occupied Unit', compute="_get_occupied_unit")
+    booking_lease = fields.Integer('Booking Lease', compute="_get_booking_lease")
+    new_lease = fields.Integer('Booking Lease', compute="_get_new_lease")
+    extend_lease =fields. Integer('Extend Lease', compute="_get_extend_lease")
+    expire_lease = fields. Integer('Expire Soon', compute ="_get_expire_lease")
 
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
@@ -298,6 +308,152 @@ class PMSProperties(models.Model):
             action = {'type': 'ir.actions.act_window_close'}
         return action
 
+    # New Vacant Count Unit
+    @api.multi
+    def _get_vacant_unit(self):
+        count = 0
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        today = date.today()
+        for unit in unit_ids:
+            lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
+                                                                        ('state','=','NEW'),
+                                                                        ('unit_no','=',unit.id),
+                                                                        ('start_date','<=',today),
+                                                                        ('end_date','>=',today)
+                                                                        ])
+            if not lease_line_ids:    
+                self.vacant_unit += 1
+
+    @api.multi
+    def vacant_action_units(self):
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        today = avail_date = datetime.today()
+        units= []
+        for unit in unit_ids:
+            lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
+                                                                        ('state','=','NEW'),
+                                                                        ('unit_no','=',unit.name),
+                                                                        ('start_date','<=',today),
+                                                                        ('end_date','>=',today)
+                                                                        ])
+            if not lease_line_ids:
+                units.append(unit.id) 
+
+        action = self.env.ref(
+            'property_management_system.action_space_all').read()[0]
+        if len(units) > 1:
+            action['domain'] = [('id', 'in', units)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_space_unit_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    # New Occupied Count Unit
+    @api.multi
+    def _get_occupied_unit(self):
+        count = 0
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        today = date.today()
+        for unit in unit_ids:
+            lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
+                                                                        ('state','=','NEW'),
+                                                                        ('unit_no','=',unit.id),
+                                                                        ('start_date','<=',today),
+                                                                        ('end_date','>=',today)
+                                                                        ])
+            if lease_line_ids:    
+                self.occupy_unit += 1
+
+    @api.multi
+    def occupied_action_units(self):
+        unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
+                                                       self.id),
+                                                      ('active', '=', True)])
+        today = avail_date = datetime.today()
+        units= []
+        for unit in unit_ids:
+            lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
+                                                                        ('state','=','NEW'),
+                                                                        ('unit_no','=',unit.name),
+                                                                        ('start_date','<=',today),
+                                                                        ('end_date','>=',today)
+                                                                        ])
+            if lease_line_ids:
+                units.append(unit.id) 
+
+        action = self.env.ref(
+            'property_management_system.action_space_all').read()[0]
+        if len(units) > 1:
+            action['domain'] = [('id', 'in', units)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_space_unit_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    # Booking Lease
+    @api.multi
+    def _get_booking_lease(self):
+        count = 0
+        unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
+                                                       self.id),('state','=','BOOKING')])
+        for unit in unit_ids:
+            self.booking_lease += 1
+
+    @api.multi
+    def booking_action_lease(self):
+        unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
+                                                       self.id),('state','=','BOOKING')])
+
+        action = self.env.ref(
+            'property_management_system.action_lease_aggrement_all').read()[0]
+        if len(unit_ids) > 1:
+            action['domain'] = [('id', 'in', unit_ids.ids)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_lease_aggrement_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    # New Lease
+    @api.multi
+    def _get_new_lease(self):
+        count = 0
+        unit_ids = self.env['pms.lease_agreement'].search(['&',('property_id', '=',
+                                                       self.id),'|',('state','=','NEW'),('state','=','EXTENDED')])
+        for unit in unit_ids:
+            self.new_lease += 1
+    
+    @api.multi
+    def new_action_lease(self):
+        unit_ids = self.env['pms.lease_agreement'].search(['&',('property_id', '=',
+                                                       self.id),'|',('state','=','NEW'),('state','=','EXTENDED')])
+
+        action = self.env.ref(
+            'property_management_system.action_lease_aggrement_all').read()[0]
+        if len(unit_ids) > 1:
+            action['domain'] = [('id', 'in', unit_ids.ids)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_lease_aggrement_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
     def property_scheduler(self):
         values = None
         property_ids = []
@@ -321,6 +477,71 @@ class PMSProperties(models.Model):
                                         for pl in property_id:
                                             pl.write({'is_api_post': True})
 
+    @api.multi
+    def _get_expire_lease(self):
+        notify_month = self.new_lease_term.notify_period
+        today = date.today()
+        expire_date = today + relativedelta(months=notify_month)
+        lease_ids = self.env['pms.lease_agreement'].search(['&',('property_id', '=', self.id),
+                                                            '|',('state','=','NEW'),
+                                                                ('state','=','EXTENDED'),
+                                                            '|','&',('end_date','>=',today),
+                                                                    ('end_date','<=',expire_date),
+                                                                '&',('extend_to','>=',today),
+                                                                    ('extend_to','<=',expire_date)])
+        for lease in lease_ids:
+            self.expire_lease += 1
+    
+    @api.multi
+    def expire_action_lease(self):
+        notify_month = self.new_lease_term.notify_period
+        today = date.today()
+        expire_date = today + relativedelta(months=notify_month)
+        lease_ids = self.env['pms.lease_agreement'].search(['&',('property_id', '=', self.id),
+                                                            '|',('state','=','NEW'),
+                                                                ('state','=','EXTENDED'),
+                                                            '|','&',('end_date','>=',today),
+                                                                    ('end_date','<=',expire_date),
+                                                                '&',('extend_to','>=',today),
+                                                                    ('extend_to','<=',expire_date)])
+
+        action = self.env.ref(
+            'property_management_system.action_lease_aggrement_all').read()[0]
+        if len(lease_ids) > 1:
+            action['domain'] = [('id', 'in', lease_ids.ids)]
+        elif len(lease_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_lease_aggrement_form').id, 'form')]
+            action['res_id'] = lease_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
+    @api.multi
+    def _get_extend_lease(self):
+        count = 0
+        unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
+                                                       self.id),('state','=','EXTENDED')])
+        for unit in unit_ids:
+            self.extend_lease += 1
+    
+    @api.multi
+    def extend_action_lease(self):
+        unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
+                                                       self.id),('state','=','EXTENDED')])
+
+        action = self.env.ref(
+            'property_management_system.action_lease_aggrement_all').read()[0]
+        if len(unit_ids) > 1:
+            action['domain'] = [('id', 'in', unit_ids.ids)]
+        elif len(unit_ids) == 1:
+            action['views'] = [(self.env.ref(
+                'property_management_system.view_lease_aggrement_form').id, 'form')]
+            action['res_id'] = unit_ids.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
     @api.model
     def create(self, values):
         if values['property_management_id'][0][2] == []:
@@ -331,6 +552,7 @@ class PMSProperties(models.Model):
             tools.image_resize_images(values, sizes={'image': (1024, None)})
         id = None
         id = super(PMSProperties, self).create(values)
+        self.env.user.write({'property_id': [(4, id.id)]})
         if id:
             property_id = None
             if values['api_integration']:
@@ -396,3 +618,117 @@ class PMSProperties(models.Model):
                                             self.write({'is_api_post': True})
 
         return super(PMSProperties, self).write(vals)
+    
+    # sub = fields.Boolean("SUB")
+    # epc = fields.Boolean("EPC")
+    # gm = fields.Boolean("GM")
+    # wm = fields.Boolean("WM")
+    # @api.onchange('gen')
+    # def onchange_gen(self):
+    #     property_id = self._context.get('active_id')
+    #     vals = {}
+    #     utilities_line = self.env['pms.utilities.lines']
+    #     if self.gen:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GEN")])
+    #         vals['utilities_type'] = utility_id.utilities_type_id.id
+    #         vals['utilities_supply'] = utility_id.id
+    #         vals['digit'] = 8
+    #         vals['property_id'] = property_id
+    #         self.utilities_lines = utilities_line.create(vals)
+    #     else:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GEN")])
+    #         if utility_id:
+    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
+    #             if utility_line_id:
+    #                 utility_line_id.unlink()
+    
+    # @api.onchange('sub')
+    # def onchange_sub(self):
+    #     property_id = self._context.get('active_id')
+    #     vals = {}
+    #     utilities_line = self.env['pms.utilities.lines']
+    #     if self.gen:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"SUB")])
+    #         vals['utilities_type'] = utility_id.utilities_type_id.id
+    #         vals['utilities_supply'] = utility_id.id
+    #         vals['digit'] = 8
+    #         vals['property_id'] = property_id
+    #         self.utilities_lines = utilities_line.create(vals)
+    #     else:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"SUB")])
+    #         if utility_id:
+    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
+    #             if utility_line_id:
+    #                 utility_line_id.unlink()
+    
+    # @api.onchange('epc')
+    # def onchange_epc(self):
+    #     property_id = self._context.get('active_id')
+    #     vals = {}
+    #     utilities_line = self.env['pms.utilities.lines']
+    #     if self.gen:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"EPC")])
+    #         vals['utilities_type'] = utility_id.utilities_type_id.id
+    #         vals['utilities_supply'] = utility_id.id
+    #         vals['digit'] = 8
+    #         vals['property_id'] = property_id
+    #         self.utilities_lines = utilities_line.create(vals)
+    #     else:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"EPC")])
+    #         if utility_id:
+    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
+    #             if utility_line_id:
+    #                 utility_line_id.unlink()
+    
+    # @api.onchange('gm')
+    # def onchange_gm(self):
+    #     property_id = self._context.get('active_id')
+    #     vals = {}
+    #     utilities_line = self.env['pms.utilities.lines']
+    #     if self.gen:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GM")])
+    #         vals['utilities_type'] = utility_id.utilities_type_id.id
+    #         vals['utilities_supply'] = utility_id.id
+    #         vals['digit'] = 8
+    #         vals['property_id'] = property_id
+    #         self.utilities_lines = utilities_line.create(vals)
+    #     else:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GM")])
+    #         if utility_id:
+    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
+    #             if utility_line_id:
+    #                 utility_line_id.unlink()
+    
+    # @api.onchange('wm')
+    # def onchange_wm(self):
+    #     property_id = self._context.get('active_id')
+    #     vals = {}
+    #     utilities_line = self.env['pms.utilities.lines']
+    #     if self.gen:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"WM")])
+    #         vals['utilities_type'] = utility_id.utilities_type_id.id
+    #         vals['utilities_supply'] = utility_id.id
+    #         vals['digit'] = 8
+    #         vals['property_id'] = property_id
+    #         self.utilities_lines = utilities_line.create(vals)
+    #     else:
+    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"WM")])
+    #         if utility_id:
+    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
+    #             if utility_line_id:
+    #                 utility_line_id.unlink()
+
+
+class UtilitiesLines(models.Model):
+    _name = "pms.utilities.lines"
+
+    utilities_type = fields.Many2one("pms.utilities.type", compute="_get_utilities_code", string="Utility Type")
+    utilities_supply =fields.Many2one("pms.utilities.supply",  compute="_get_utilities_code", string="Supply Type")
+    digit = fields.Integer("Digit",  compute="_get_utilities_code")
+    property_id = fields.Many2one("pms.properties", "Property" , compute="_get_utilities_code")
+
+    @api.depends('property_id.utilities_lines')
+    def _get_utilities_code(self):
+        if self.mapped('property_id'):
+            self.utilities_supply = None
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="view_message_wiz" model="ir.ui.view">
+            <field name="name">Messages</field>
+            <field name="model">pms.alert.message.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Message">
+                    <p style="font-weight:bold;">
+                        <field name="message"/>
+                    </p>
+                    <footer>
+                        <button string="OK" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    <record id="action_message_wiz" model="ir.actions.act_window">
+        <field name="name">ZPMS</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pms.alert.message.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

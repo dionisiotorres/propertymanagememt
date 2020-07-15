@@ -379,118 +379,81 @@ class APIData:
                         bt = datetime.datetime.now().strftime("%H%M%S")
                         data_batch.BatchCode = str(bd + bt)
                         data_batch.InterfaceCode = "Facilities"
-                        if 'create' not in self.values and len(
-                                self.model_id) >= 1:
-                            for facl in self.model_id:
-                                flineids = space_unit_id = PropertyCode = UtilityMeterNo = UtilityType = StartDate = Remark = Digit = None
-                                if 'facilities_line' in facl:
-                                    if facl.facilities_line:
-                                        flineids = facl.facilities_line
-                                        space_unit_id = self.values.env[
-                                            'pms.space.unit'].search([
-                                                ('property_id', '=',
-                                                 facl.property_id.id)
-                                            ])
-                                    PropertyCode = facl.property_id.code
-                                    UtilityMeterNo = facl.utilities_no.name
-                                    UtilityType = facl.utilities_type_id.code
-                                    StartDate = facl.install_date.strftime(
-                                        '%Y-%m-%d'
-                                    ) if facl.install_date != False else None
-                                    Remark = str(
-                                        facl.remark
-                                    ) if facl.remark != False else None
-                                    Digit = facl.utilities_no.digit
-                                if 'facility_line' in facl:
-                                    if facl.facility_line:
-                                        for fal in facl.facility_line:
-                                            if fal.facilities_line:
-                                                flineids = fal.facilities_line
-                                                StartDate = fal.install_date.strftime(
-                                                    '%Y-%m-%d'
-                                                ) if fal.install_date != False else None
-                                                PropertyCode = fal.property_id.code
-                                                UtilityMeterNo = fal.utilities_no.name
-                                                UtilityType = fal.utilities_type_id.code
-                                                Remark = str(
-                                                    fal.remark
-                                                ) if fal.remark != False else None
-                                                Digit = fal.utilities_no.digit
-                                for facline in flineids:
-                                    facility = SpaceUnitFacility()
-                                    data_batch.PropertyCode = PropertyCode
-                                    facility.UtilityMeterNo = UtilityMeterNo
-                                    facility.UtilityType = UtilityType
-                                    facility.StartDate = StartDate
-                                    facility.Remark = Remark
-                                    facility.Digit = Digit
-                                    if space_unit_id:
-                                        for sp in space_unit_id:
-                                            if sp.facility_line:
-                                                for spf in sp.facility_line:
-                                                    if spf.id == facl.id:
-                                                        facility.SpaceUnitID = sp.id
-                                    else:
-                                        facility.SpaceUnitID = self.model_id.id
-                                    facility.SpaceUnitFacilityID = ''
-                                    facility.EndDate = facline.end_date.strftime(
-                                        '%Y-%m-%d'
-                                    ) if facline.end_date != False else None
-                                    facility.LastReadingOn = facline.lmr_date.strftime(
-                                        '%Y-%m-%d'
-                                    ) if facline.lmr_date != False else None
-                                    facility.LastReadingValue = facline.lmr_value
-                                    facility.LastReadingNOC = 0
-                                    facility.LastReadingNOH = 0
-                                    facility.EMeterType = facline.source_type_id.code
-                                    facility.IsNew = True
-                                    facility.UpdateMethod = None
-                                    facility.Indicator = None
-                                    facility.CanChangeMeterNo = False
-                                    facility.ExtDataSourceID = 'ZPMS'
-                                    facility.ExtSpaceUnitFacilityID = str(
-                                        facline.id)
-                                    facility.ModifiedDate = modify_date
-                                    facility.BatchInfo = data_batch.__dict__
-                                    if facility.SpaceUnitID:
-                                        data.append(facility.__dict__)
-                        else:
-                            if self.model_id.facility_line:
-                                for ffl in self.model_id.facility_line:
-                                    if ffl.facilities_line:
-                                        for facline in ffl.facilities_line:
-                                            facility = SpaceUnitFacility()
-                                            data_batch.PropertyCode = facline.property_id.code
-                                            facility.SpaceUnitID = str(
-                                                self.model_id.id)
-                                            facility.SpaceUnitFacilityID = ''
-                                            facility.StartDate = str(
-                                                self.model_id.start_date)
-                                            facility.EndDate = str(
-                                                self.model_id.end_date
-                                            ) if self.model_id.end_date else None
-                                            facility.UtilityMeterNo = ffl.utilities_no.name
-                                            facility.UtilityType = ffl.utilities_type_id.code
-                                            facility.LastReadingOn = str(
-                                                facline.lmr_date)
-                                            facility.LastReadingValue = facline.lmr_value
-                                            facility.LastReadingNOC = 0
-                                            facility.LastReadingNOH = 0
-                                            facility.EMeterType = facline.source_type_id.code
-                                            facility.Remark = str(
-                                                self.model_id.remark
-                                            ) if self.model_id.remark != False else None
-                                            facility.IsNew = True
-                                            facility.UpdateMethod = None
-                                            facility.Digit = ffl.utilities_no.digit
-                                            facility.Indicator = None
-                                            facility.CanChangeMeterNo = False
-                                            facility.ExtDataSourceID = 'ZPMS'
-                                            facility.ExtSpaceUnitFacilityID = str(
-                                                facline.id)
-                                            facility.ModifiedDate = modify_date
-                                            facility.BatchInfo = data_batch.__dict__
-                                            data.append(facility.__dict__)
+                        if len(self.model_id) >= 1 and self.values == None:
+                            for unfacl in self.model_id:
+                                facility = SpaceUnitFacility()
+                                data_batch.PropertyCode = property_ids.code
+                                facility.SpaceUnitFacilityID = ''
+                                facility.UtilityMeterNo = str(unfacl.facility_id.name)
+                                facility.SpaceUnitID = str(unfacl.unit_id.id)
+                                facility.StartDate = str(unfacl.facility_id.install_date.strftime('%Y-%m-%d') if unfacl.end_date else "")
+                                facility.EndDate = str(unfacl.end_date.strftime('%Y-%m-%d') if unfacl.end_date else "")
+                                facility.LastReadingOn = str(unfacl.lmr_date.strftime('%Y-%m-%d') if unfacl.lmr_date else "")
+                                facility.UtilityType = str(unfacl.source_type_id.code)
+                                facility.LastReadingValue = str(unfacl.lmr_value)
+                                facility.EMeterType = facility.EMeterType or str(unfacl.source_type_id.code)
+                                facility.Remark = facility.Remark or str(unfacl.facility_id.remark if unfacl.facility_id.remark else "" )
+                                facility.Digit = facility.Digit or str(unfacl.digit if unfacl.digit else 0)
+                                facility.ExtSpaceUnitFacilityID = facility.ExtSpaceUnitFacilityID or str(unfacl.id)
+                                facility.LastReadingNOC = 0
+                                facility.LastReadingNOH = 0
+                                facility.IsNew = True
+                                facility.UpdateMethod = None
+                                facility.Indicator = None
+                                facility.CanChangeMeterNo = False
+                                facility.ExtDataSourceID = 'ZPMS'
+                                facility.ModifiedDate = modify_date
+                                facility.BatchInfo = data_batch.__dict__
+                                if facility.SpaceUnitID:
+                                    data.append(facility.__dict__)
+                        else:      
+                            facility = SpaceUnitFacility()
+                            data_batch.PropertyCode = property_ids.code
+                            facility.SpaceUnitFacilityID = ''
+                            if 'name' in self.values:
+                                facility.UtilityMeterNo = str(self.values['name'])
+                            facility.UtilityMeterNo = facility.UtilityMeterNo or str(self.model_id.facility_id.name)
+                            if 'unit_id' in self.values:
+                                facility.SpaceUnitID = str(self.values['unit_id'])
+                            facility.SpaceUnitID = facility.SpaceUnitID or str(self.model_id.unit_id.id)
+                            if 'start_date' in self.values:
+                                facility.StartDate = str(self.values['start_date'].strftime('%Y-%m-%d'))
+                            facility.StartDate = facility.StartDate or str(self.model_id.facility_id.install_date.strftime('%Y-%m-%d'))
+
+                            if 'end_date' in self.values:
+                                facility.EndDate = str(self.values['end_date'].strftime('%Y-%m-%d') if self.values['end_date'] else "")
+                            facility.EndDate = facility.EndDate or str(self.model_id.end_date.strftime('%Y-%m-%d') if self.model_id.end_date else "")
+                            if 'lmr_date' in self.values:
+                                facility.LastReadingOn = self.values['lmr_date'].strftime('%Y-%m-%d')
+                            facility.LastReadingOn = facility.LastReadingOn or str(self.model_id.lmr_date.strftime('%Y-%m-%d'))
+                            if 'source_type_id' in self.values:
+                                facility.UtilityType = str(self.values['source_type_id'])
+                            facility.UtilityType = facility.UtilityType or str(self.model_id.source_type_id.code)
+                            if 'lmr_value' in self.values:
+                                facility.LastReadingValue = str(self.values['lmr_value'])
+                            facility.LastReadingValue = facility.LastReadingValue or str(self.model_id.lmr_value)
+                            if 'source_type_id' in self.values:
+                                facility.EMeterType = str(self.values['source_type_id'])
+                            facility.EMeterType = facility.EMeterType or str(self.model_id.source_type_id.code)
+                            if 'remark' in self.values:
+                                facility.Remark = str(self.values['remark'])
+                            facility.Remark = facility.Remark or str(self.model_id.facility_id.remark if self.model_id.facility_id.remark else "" )
+                            if 'digit' in self.values:
+                                facility.Digit = str(self.values['digit'])
+                            facility.Digit = facility.Digit or str(self.model_id.digit if self.model_id.digit else 0)
+                            if 'digit' in self.values:
+                                facility.ExtSpaceUnitFacilityID = str(self.values['id'])
+                            facility.ExtSpaceUnitFacilityID = facility.ExtSpaceUnitFacilityID or str(self.model_id.id)
+                            facility.LastReadingNOC = 0
+                            facility.LastReadingNOH = 0
+                            facility.IsNew = True
+                            facility.UpdateMethod = None
+                            facility.Indicator = None
+                            facility.CanChangeMeterNo = False
+                            facility.ExtDataSourceID = 'ZPMS'
+                            facility.ModifiedDate = modify_date
+                            facility.BatchInfo = data_batch.__dict__
+                            payload = facility.__dict__
                     if line.name == 'LeaseAgreement':
                         # payload_code = str(self.values['code'])
                         # payload_name = str(self.values['name'])
@@ -528,7 +491,7 @@ class APIData:
                                 elif lg.state == 'EXTENDED':
                                     status = "Extended"
                                     ext_date = lg.extend_to
-                                elif lg.state == 'TERMINATED':
+                                elif lg.state == 'PRE-TERMINATED':
                                     status = 'Pre-terminated'
                                 elif lg.state == 'CANNELLED':
                                     status = 'Cancelled'
@@ -575,7 +538,7 @@ class APIData:
                             elif self.values['state'] == 'EXTENDED':
                                 status = "Extended"
                                 ext_date = self.model_id.extend_to
-                            elif self.values['state'] == 'TERMINATED':
+                            elif self.values['state'] == 'PRE-TERMINATED':
                                 status = 'Pre-terminated'
                             elif self.values['state'] == 'CANNELLED':
                                 status = 'Cancelled'

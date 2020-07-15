@@ -10,7 +10,7 @@
                     <field name="property_id" string="Mall"/>
                     <field name="lease_no" string="Lease"/>
                     <field name="lease_items" invisible='1'/>
-                    <field name="unit_no" sting="Unit"/>
+                    <!-- <field name="unit_no" sting="Unit"/> -->
                 </field>
                 <field name="partner_id" position="attributes">
                     <attribute name="string">Shop</attribute>
@@ -18,11 +18,18 @@
                 <field name="date_due" position="after">
                     <field name="inv_month" string="Month"/>
                 </field>
+                <field name="user_id" position="attributes">
+                    <attribute name="string">Invoice Person</attribute>
+                </field>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="after">
+                    <field name="unit_no"/>
+                    <field name="charge_type_id"/>
+                </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="attributes">
-                    <attribute name="string">Charge Type</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="attributes">
                     <attribute name="string">Quantity</attribute>
@@ -39,7 +46,7 @@
                 </field> -->
                 <field name="company_id" position="before">
                     <field name="property_id" string="Mall"/>
-                    <field name="unit_no" string="Unit"/>
+                    <!-- <field name="unit_no" string="Unit"/> -->
                     <field name="lease_no" string="Lease"/>
                     <field name="lease_items" invisible='1'/>
                     <field name="inv_month" string="Month"/>

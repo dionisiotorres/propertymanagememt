@@ -12,6 +12,11 @@
           <link rel="stylesheet" type="text/scss" href="/property_management_system/static/src/scss/property_menu.scss"/>
       </xpath>
     </template> -->
+    <template id="assets_backend" name="web assets for property" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+          <link rel="stylesheet" href="/property_management_system/static/src/css/custom.css"/>
+        </xpath>
+    </template>
     <record model="ir.ui.view" id="view_pms_properties_form">
       <field name="name">Properites Form</field>
       <field name="model">pms.properties</field>
@@ -20,8 +25,26 @@
           <sheet>
           <div class="oe_button_box" name="button_box">
             <button name="action_units" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('count_unit', '=', 0)]}">
-                  <field name="count_unit" widget="statinfo" string="Units"/>
-              </button>
+              <field name="count_unit" widget="statinfo" string="Units"/>
+            </button>
+            <button name="expire_action_lease" type="object" class="oe_stat_button" icon="fa-check" attrs="{'invisible': [('expire_lease', '=', 0)]}">
+              <field name="expire_lease" widget="statinfo" string="Expire Soon"/>
+            </button>
+            <button name="booking_action_lease" type="object" class="oe_stat_button" icon="fa-bold" attrs="{'invisible': [('booking_lease', '=', 0)]}">
+              <field name="booking_lease" widget="statinfo" string="Booking"/>
+            </button>
+            <button name="extend_action_lease" type="object" class="oe_stat_button" icon="fa-expand" attrs="{'invisible': [('extend_lease', '=', 0)]}">
+              <field name="extend_lease" widget="statinfo" string="Extend"/>
+            </button>
+            <button name="new_action_lease" type="object" class="oe_stat_button" icon="fa-font" attrs="{'invisible': [('new_lease', '=', 0)]}">
+              <field name="new_lease" widget="statinfo" string="Active"/>
+            </button>
+            <button name="vacant_action_units" type="object" class="oe_stat_button" icon="fa-vimeo-square" attrs="{'invisible': [('vacant_unit', '=', 0)]}">
+                <field name="vacant_unit" widget="statinfo" string="Vacant"/>
+            </button>
+            <button name="occupied_action_units" type="object" class="oe_stat_button" icon="fa-cricle-o" attrs="{'invisible': [('occupy_unit', '=', 0)]}">
+                <field name="occupy_unit" widget="statinfo" string="Occupied"/>
+            </button>
           </div>
           <field name="image" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;: &quot;image_medium&quot;}"/>
           <div class="oe_title">
@@ -157,7 +180,7 @@
                 <group>
                   <group string="Fixed Code Integration">
                     <field name="property_code_len"/>
-                    <field name="unit_code_len"/>
+                    <!-- <field name="unit_code_len"/> -->
                     <field name="floor_code_len"/>
                   </group>
                   <group string="Define Lease Terms">
@@ -170,11 +193,31 @@
                     <field name="pos_id_format" widget="selection"/>
                     <field name="unit_format" widget="selection"/>
                     <field name="lease_format" widget="selection"/>
+                    <field name="prospect_format_id" widget="selection"/>
                   </group>
                   <group string="Define Rent Schedule Type">
                     <field name="rentschedule_type"/>
                   </group>
                 </group>
+              </page>
+               <page name="Utilities" string="Utilities Configuration">
+                <group>
+                  <group>
+                    <field name="billing_circle_from"/>
+                    <field name="billing_circle_to"/>
+                  </group>
+                  <group>
+                      <field name="utilities_type_ids"  widget="many2many_tags"/>
+                      <field name="utilities_supply_ids" widget="many2many_tags"/>
+                  </group>
+                </group>
+                <field name="utilities_lines" options="{'no_create':True,'no_open':True,}">
+                  <tree create="0" delete="0" editable="buttom">
+                    <field name="utilities_type" readonly="1"/>
+                    <field name="utilities_supply" readonly="1"/>
+                    <field name="digit"/>
+                  </tree>
+                </field>
               </page>
               <page name="API Information" string="API Information">
                 <group>

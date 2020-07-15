@@ -42,6 +42,8 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
     unit_no = fields.Many2one("pms.space.unit", "Unit", compute="get_lease_id")
     start_date = fields.Date("Start Date", default=_get_start_date)
     end_date = fields.Date("End Date", default=_get_end_date)
+    # base_type_ids = fields.Many2many("pms.base.charge", related="applicable_charge_id.base_type_id", string="Base")
+    # base_type_id = fields.Many2one("pms.base.charge","Base")
 
     @api.one
     @api.depends('lease_line_id')
@@ -73,3 +75,13 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
                 else:
                     self.rate = self.rate
                     self.total_amount = self.rate
+
+    @api.multi
+    def unlink(self):
+        if self.lease_line_id:
+            for agl in self.lease_line_id:
+                if agl.state not in ('BOOKING'):
+                    raise UserError(
+                        _('You can not delete charge lines in a activated lease agreement.'
+                        ))
+        return super(PMSLeaseUnitChargeTypeLine, self).unlink()    

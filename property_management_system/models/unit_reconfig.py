@@ -51,7 +51,7 @@ class UnitReconfig(models.Model):
         leaseline_id = self.env['pms.lease_agreement.line'].search([
             ('unit_no', '=', unit.id),
             ('state', 'not in',
-             ['BOOKING', 'CANCELLED', 'EXPIRED', 'TERMINATED'])
+             ['BOOKING', 'CANCELLED', 'EXPIRED', 'PRE-TERMINATED'])
         ])
         if leaseline_id:
             leaseline_id.write({

@@ -33,7 +33,7 @@
                           <sheet>
                             <group>
                               <group>
-                              <field name="position_order"/>
+                              <!-- <field name="sequence"/> -->
                               <field name="value_type"/>         
                               </group>
                               <group>
@@ -47,7 +47,7 @@
                           </sheet>
                         </form>
                         <tree>
-                          <field name="position_order"/>
+                          <field name="sequence" widget="handle"/>
                           <field name="value_type" readonly='1'/> 
                           <field name="value" readonly='1'/>
                         </tree>
@@ -94,7 +94,7 @@
           <sheet>
             <group>
               <group>
-              <field name="position_order"/>
+              <field name="sequence"/>
               <field name="value_type"/>         
               </group>
               <group>
@@ -114,7 +114,7 @@
       <field name="model">pms.format.detail</field>
       <field name="arch" type="xml">
         <tree>
-            <field name="position_order"/>
+            <field name="sequence" widget="handle"/>
             <field name="value_type"/>  
             <field name="value"/> 
         </tree>

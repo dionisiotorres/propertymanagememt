@@ -2,7 +2,6 @@
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
 
-
 class PMSEquipment(models.Model):
     _name = 'pms.equipment'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
@@ -25,7 +24,6 @@ class PMSEquipment(models.Model):
                         help='Model of Equipment.')
     manufacturer = fields.Char("Manufacturer", track_visibility=True)
     ref_code = fields.Char("Reference Code", track_visibility=True)
-    # active = fields.Boolean(default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   required=True,
@@ -37,16 +35,23 @@ class PMSEquipment(models.Model):
     count_facility = fields.Integer("Count Unit",
                                     compute="_get_count_facility")
     roll_over_type = fields.Selection(
-        [('DIGITROLLOVER', 'Digit RollOver'), ('UNITROLLOVER', 'Unit RollOver')],
+        [('DIGITROLLOVER', 'Digit RollOver'), ('UNITROLLOVER', 'Unit RollOver'),('CURRENTROLLOVER','Current RollOver')],
         "Rollover Type",
         help='Which method will be use if equipment roll over.')
+    utilities_type = fields.Many2one("pms.utilities.type","Utiliteis Type")
+    utilities_code = fields.Char("Utiliteis Code", related="utilities_type.code")
+    current_unit_type = fields.Selection([('watt',"Watts"),('kilowatt',"Kilowatts"),('megawatt',"Megawatts")],string="Current Unit Type")
+    meter_type = fields.Selection([('normal','Normal'),('share-meter','Share Meter')],string="Meter Type")
+    power_system = fields.Selection([('single-phase','Single Phase'),('three-phase','Three Phase')], string="Power System")
+    meter_template_id = fields.Many2one("pms.meter.template","Meter Templates")
+    equipment_line = fields.One2many("pms.equipment.line","equipment_id",string="Equipment Lines")
 
     @api.multi
     def _get_count_facility(self):
         count = 0
         unit_ids = self.env['pms.facilities'].search([('utilities_no', '=',
                                                        self.id),
-                                                      ('status', '=', True)])
+                                                      ('inuse', '=', True)])
         for unit in unit_ids:
             self.count_facility += 1
 
@@ -82,19 +87,43 @@ class PMSEquipment(models.Model):
             if equip_id:
                 raise UserError(_("%s is already existed" % vals['name']))
         return super(PMSEquipment, self).write(vals)
-
-
+    
+    def _compute_line_data_for_template_change(self, line):
+        return{'utilities_supply_id':line.utilities_supply_id.id}
+        
+                
+    @api.onchange('meter_template_id')
+    def onchange_meter_template_id(self):
+        template = self.meter_template_id.with_context(lang=self._context.get('lang'))
+        equipment_lines = [(5,0,0)]
+        data = []
+        if template:
+            if len(template.template_line)>0:
+                for l in template.template_line:
+                    data = self._compute_line_data_for_template_change(l)               
+                    equipment_lines.append((0, 0, data))
+                    self.equipment_line = equipment_lines
+            self.utilities_type = template.utilities_type
+            self.current_unit_type = template.current_unit_type
+            self.meter_type = template.meter_type
+            self.power_system = template.power_system
+            self.digit = template.digit
+            
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'
     _description = 'Equipment Types'
+    _order = 'sequence,name'
 
     name = fields.Char("Equipment Type", required=True, track_visibility=True)
+    description = fields.Text("Description", track_visibility=True)
     active = fields.Boolean(default=True, track_visibility=True)
-    ordinal_no = fields.Integer("Ordinal No",
-                                required=True,
-                                help='To display order as prefer.')
-    # _sql_constraints = [('name_unique', 'unique(name)',
-    #                      'Your name is exiting in the database.')]
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.model
     def create(self, values):
@@ -110,3 +139,10 @@ class PMSEquipmentType(models.Model):
             if equip_type_id:
                 raise UserError(_("%s is already existed" % vals['name']))
         return super(PMSEquipmentType, self).write(vals)
+
+class PMSEquipmentLine(models.Model):
+    _name = 'pms.equipment.line'
+    _description = 'Equipment Lines'
+
+    utilities_supply_id = fields.Many2one("pms.utilities.supply","Utilities Supply")
+    equipment_id = fields.Many2one("pms.equipment", "Equipment")

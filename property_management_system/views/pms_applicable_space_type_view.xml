@@ -22,7 +22,6 @@
               <field name="space_type_id" options="{'no_quick_create':True}"/>
               <field name="chargeable"/>
               <field name="divisible"/> 
-              <field name="ordinal_no"/>
             </group>
             <group>
             </group>
@@ -36,11 +35,11 @@
       <field name="model">pms.applicable.space.type</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="sequence" widget="handle"/>
           <field name="name"/>
           <field name="space_type_id"/>
           <field name="chargeable"/>
           <field name="divisible"/>
-          <field name="ordinal_no"/>
         </tree>
       </field>
     </record>

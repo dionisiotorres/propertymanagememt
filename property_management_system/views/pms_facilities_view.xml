@@ -1,5 +1,10 @@
 <odoo>
   <data>
+    <template id="button_render_js" inherit_id="web.assets_backend">
+      <xpath expr="." position="inside">
+          <script src="property_management_system/static/src/js/action_call.js" type="text/javascript"/>
+      </xpath>
+  </template>
     <record model="ir.ui.view" id="view_facilities_form">
       <field name="name">Facility Form</field>
       <field name="model">pms.facilities</field>
@@ -59,7 +64,7 @@
             <field name="e_meter_type"/>
             <field name="last_rdate"/>
             <field name="lmr_rvalue"/>
-            <field name="status"/>
+            <field name="inuse"/>
         </tree>
       </field>
     </record>
@@ -71,18 +76,26 @@
             <field name="utilities_type_id"/>
             <field name="interface_type"/>
             <separator/>
-            <filter string="Status" name="status" icon="terp-personal" domain="[('status','=',0)]"/>
+            <filter string="In Use" name="status" icon="terp-personal" domain="[('inuse','=',1)]"/>
         </search>
       </field>
     </record>
-     <record id="action_facilities_all" model="ir.actions.act_window">
-        <field name="name">Facilities</field>
-        <field name="res_model">pms.facilities</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="view_facilities_tree"/> 
-        <field name="context">{"search_default_status":1}</field>
-      </record> 
+    <record id="action_facilities_all" model="ir.actions.act_window">
+      <field name="name">Facilities</field>
+      <field name="res_model">pms.facilities</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_id" ref="view_facilities_tree"/> 
+      <field name="context">{"search_default_status":1}</field>
+    </record>
+    <record id="action_facilities_gen_alls" model="ir.actions.act_window">
+      <field name="name">Facilities</field>
+      <field name="res_model">pms.facilities</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_id" ref="view_facilities_tree"/> 
+      <field name="context">{"search_default_status":0}</field>
+    </record>  
     <menuitem  id="facilities_menu_root" 
       name="Facilities" 
       parent="property_management_menu"

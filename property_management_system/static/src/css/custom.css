@@ -1,4 +1,10 @@
 
+.utilities-code .o_field_widget div div{
+    float:left;
+    padding-left:1.1rem;
+}
+
+/* 
 #leave-term{
     background-color: #3424;
     width: 100%;
@@ -7,3 +13,11 @@
     font-family: -webkit-body;
     margin-bottom: -20px;
     font-weight: bold;}
+.#leave-term{
+    background-color: #3424;
+    width: 100%;
+    padding: 3px;
+    font-size: 18px;
+    font-family: -webkit-body;
+    margin-bottom: -20px;
+    font-weight: bold;} */

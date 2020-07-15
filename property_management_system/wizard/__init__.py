@@ -5,3 +5,4 @@ from . import pms_cancel_wizard
 from . import pms_activate_wizard
 from . import pms_terminate_wizard
 from . import pms_lease_report_wizard
+from . import pms_alert_message_box

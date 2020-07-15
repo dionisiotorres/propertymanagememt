@@ -1,0 +1,65 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_unit_job_form">
+      <field name="name">Unit Job</field>
+      <field name="model">pms.space.unit.job.line</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button name='action_done' string='Done' type="object" />
+          </header>
+          <sheet>
+            <div class="oe_title">
+            <label for="name" string="Job Title" />
+            <h1>
+                <field name="name" placeholder="Job"/>
+            </h1>
+          </div>
+          <group>
+            <group>
+              <field name="engineer_id"/>
+              <field name="description"/>
+            </group>
+            <group>
+              <field name="recommend_by"/>
+              <field name="remark"/>
+            </group>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="view_unit_job_tree">
+      <field name="name">Unit Job list</field>
+      <field name="model">pms.space.unit.job.line</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="sequence" widget="handle"/>
+          <field name="name"/>          
+        </tree>
+      </field>
+    </record>
+     <record model="ir.ui.view" id="view_unit_job_filter">
+      <field name="name">Unit Job list</field>
+      <field name="model">pms.space.unit.job.line</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="engineer_id"/>
+        </search>
+      </field>
+    </record>
+     <record id="action_unit_job_all" model="ir.actions.act_window">
+       <field name="name">Unit Jobs</field>
+       <field name="res_model">pms.space.unit.job.line</field>
+       <field name="view_type">form</field>
+       <field name="view_mode">tree,form</field>
+       <field name="view_id" ref="view_unit_job_tree"/> 
+    </record> 
+    <menuitem  id="unit_job_menu_root" 
+      name="Unit Job" 
+      parent="property_management_menu_sub"
+      action="action_unit_job_all"
+      sequence="100"/>
+  </data>
+</odoo>

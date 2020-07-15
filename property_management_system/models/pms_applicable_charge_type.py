@@ -22,8 +22,9 @@ class PMSApplicableChargeType(models.Model):
                                             readonly=False,
                                             required=True,
                                             store=True)
-    is_apply_tax = fields.Boolean('Apply Tax', track_visibility=True)
-    tax = fields.Float("Tax", track_visibility=True)
+    is_apply_tax = fields.Boolean('Apply Tax', default=True,track_visibility=True)
+    # tax = fields.Float("Tax", track_visibility=True)
+    tax_id = fields.Many2one("account.tax","Tax")
     billing_type = fields.Selection([('monthly', 'Monthly'),
                                      ('quarterly', 'Quarterly'),
                                      ('semi-annually', 'Semi-Annually')],
@@ -37,27 +38,18 @@ class PMSApplicableChargeType(models.Model):
                                        "Unit Charge Line")
     use_formula = fields.Boolean("Use Formula")
     rate = fields.Float("Rate")
-    source_type_id = fields.Many2one("pms.utilities.source.type",
+    source_type_id = fields.Many2one("pms.utilities.supply",
                                      "Source Type")
     is_meter = fields.Boolean("IsMeter",
                               default=False,
                               compute="compute_ismeter")
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
 
-    _sql_constraints = [('name_uniq', 'unique (name)',
-                         _("Name is exiting in the chrage applicable."))]
-
-    # @api.onchange('charge_type_id')
-    # def onchange_field_charge_type_id(self):
-    #     if self.charge_type_id:
-    #         for line in self.charge_type_id.calculate_method_ids:
-    #             product_ids = line.ids
-    #         return {
-    #             'domain': {
-    #                 'calculation_method_id': [('id', 'in', product_ids)]
-    #             }
-    #         }
-    #     else:
-    #         return {'domain': {'calculation_method_id': []}}
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
 
     @api.one
     @api.depends('calculation_method_id')
@@ -101,3 +93,21 @@ class PMSUnitChargeLine(models.Model):
                 self.from_unit) + " Units To" + str(self.to_unit) + ")."
         else:
             self.name = "UNDEFINED"
+
+class PMSBaseCharge(models.Model):
+    _name = "pms.base.charge"
+    _description = "sequence,name"
+
+    name = fields.Char("Name")
+    description = fields.Text("Description")
+    sequence = fields.Integer(track_visibility=True)
+    index = fields.Integer(compute='_compute_index')
+    base_type_id = fields.Many2many("pms.base.charge","pms_charge_line_base_rel","charge_id","base_id", "Base")
+
+    _sql_constraints = [('name_uniq', 'unique (name)',
+                         _("Name is exiting in the chrage applicable."))]
+
+    @api.one
+    def _compute_index(self):
+        cr, uid, ctx = self.env.args
+        self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1

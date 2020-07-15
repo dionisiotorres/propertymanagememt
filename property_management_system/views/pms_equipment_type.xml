@@ -19,7 +19,7 @@
           </div>
           <group>
             <group>
-              <field name='ordinal_no'/>
+              <field name="description"/>
             </group>
           </group>
           </sheet>
@@ -31,8 +31,8 @@
       <field name="model">pms.equipment.type</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="sequence" widget="handle"/>
           <field name="name"/>
-           <field name='ordinal_no'/>
         </tree>
       </field>
     </record>

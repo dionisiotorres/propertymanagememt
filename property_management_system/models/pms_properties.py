@@ -2,7 +2,7 @@ import json
 import pytz
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError
-from datetime import datetime,date, timedelta
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from odoo.addons.property_management_system.models import api_rauth_config
 
@@ -59,7 +59,7 @@ class PMSProperties(models.Model):
         else:
             country_id = self.env['res.country'].search([('code', '=', "MM")])
         return country_id
-
+    
     propertytype_id = fields.Many2one(
         "pms.property.type",
         "Property Type",
@@ -234,9 +234,7 @@ class PMSProperties(models.Model):
     meter_type = fields.Selection([('SHARED','Shared'),('NORMAL','Normal')], string="Meter Type", default="NORMAL")
     billing_circle_from = fields.Char("Billing Circle From")
     billing_circle_to = fields.Char("Billing Circle To")
-    utilities_lines = fields.One2many("pms.utilities.lines",'property_id',"Utilities")
-    utilities_type_ids = fields.Many2many("pms.utilities.type", string="Utilities")
-    utilities_supply_ids = fields.Many2many("pms.utilities.supply", string="Utilities Supply")
+    utilities_lines = fields.One2many("pms.utilities.lines",'property_id', string="Utilities")
     vacant_unit = fields.Integer("Vacant Unit", compute="_get_vacant_unit")
     occupy_unit = fields.Integer('Occupied Unit', compute="_get_occupied_unit")
     booking_lease = fields.Integer('Booking Lease', compute="_get_booking_lease")
@@ -247,6 +245,16 @@ class PMSProperties(models.Model):
     _sql_constraints = [('code_unique', 'unique(code)',
                          'Your code is exiting in the database.')]
 
+
+    # @api.model
+    # @api.returns('self', lambda value: value.id)
+    # def _property_default_get(self, object=False, field=False):
+    #     """ Returns the default company (usually the user's company).
+    #     The 'object' and 'field' arguments are ignored but left here for
+    #     backward compatibility and potential override.
+    #     """
+    #     return self.env['res.users']._get_property()
+    
     @api.multi
     @api.onchange('currency_id')
     def onchange_currency_id(self):
@@ -283,12 +291,12 @@ class PMSProperties(models.Model):
 
     @api.multi
     def _get_count_unit(self):
-        count = 0
         unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
-        for unit in unit_ids:
-            self.count_unit += 1
+        for un in unit_ids:
+            if un:
+                self.count_unit += 1
 
     @api.multi
     def action_units(self):
@@ -311,7 +319,6 @@ class PMSProperties(models.Model):
     # New Vacant Count Unit
     @api.multi
     def _get_vacant_unit(self):
-        count = 0
         unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
@@ -331,7 +338,7 @@ class PMSProperties(models.Model):
         unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
-        today = avail_date = datetime.today()
+        today = datetime.today()
         units= []
         for unit in unit_ids:
             lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
@@ -358,7 +365,6 @@ class PMSProperties(models.Model):
     # New Occupied Count Unit
     @api.multi
     def _get_occupied_unit(self):
-        count = 0
         unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
@@ -378,7 +384,7 @@ class PMSProperties(models.Model):
         unit_ids = self.env['pms.space.unit'].search([('property_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
-        today = avail_date = datetime.today()
+        today = datetime.today()
         units= []
         for unit in unit_ids:
             lease_line_ids = self.env['pms.lease_agreement.line'].search([('property_id', '=', self.id),
@@ -405,11 +411,11 @@ class PMSProperties(models.Model):
     # Booking Lease
     @api.multi
     def _get_booking_lease(self):
-        count = 0
         unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
                                                        self.id),('state','=','BOOKING')])
-        for unit in unit_ids:
-            self.booking_lease += 1
+        for un in unit_ids:
+            if un:
+                self.booking_lease += 1
 
     @api.multi
     def booking_action_lease(self):
@@ -431,11 +437,11 @@ class PMSProperties(models.Model):
     # New Lease
     @api.multi
     def _get_new_lease(self):
-        count = 0
         unit_ids = self.env['pms.lease_agreement'].search(['&',('property_id', '=',
                                                        self.id),'|',('state','=','NEW'),('state','=','EXTENDED')])
-        for unit in unit_ids:
-            self.new_lease += 1
+        for un in unit_ids:
+            if un:
+                self.new_lease += 1
     
     @api.multi
     def new_action_lease(self):
@@ -456,7 +462,6 @@ class PMSProperties(models.Model):
 
     def property_scheduler(self):
         values = None
-        property_ids = []
         property_id = self.search([('api_integration', '=', True),
                                    ('is_api_post', '=', False)])
         if property_id:
@@ -490,7 +495,8 @@ class PMSProperties(models.Model):
                                                                 '&',('extend_to','>=',today),
                                                                     ('extend_to','<=',expire_date)])
         for lease in lease_ids:
-            self.expire_lease += 1
+            if lease:
+                self.expire_lease += 1
     
     @api.multi
     def expire_action_lease(self):
@@ -519,11 +525,11 @@ class PMSProperties(models.Model):
 
     @api.multi
     def _get_extend_lease(self):
-        count = 0
         unit_ids = self.env['pms.lease_agreement'].search([('property_id', '=',
                                                        self.id),('state','=','EXTENDED')])
-        for unit in unit_ids:
-            self.extend_lease += 1
+        for et in unit_ids:
+            if et:
+                self.extend_lease += 1
     
     @api.multi
     def extend_action_lease(self):
@@ -544,34 +550,37 @@ class PMSProperties(models.Model):
 
     @api.model
     def create(self, values):
-        if values['property_management_id'][0][2] == []:
-            raise UserError(
-                _("Please set your management company for setting management rules."
-                  ))
-        if values['image']:
-            tools.image_resize_images(values, sizes={'image': (1024, None)})
+        # if 'property_management_id' in values:
+        #     if values['property_management_id'][0][2] == []:
+        #         raise UserError(
+        #             _("Please set your management company for setting management rules."
+        #             ))
+        if 'image' in values:
+            if values['image']:
+                tools.image_resize_images(values, sizes={'image': (1024, None)})
         id = None
         id = super(PMSProperties, self).create(values)
         self.env.user.write({'property_id': [(4, id.id)]})
+        self.env.user.write({'current_property_id': id.id})
         if id:
             property_id = None
-            if values['api_integration']:
-                if values['api_integration_id']:
-                    integ_obj = self.env['pms.api.integration'].browse(
-                        values['api_integration_id'])
-                    integ_line_obj = integ_obj.api_integration_line
-                    api_line_ids = integ_line_obj.search([('name', '=',
-                                                           "Property")])
-                    datas = api_rauth_config.APIData.get_data(
-                        id, values, property_id, integ_obj, api_line_ids)
-                    if datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus']:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            id.write({'is_api_post': True})
+            if 'api_integration' in values:
+                    if 'api_integration_id' in values:
+                        integ_obj = self.env['pms.api.integration'].browse(
+                            values['api_integration_id'])
+                        integ_line_obj = integ_obj.api_integration_line
+                        api_line_ids = integ_line_obj.search([('name', '=',
+                                                            "Property")])
+                        datas = api_rauth_config.APIData.get_data(
+                            id, values, property_id, integ_obj, api_line_ids)
+                        if datas:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus']:
+                                        if 'message' in response:
+                                            if response['message'] == 'SUCCESS':
+                                                id.write({'is_api_post': True})
         return id
 
     @api.multi
@@ -584,6 +593,8 @@ class PMSProperties(models.Model):
         tools.image_resize_images(vals, sizes={'image': (1024, None)})
         id = None
         id = super(PMSProperties, self).write(vals)
+        if 'api_integration' in vals and len(vals) == 1:
+            return id
         if id and self.api_integration == True:
             property_id = self
             if self.api_integration_id:
@@ -617,118 +628,16 @@ class PMSProperties(models.Model):
                                         if response['message'] == 'SUCCESS':
                                             self.write({'is_api_post': True})
 
-        return super(PMSProperties, self).write(vals)
+        return id
     
-    # sub = fields.Boolean("SUB")
-    # epc = fields.Boolean("EPC")
-    # gm = fields.Boolean("GM")
-    # wm = fields.Boolean("WM")
-    # @api.onchange('gen')
-    # def onchange_gen(self):
-    #     property_id = self._context.get('active_id')
-    #     vals = {}
-    #     utilities_line = self.env['pms.utilities.lines']
-    #     if self.gen:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GEN")])
-    #         vals['utilities_type'] = utility_id.utilities_type_id.id
-    #         vals['utilities_supply'] = utility_id.id
-    #         vals['digit'] = 8
-    #         vals['property_id'] = property_id
-    #         self.utilities_lines = utilities_line.create(vals)
-    #     else:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GEN")])
-    #         if utility_id:
-    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
-    #             if utility_line_id:
-    #                 utility_line_id.unlink()
-    
-    # @api.onchange('sub')
-    # def onchange_sub(self):
-    #     property_id = self._context.get('active_id')
-    #     vals = {}
-    #     utilities_line = self.env['pms.utilities.lines']
-    #     if self.gen:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"SUB")])
-    #         vals['utilities_type'] = utility_id.utilities_type_id.id
-    #         vals['utilities_supply'] = utility_id.id
-    #         vals['digit'] = 8
-    #         vals['property_id'] = property_id
-    #         self.utilities_lines = utilities_line.create(vals)
-    #     else:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"SUB")])
-    #         if utility_id:
-    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
-    #             if utility_line_id:
-    #                 utility_line_id.unlink()
-    
-    # @api.onchange('epc')
-    # def onchange_epc(self):
-    #     property_id = self._context.get('active_id')
-    #     vals = {}
-    #     utilities_line = self.env['pms.utilities.lines']
-    #     if self.gen:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"EPC")])
-    #         vals['utilities_type'] = utility_id.utilities_type_id.id
-    #         vals['utilities_supply'] = utility_id.id
-    #         vals['digit'] = 8
-    #         vals['property_id'] = property_id
-    #         self.utilities_lines = utilities_line.create(vals)
-    #     else:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"EPC")])
-    #         if utility_id:
-    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
-    #             if utility_line_id:
-    #                 utility_line_id.unlink()
-    
-    # @api.onchange('gm')
-    # def onchange_gm(self):
-    #     property_id = self._context.get('active_id')
-    #     vals = {}
-    #     utilities_line = self.env['pms.utilities.lines']
-    #     if self.gen:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GM")])
-    #         vals['utilities_type'] = utility_id.utilities_type_id.id
-    #         vals['utilities_supply'] = utility_id.id
-    #         vals['digit'] = 8
-    #         vals['property_id'] = property_id
-    #         self.utilities_lines = utilities_line.create(vals)
-    #     else:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"GM")])
-    #         if utility_id:
-    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
-    #             if utility_line_id:
-    #                 utility_line_id.unlink()
-    
-    # @api.onchange('wm')
-    # def onchange_wm(self):
-    #     property_id = self._context.get('active_id')
-    #     vals = {}
-    #     utilities_line = self.env['pms.utilities.lines']
-    #     if self.gen:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"WM")])
-    #         vals['utilities_type'] = utility_id.utilities_type_id.id
-    #         vals['utilities_supply'] = utility_id.id
-    #         vals['digit'] = 8
-    #         vals['property_id'] = property_id
-    #         self.utilities_lines = utilities_line.create(vals)
-    #     else:
-    #         utility_id = self.env['pms.utilities.supply'].search([('export_supply_type','=',"WM")])
-    #         if utility_id:
-    #             utility_line_id = utilities_line.search([('utilities_supply','=',utility_id.id)])
-    #             if utility_line_id:
-    #                 utility_line_id.unlink()
-
 
 class UtilitiesLines(models.Model):
     _name = "pms.utilities.lines"
 
-    utilities_type = fields.Many2one("pms.utilities.type", compute="_get_utilities_code", string="Utility Type")
-    utilities_supply =fields.Many2one("pms.utilities.supply",  compute="_get_utilities_code", string="Supply Type")
-    digit = fields.Integer("Digit",  compute="_get_utilities_code")
-    property_id = fields.Many2one("pms.properties", "Property" , compute="_get_utilities_code")
+    utilities_supply =fields.Many2one("pms.utilities.supply", string="Supply Type", store=True)
+    utilities_type = fields.Many2one("pms.utilities.type", string="Utility Type", related="utilities_supply.utilities_type_id", store=True)
+    digit = fields.Integer("Digit", default=8,store=True)
+    property_id = fields.Many2one("pms.properties", "Property", store=True)
 
-    @api.depends('property_id.utilities_lines')
-    def _get_utilities_code(self):
-        if self.mapped('property_id'):
-            self.utilities_supply = None
+    
 

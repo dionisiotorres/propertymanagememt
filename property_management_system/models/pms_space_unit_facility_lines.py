@@ -8,6 +8,10 @@ class PMSSpaceUnitFacilityLines(models.Model):
     _name = 'pms.space.unit.facility.lines'
     _description = "PMS Space Facility Lines"
 
+    @api.one
+    def _get_property(self):
+        return self.env.user.current_property_id
+
     facility_id = fields.Many2one("pms.facilities","Utilities")
     facility_line_id = fields.Many2one("pms.facility.lines",
                                   "Facility Lines",
@@ -16,12 +20,13 @@ class PMSSpaceUnitFacilityLines(models.Model):
                                      "Utilities Supply",
                                      required=True,
                                      track_visibility=True)
-    lmr_date = fields.Date("Last Reading Date", track_visibility=True)
-    lmr_value = fields.Float("Last Reading Value", track_visibility=True)
+    start_reading_date = fields.Date("Start Date", track_visibility=True)
+    start_reading_value = fields.Float("Start Reading Value", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
+                                  default=_get_property,
                                   required=True,
                                   store=True,
                                   track_visibility=True)
@@ -38,7 +43,7 @@ class PMSSpaceUnitFacilityLines(models.Model):
                                help='Type of Electric Meters')    
 
     def suf_scheduler(self):
-        values = self
+        values = None
         property_id = None
         property_ids = self.env['pms.properties'].search([
             ('api_integration', '=', True), ('api_integration_id', '!=', False)
@@ -46,12 +51,13 @@ class PMSSpaceUnitFacilityLines(models.Model):
         for pro in property_ids:
             property_id = pro
             facility_ids = self.search([('is_api_post', '=', False),
-                                        ('property_id', '=', property_id.id)])
-            if facility_ids and self.inuse:
+                                        ('property_id', '=', property_id.id),
+                                        ('inuse','=',True)])
+            if facility_ids:
                 integ_obj = property_id.api_integration_id
                 integ_line_obj = integ_obj.api_integration_line
                 api_line_ids = integ_line_obj.search([('name', '=',
-                                                       "SpaceUnitFacilities")])
+                                                    "SpaceUnitFacilities")])
                 datas = api_rauth_config.APIData.get_data(
                     facility_ids, values, property_id, integ_obj, api_line_ids)
                 if datas:
@@ -69,11 +75,11 @@ class PMSSpaceUnitFacilityLines(models.Model):
         res = super(PMSSpaceUnitFacilityLines,self).create(values)
         if 'unit_id' in values:
             unit_id = self.env['pms.space.unit'].browse(values['unit_id'])
-            if unit_id.spaceunittype_id.space_type_id.is_import:    
+            if unit_id.spaceunittype_id.space_type_id.is_export:    
                 if 'facility_id' in values:
                     facility_id = self.env['pms.facilities'].browse(values['facility_id'])
                     values['utilities_type_id'] = facility_id.utilities_type_id.export_utilities_type
-                    values['start_date'] = facility_id.install_date
+                    values['start_reading_date'] = facility_id.install_date
                     values['remark'] = facility_id.remark
                 if 'facility_line_id' in values:
                     facility_line_id = self.env['pms.facility.lines'].browse(values['facility_line_id'])

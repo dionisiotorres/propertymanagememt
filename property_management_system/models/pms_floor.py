@@ -12,6 +12,9 @@ class PMSFloor(models.Model):
     _description = "ZPMS Floor"
     _order = "code,name"
 
+    def _get_property(self):
+        return self.env.user.current_property_id
+
     name = fields.Char("Floor", required=True, track_visibility=True)
     code = fields.Char("Floor Code", required=True, track_visibility=True)
     floor_code_ref = fields.Char("Reference Code", track_visibility=True)
@@ -20,6 +23,7 @@ class PMSFloor(models.Model):
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   index=True,
+                                  default=_get_property,
                                   required=True,
                                   track_visibility=True)
     is_api_post = fields.Boolean("Posted")

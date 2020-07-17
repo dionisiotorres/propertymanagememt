@@ -10,6 +10,9 @@ class PMSEquipment(models.Model):
     def _get_name(self):
         return self.name
 
+    def _get_property(self):
+        return self.env.user.current_property_id
+
     equipment_type_id = fields.Many2one("pms.equipment.type",
                                         string="Equipment Type",
                                         track_visibility=True,
@@ -26,6 +29,7 @@ class PMSEquipment(models.Model):
     ref_code = fields.Char("Reference Code", track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
+                                  default=_get_property,
                                   required=True,
                                   track_visibility=True)
     digit = fields.Integer(
@@ -108,6 +112,16 @@ class PMSEquipment(models.Model):
             self.meter_type = template.meter_type
             self.power_system = template.power_system
             self.digit = template.digit
+    
+    @api.onchange('digit')
+    def onchange_digit(self):
+        if self.digit and self.name:
+            facility_id = self.env['pms.facilities'].search([('utilities_no','=',self.name),('inuse','=',True)])
+            if facility_id.facilities_line:
+                for fl in facility_id.facilities_line:
+                    spunitfl_ids = self.env['pms.space.unit.facility.lines'].search([('facility_id','=',facility_id.id),('facility_line_id','=',fl.id),('inuse','=',True)])
+                    spunitfl_ids.write({'digit':self.digit})
+            
             
 class PMSEquipmentType(models.Model):
     _name = 'pms.equipment.type'

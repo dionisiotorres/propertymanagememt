@@ -11,7 +11,18 @@ class PMSFacilities(models.Model):
     _name = 'pms.facilities'
     _description = "Facilities"
     
-
+    def _get_property(self):
+        return self.env.user.current_property_id
+    
+    def _get_utilities_no(self):
+        facilities_ids = self.env['pms.facilities'].search([])
+        utilities = []
+        # domain = {}
+        if not self.utilities_no:
+            if facilities_ids:
+                for uti in facilities_ids:
+                    utilities.append(uti.utilities_no.id)
+        return [('id','not in',utilities)]
 
     name = fields.Char(default="Utilities No",
                        related='utilities_no.name',
@@ -23,7 +34,7 @@ class PMSFacilities(models.Model):
                                         "Utilities Type",
                                         required=True,
                                         track_visibility=True)
-    utilities_no = fields.Many2one("pms.equipment","Utilities No",domain=lambda self: [("id", "not in", self.env['pms.facilities'].search([]).mapped("utilities_no").ids)],required=True,track_visibility=True)
+    utilities_no = fields.Many2one("pms.equipment","Utilities No", domain=_get_utilities_no , required=True, track_visibility=True)
     interface_type = fields.Selection([('auto', 'Auto'), ('manual', 'Manual'),
                                        ('mobile', 'Mobile')],
                                       "Data Interface Type",
@@ -39,20 +50,21 @@ class PMSFacilities(models.Model):
                                       track_visibility=True)
     property_id = fields.Many2one("pms.properties",
                                   "Property",
+                                  default=_get_property,
                                   required=True,
                                   track_visibility=True)
     count_unit = fields.Integer("Count Unit", compute="_get_count_unit")
     install_date = fields.Date("Installation Date",
                                track_visibility=True,
                                help='The date of Facility installation date.')
-    e_meter_type = fields.Char("Meter Type",
+    meter_type = fields.Char("Meter Type",
                                compute="compute_meters",
                                track_visibility=True,
                                help='Type of Electric Meters')
-    last_rdate = fields.Date("LMR Date",
+    start_date = fields.Date("Start Date",
                              compute="compute_meters",
                              help='Last Month Reading Date.')
-    lmr_rvalue = fields.Char("LMR Value",
+    initial_value = fields.Char("Initial Value",
                              compute="compute_meters",
                              help='Last Month Reading Value.')
     is_api_post = fields.Boolean("Posted")
@@ -94,11 +106,11 @@ class PMSFacilities(models.Model):
         return action
 
     @api.one
-    @api.depends('facilities_line.source_type_id', 'facilities_line.lmr_value',
-                 'facilities_line.lmr_date')
+    @api.depends('facilities_line.source_type_id', 'facilities_line.initial_value',
+                 'facilities_line.start_date')
     def compute_meters(self):
         ldata = []
-        emetertype = lmrvalue = lmrdate = None
+        metertype = initialvalue = stdate = None
         if self.facilities_line:
             if len(self.facilities_line) > 0:
                 for line in self.facilities_line:
@@ -106,19 +118,19 @@ class PMSFacilities(models.Model):
                         ldata.append(line.source_type_id)
                     utiliy_id = self.env['pms.utilities.supply'].browse(
                         line.source_type_id.id)
-                    if emetertype:
-                        emetertype += " | " + str(utiliy_id.code)
-                        lmrvalue += " | " + str(line.lmr_value)
-                    if not emetertype:
-                        emetertype = str(utiliy_id.code)
-                        lmrvalue = str(line.lmr_value)
-                        lmrdate = line.lmr_date
-        if emetertype:
-            self.e_meter_type = emetertype
-        if lmrvalue:
-            self.lmr_rvalue = lmrvalue
-        if lmrdate:
-            self.last_rdate = lmrdate
+                    if metertype:
+                        metertype += " | " + str(utiliy_id.code)
+                        initialvalue += " | " + str(line.initial_value)
+                    if not metertype:
+                        metertype = str(utiliy_id.code)
+                        initialvalue  = str(line.initial_value)
+                        stdate = line.start_date
+        if metertype:
+            self.meter_type = metertype
+        if initialvalue:
+            self.initial_value = initialvalue
+        if stdate:
+            self.last_rdate = stdate
 
     @api.multi
     @api.onchange('end_date')
@@ -128,46 +140,47 @@ class PMSFacilities(models.Model):
                 line.write({'end_date':self.end_date})
             self.write({'inuse':False})
 
-    def suf_scheduler(self):
-        values = self
-        property_id = None
-        property_ids = self.env['pms.properties'].search([
-            ('api_integration', '=', True), ('api_integration_id', '!=', False)
-        ])
-        for pro in property_ids:
-            property_id = pro
-            spacetype = spappid = units = []
-            space_type_ids = self.env['pms.space.type'].search([('is_import','=',True)])
-            for sp in space_type_ids:
-                spacetype.append(sp.id)
-            applicable_space_ids = self.env['pms.applicable.space.type'].search([('space_type_id','in',spacetype)])
-            for sapt in applicable_space_ids:
-                spappid.append(sapt.id)
-            spaceunit_ids = self.search([('is_api_post', '=', False),
-                                         ('property_id', '=', property_id.id),
-                                         ('spaceunittype_id','in',spappid)
-                                         ])
-            for spu in spaceunit_ids:
-                units.append(spu.id)
-            facility_ids = self.search([('is_api_post', '=', False),
-                                        ('property_id', '=', property_id.id),
-                                        ('unit_id','in',units)])
-            if facility_ids:
-                integ_obj = property_id.api_integration_id
-                integ_line_obj = integ_obj.api_integration_line
-                api_line_ids = integ_line_obj.search([('name', '=',
-                                                       "SpaceUnitFacilities")])
-                datas = api_rauth_config.APIData.get_data(
-                    facility_ids, values, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        for fc in facility_ids:
-                                            fc.write({'is_api_post': True})
+    # def suf_scheduler(self):
+    #     values = self
+    #     property_id = None
+    #     property_ids = self.env['pms.properties'].search([
+    #         ('api_integration', '=', True), ('api_integration_id', '!=', False)
+    #     ])
+    #     for pro in property_ids:
+    #         property_id = pro
+    #         spacetype = []
+    #         spappid = []
+    #         units = []
+    #         space_type_ids = self.env['pms.space.type'].search([('is_export','=',True)])
+    #         for sp in space_type_ids:
+    #             spacetype.append(sp.id)
+    #         applicable_space_ids = self.env['pms.applicable.space.type'].search([('space_type_id','in',spacetype)])
+    #         for sapt in applicable_space_ids:
+    #             spappid.append(sapt.id)
+    #         spaceunit_ids = self.env['pms.space.unit'].search([('property_id', '=', property_id.id),
+    #                                      ('spaceunittype_id','in', spappid)
+    #                                      ])
+    #         for spu in spaceunit_ids:
+    #             units.append(spu.id)
+    #         facility_ids = self.search([('is_api_post', '=', False),
+    #                                     ('property_id', '=', property_id.id),
+    #                                     ('unit_id','in',units)])
+    #         if facility_ids:
+    #             integ_obj = property_id.api_integration_id
+    #             integ_line_obj = integ_obj.api_integration_line
+    #             api_line_ids = integ_line_obj.search([('name', '=',
+    #                                                    "SpaceUnitFacilities")])
+    #             datas = api_rauth_config.APIData.get_data(
+    #                 facility_ids, values, property_id, integ_obj, api_line_ids)
+    #             if datas:
+    #                 if datas.res:
+    #                     response = json.loads(datas.res)
+    #                     if 'responseStatus' in response:
+    #                         if response['responseStatus']:
+    #                             if 'message' in response:
+    #                                 if response['message'] == 'SUCCESS':
+    #                                     for fc in facility_ids:
+    #                                         fc.write({'is_api_post': True})
 
 
     @api.model
@@ -242,7 +255,7 @@ class PMSFacilities(models.Model):
                     vals['source_type_id'] = uti.utilities_supply_id.id
                     vals['property_id'] =  self.utilities_no.property_id.id
                     vals['facility_id'] = self.id
-                    vals['lmr_date'] = date.today()
+                    vals['start_date'] = date.today()
                     data = vals  
                     facilities_line.append((0, 0, data))
                 if not self.property_id:
@@ -264,14 +277,14 @@ class PMSFacilities(models.Model):
                 'name':facility.name,
                 'digit':facility.utilities_no.digit,
                 'interface_type':facility.interface_type,
-                'meter_type':facility.e_meter_type,
+                'meter_type':facility.meter_type,
                 'facility_id':facility.id,
                 'facility_line_id':fcl.id,
                 'unit_id':space_units.id,
                 'source_type_id':fcl.source_type_id.id,
                 'property_id':fcl.property_id.id,
-                'lmr_date':fcl.lmr_date,
-                'lmr_value':fcl.lmr_value,
+                'start_reading_date':fcl.start_date,
+                'start_reading_value':fcl.initial_value,
                 'end_date':fcl.end_date,
                 'inuse':True,
             }

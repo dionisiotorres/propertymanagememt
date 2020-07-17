@@ -42,8 +42,6 @@ class PMSLeaseUnitChargeTypeLine(models.Model):
     unit_no = fields.Many2one("pms.space.unit", "Unit", compute="get_lease_id")
     start_date = fields.Date("Start Date", default=_get_start_date)
     end_date = fields.Date("End Date", default=_get_end_date)
-    # base_type_ids = fields.Many2many("pms.base.charge", related="applicable_charge_id.base_type_id", string="Base")
-    # base_type_id = fields.Many2one("pms.base.charge","Base")
 
     @api.one
     @api.depends('lease_line_id')

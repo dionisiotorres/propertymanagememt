@@ -4,7 +4,7 @@
         <!--pms.format -->
         <record model="pms.format" id="pms_format_id1">
           <field name="name">Space Unit Format</field>
-          <field name="sample">floor ref code-xxxxx</field>
+          <field name="sample">floor ref code-12345</field>
           <field name="active">True</field>
         </record>
         <record model="pms.format" id="pms_format_id2">
@@ -14,7 +14,12 @@
         </record>
         <record model="pms.format" id="pms_format_id3">
           <field name="name">Lease Format</field>
-          <field name="sample">LA-property code-YYYY/xxxxx</field>
+          <field name="sample">LA-property code-YYYY/12345</field>
+          <field name="active">True</field>
+        </record>
+        <record model="pms.format" id="pms_format_id4">
+          <field name="name">Booking Format</field>
+          <field name="sample">LA-BK-property code-12345</field>
           <field name="active">True</field>
         </record>
         <record model="pms.format.detail" id="pms_format_detail_id1">
@@ -149,6 +154,50 @@
             <field name="datetime_value"></field>
             <field name="value">5</field>
         </record>
+        <record model="pms.format.detail" id="pms_format_detail_id15">
+            <field name="format_id" ref="pms_format_id4"/>
+            <field name="name">Fix Char</field>
+            <field name="sequence">1</field>
+            <field name="value_type">fix</field>
+            <field name="fix_value">LA-BK-</field>
+            <field name="digit_value">0</field>
+            <field name="dynamic_value"></field>
+            <field name="datetime_value"></field>
+            <field name="value">LA-BK-</field>
+        </record>
+         <record model="pms.format.detail" id="pms_format_detail_id16">
+            <field name="format_id" ref="pms_format_id4"/>
+            <field name="name">Property</field>
+            <field name="sequence">2</field>
+            <field name="value_type">dynamic</field>
+            <field name="fix_value"></field>
+            <field name="digit_value">0</field>
+            <field name="dynamic_value">property code</field>
+            <field name="datetime_value"></field>
+            <field name="value">property code</field>
+        </record>
+        <record model="pms.format.detail" id="pms_format_detail_id17">
+            <field name="format_id" ref="pms_format_id4"/>
+            <field name="name">Fix Char</field>
+            <field name="sequence">3</field>
+            <field name="value_type">fix</field>
+            <field name="fix_value">-</field>
+            <field name="digit_value">0</field>
+            <field name="dynamic_value"></field>
+            <field name="datetime_value"></field>
+            <field name="value">-</field>
+        </record>
+        <record model="pms.format.detail" id="pms_format_detail_id18">
+            <field name="format_id" ref="pms_format_id4"/>
+            <field name="name">Digit Char</field>
+            <field name="sequence">6</field>
+            <field name="value_type">digit</field>
+            <field name="fix_value"></field>
+            <field name="digit_value">5</field>
+            <field name="dynamic_value"></field>
+            <field name="datetime_value"></field>
+            <field name="value">5</field>
+        </record>
         <record model="pms.leaseterms" id="pms_leaseterms_id1">
             <field name="name">NLT Month(N-5|min-12|max-24)</field>
             <field name="lease_period_type">month</field>
@@ -173,6 +222,7 @@
             <field name="space_unit_code_format" ref="pms_format_id1"/>
             <field name="pos_id_format" ref="pms_format_id2"/>
             <field name="lease_agre_format_id" ref="pms_format_id3"/>
+            <field name="prospect_format_id" ref="pms_format_id4"/>
             <field name="new_lease_term" ref="pms_leaseterms_id1"/>
             <field name="extend_lease_term" ref="pms_leaseterms_id2"/>     
         </record>

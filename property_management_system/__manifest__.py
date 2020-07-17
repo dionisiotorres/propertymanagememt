@@ -21,6 +21,7 @@
         'data/pms_config_data.xml',
         # 'data/pms.api.integration.csv',
         # 'data/pms.api.integration.line.csv',
+        'data/pms_space_type_data.xml',
         'data/pms_api_integration_data.xml',
         'data/pms_generate_rs_data.xml',
         'data/pms.company.category.csv',
@@ -35,14 +36,12 @@
         'wizard/pms_activate_wizard_view.xml',
         'wizard/pms_terminate_wizard_view.xml',
         'wizard/pms_lease_report_wizard_view.xml',
-        'wizard/pms_alert_message_box_view.xml',
         'data/pms.utilities.type.csv',
         'data/res.country.state.csv',
         'data/pms.city.csv',
         'data/pms.township.csv',
         'data/pms.calculation.method.csv',
         'data/pms.charge_types.csv',
-        # 'data/pms.space.type.csv',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',
@@ -87,10 +86,11 @@
     'qweb': [
         'static/src/xml/facilities.xml',
         'static/src/xml/datepicker.xml',
-        # 'static/src/xml/property_menu_template.xml',
+        'static/src/xml/property_menu_template.xml',
         ],
     'installable':
     True,
     'application':
     True,
+    'auto_install':True
 }

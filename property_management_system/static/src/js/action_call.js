@@ -25,7 +25,7 @@ odoo.define('property_management_system.action_button', function(require) {
                 method: 'select_values',
                 args: [[user],{'id':user,'active_id':active_id,'selection_id':selection_id}],
                 });
+            this.closed = true;
             },
     });
-    Dialog.close();
 });

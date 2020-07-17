@@ -6,8 +6,9 @@
             <field name="inherit_id" ref="base.view_users_form"/>
             <field name="arch" type="xml">
                 <page name="access_rights"  position="inside">
-                    <group string="Property">
-                        <field name="property_id" widget="many2many_tags" options='{"no_open": True, "no_create": True}'/>
+                    <group string="Property" groups="base.group_no_one">
+                        <field name="property_id" widget="many2many_tags"  options='{"no_open": True, "no_create": True}'/>
+                        <field name="current_property_id"  domain="[('id','in',property_id)]"  options='{"no_open": True, "no_create": True}'/>
                     </group>
                 </page>
             </field>

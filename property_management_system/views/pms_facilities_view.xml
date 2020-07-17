@@ -42,8 +42,8 @@
                 <tree editable="buttom" options="{'no_quick_create':True}">
                   <field name="property_id" invisible='1'/>
                   <field name="source_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
-                  <field name="lmr_date"/>
-                  <field name="lmr_value"/>
+                  <field name="start_date"/>
+                  <field name="initial_value"/>
                   <field name="end_date"/>
                 </tree>
                </field>
@@ -61,9 +61,9 @@
             <field name="utilities_type_id"/>
             <field name="interface_type"/>
             <field name="utilities_no"/>
-            <field name="e_meter_type"/>
-            <field name="last_rdate"/>
-            <field name="lmr_rvalue"/>
+            <field name="meter_type"/>
+            <field name="start_date"/>
+            <field name="initial_value"/>
             <field name="inuse"/>
         </tree>
       </field>
@@ -122,8 +122,8 @@
               <group>
                   <field name="property_id" />
                   <field name="source_type_id" options="{'no_create': True, 'no_create_edit':True}"/>
-                  <field name="lmr_date"/>
-                  <field name="lmr_value"/>
+                  <field name="start_date"/>
+                  <field name="initial_value"/>
                   <field name="end_date"/>
                   <field name="status"/>
                </group>
@@ -139,8 +139,8 @@
         <tree>
           <!-- <field name="property_id" invisible='1'/> -->
           <field name="source_type_id" />
-          <field name="lmr_date"/>
-          <field name="lmr_value"/>
+          <field name="start_date"/>
+          <field name="initial_value"/>
           <field name="end_date"/>
           <field name="status"/>
         </tree>

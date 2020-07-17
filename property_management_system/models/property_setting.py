@@ -209,24 +209,28 @@ class PMSRentSchedule(models.Model):
             property_id = pro
             lease_ids = self.search([('is_api_post', '=', False),
                                     ('property_id', '=', property_id.id)])
-            if lease_ids:
-                integ_obj = property_id.api_integration_id
-                integ_line_obj = integ_obj.api_integration_line
-                api_line_ids = integ_line_obj.search([
-                    ('name', '=', "RentSchedule")
-                ])
-                datas = api_rauth_config.APIData.get_data(lease_ids, values,
-                                                        property_id, integ_obj,
-                                                        api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        for lid in lease_ids:
-                                            lid.write({'is_api_post': True})
+            for lease in lease_ids.lease_agrrement_line:
+                for chline in lease.applicable_type_line_id:
+                    if chline.applicable_charge_id.charge_type_id:
+                        exported = chline.applicable_charge_id.charge_type_id.is_export
+                        if exported:
+                            integ_obj = property_id.api_integration_id
+                            integ_line_obj = integ_obj.api_integration_line
+                            api_line_ids = integ_line_obj.search([
+                                ('name', '=', "RentSchedule")
+                            ])
+                            datas = api_rauth_config.APIData.get_data(lease, values,
+                                                                    property_id, integ_obj,
+                                                                    api_line_ids)
+                            if datas:
+                                if datas.res:
+                                    response = json.loads(datas.res)
+                                    if 'responseStatus' in response:
+                                        if response['responseStatus']:
+                                            if 'message' in response:
+                                                if response['message'] == 'SUCCESS':
+                                                    for lid in lease_ids:
+                                                        lid.write({'is_api_post': True})
 
     @api.multi
     def toggle_active(self):
@@ -392,6 +396,9 @@ class PMSFacilitiesline(models.Model):
     def get_property_id(self):
         if self._context.get('property_id') != False:
             return self._context.get('property_id')
+    def get_start_date(self):
+        if self.facility_id.install_date:
+            self.start_date = self.facility_id.install_date
 
     facility_id = fields.Many2one("pms.facilities",
                                   "Facilities",
@@ -400,8 +407,8 @@ class PMSFacilitiesline(models.Model):
                                      "Utilities Supply",
                                      required=True,
                                      track_visibility=True)
-    lmr_date = fields.Date("Last Reading Date", track_visibility=True)
-    lmr_value = fields.Float("Last Reading Value", track_visibility=True)
+    start_date = fields.Date("Start Date", default=get_start_date, track_visibility=True)
+    initial_value = fields.Float("Initial Value", track_visibility=True)
     end_date = fields.Date("End Date", track_visibility=True)
     status = fields.Boolean("Status", default=True, track_visibility=True)
     property_id = fields.Many2one("pms.properties",
@@ -718,6 +725,10 @@ class PMSCompanyCategory(models.Model):
 class Partner(models.Model):
     _inherit = "res.partner"
 
+    # def _default_property(self):
+    #     return self.env['pms.properties']._property_default_get('res.partner')
+
+
     company_type = fields.Selection(
         string='Company Type',
         selection=[('person', 'Individual'), ('company', 'Company')],
@@ -755,6 +766,9 @@ class Partner(models.Model):
     shop_ids = fields.One2many('res.partner', "parent_id", string='Shop', domain=[('is_shop', '=', True)], track_visibility=True, index=True)
     lease_id = fields.Many2one("pms.lease.agreement", "Lease")
     lease_line_id = fields.Many2one("pms.lease.agreement", "Lease")
+    current_property_id = fields.Many2one("pms.properties", string="Properties")
+
+    
 
 
     @api.one

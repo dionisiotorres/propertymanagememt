@@ -438,7 +438,7 @@
                 <group>
                   <field name="calculate_method_ids" widget="many2many_tags"/>
                   <field name="description" placeholder="Descripton"/>
-                  <field name="is_import" />
+                  <field name="is_export" />
                   <field name="remark" placeholder="Remark"/>
                 </group>
                 <group>
@@ -463,7 +463,7 @@
           <field name="description"/>
           <field name="calculate_method_ids" widget="many2many_tags"/>
           <field name="space_type_ids"/>
-          <field name="is_import" />    
+          <field name="is_export" />    
         </tree>
       </field>
     </record>

@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id ="propertytype_id" model="pms.property.type">
-        <field name="name">Retail</field> 
-        <field name="active">True</field>
-    </record>
-    <record id="area_category_id" model="uom.category">
-        <field name="name">Area</field>
-    </record>
-    <record id="square_feet_id" model="uom.uom">
-        <field name="name">sqft</field>
-        <field name="category_id" ref="area_category_id"/>
-    </record>
-    <record id="res_partner_title_id" model="res.partner.title">
-        <field name="name">U</field>
-    </record>
-    <record id="res_partner_title_id" model="res.partner.title">
-        <field name="name">Mr.</field>
-    </record>
+    <data noupdate="1">
+        <record id ="propertytype_id" model="pms.property.type">
+            <field name="name">Retail</field> 
+            <field name="active">True</field>
+        </record>
+        <record id="area_category_id" model="uom.category">
+            <field name="name">Area</field>
+        </record>
+        <record id="square_feet_id" model="uom.uom">
+            <field name="name">sqft</field>
+            <field name="category_id" ref="area_category_id"/>
+        </record>
+        <record id="res_partner_title_id" model="res.partner.title">
+            <field name="name">U</field>
+        </record>
+        <record id="res_partner_title_id" model="res.partner.title">
+            <field name="name">Mr.</field>
+        </record>
+        <record id="main_property" model="pms.properties">
+            <field name="name">My Mall</field>
+            <field name="code">MM</field>
+            <field name="currency_id" ref="base.MMK"/>
+            <field name="propertytype_id" ref="propertytype_id"/>
+            <field name="area" ref="square_feet_id"/>
+            <field name="timezone">Asia/Yangon</field>
+            <field name="property_management_id" eval="[(4, ref('base.main_company'))]"/>
+        </record>
+    </data>
 </odoo>

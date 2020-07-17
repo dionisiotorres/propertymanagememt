@@ -13,13 +13,9 @@ class PMSSpaceUnit(models.Model):
     _description = "Space Units"
     _order = "parent_id"
 
-    def get_property_id(self):
-        if not self.property_id:
-            property_id = None
-            if not self.env.user.property_id:
-                raise UserError(_("Please set property in user setting."))
-            property_id = self.env.user.property_id[0]
-            return property_id
+    def _get_property(self):
+        return self.env.user.current_property_id
+        
 
     def get_floor(self):
         if not self.floor_id:
@@ -43,7 +39,7 @@ class PMSSpaceUnit(models.Model):
     unit_code = fields.Char("Unit", compute="get_unit_code", readonly=True)
     property_id = fields.Many2one("pms.properties",
                                   string="Property",
-                                  default=get_property_id,
+                                  default=_get_property,
                                   track_visibility=True,
                                   required=True)
     floor_id = fields.Many2one("pms.floor",
@@ -297,7 +293,7 @@ class PMSSpaceUnit(models.Model):
         for pro in property_id:
             property_ids = pro
             spacetype = spappid = []
-            space_type_ids = self.env['pms.space.type'].search([('is_import','=',True)])
+            space_type_ids = self.env['pms.space.type'].search([('is_export','=',True)])
             for sp in space_type_ids:
                 spacetype.append(sp.id)
             applicable_space_ids = self.env['pms.applicable.space.type'].search([('space_type_id','in',spacetype)])
@@ -374,8 +370,8 @@ class PMSSpaceUnit(models.Model):
                     fac_id.write({'status': True})
         id = None
         id = super(PMSSpaceUnit, self).create(values)
-        imported = id.spaceunittype_id.space_type_id.is_import
-        if id and imported:
+        exported = id.spaceunittype_id.space_type_id.is_export
+        if id and exported:
             property_obj = self.env['pms.properties']
             property_id = property_obj.browse(values['property_id'])
             if property_id.api_integration:
@@ -445,8 +441,8 @@ class PMSSpaceUnit(models.Model):
                     fac_id.write({'status': True})
         id = None
         id = super(PMSSpaceUnit, self).write(val)
-        imported = self.spaceunittype_id.space_type_id.is_import
-        if id and imported:
+        exported = self.spaceunittype_id.space_type_id.is_export
+        if id and exported:
             property_id = None
             if 'property_id' in val:
                 property_id = val['property_id']

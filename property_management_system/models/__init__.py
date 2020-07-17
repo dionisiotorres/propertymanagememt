@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import res_user
 from . import pms_config
 from . import pms_api_integration
 from . import property_setting
@@ -22,3 +23,4 @@ from . import unit_reconfig
 from . import unit_resurvey
 from . import pms_space_unit_facility_lines
 from . import pms_meter_template
+from . import pms_http

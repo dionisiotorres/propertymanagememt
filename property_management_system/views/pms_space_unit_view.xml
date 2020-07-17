@@ -66,8 +66,8 @@
                     <tree editable="buttom" create="false">
                       <field name="facility_id"/>
                       <field name="source_type_id" options="{'no_create_edit': True}"/>
-                      <field name="lmr_value" />
-                      <field name="lmr_date"/>
+                      <field name="start_reading_date"/>
+                      <field name="start_reading_value" />
                       <field name="end_date"/>
                     </tree>
                   </field>

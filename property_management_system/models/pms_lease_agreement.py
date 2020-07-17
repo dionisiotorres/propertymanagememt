@@ -48,11 +48,14 @@ class PMSLeaseAgreement(models.Model):
     _description = "Lease Agreements"
     _order = "property_id, company_tanent_id, state, start_date"
 
+    def _get_property(self):
+        return self.env.user.current_property_id
+
     name = fields.Char("Name",
                        default="New",
                        compute="compute_tanent",
                        track_visibility=True)
-    property_id = fields.Many2one("pms.properties", track_visibility=True)
+    property_id = fields.Many2one("pms.properties", default=_get_property, track_visibility=True)
     company_tanent_id = fields.Many2one("res.partner",
                                         "Tenant",
                                         required=True,
@@ -224,16 +227,16 @@ class PMSLeaseAgreement(models.Model):
                 formats = format.sample
                 for ft in format.format_line_id:
                     if ft.value_type == 'dynamic':
-                        if property.code and ft.dynamic_value == 'property code':
-                            val.append(property.code)
+                        if prop.code and ft.dynamic_value == 'property code':
+                            val.append(prop.code)
                     if ft.value_type == 'fix':
                         val.append(ft.fix_value)
                     if ft.value_type == 'digit':
                         sequent_ids = self.env['ir.sequence'].search([
-                            ('name', '=', 'Lease Agreement'),('property_id','=',property.id), ('code','=',formats)
+                            ('name', '=', 'Lease Agreement'),('property_id','=',prop.id), ('code','=',formats)
                         ])
                         if not sequent_ids:
-                            sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':property.id,'code': formats})
+                            sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':prop.id,'code': formats})
                         sequent_ids.write({'padding': ft.digit_value})
                     if ft.value_type == 'datetime':
                         mon = yrs = ''
@@ -249,7 +252,7 @@ class PMSLeaseAgreement(models.Model):
                         if ft.datetime_value == 'YYYY':
                             yrs = datetime.today().strftime("%Y")
                             val.append(yrs)
-                space = []
+                # space = []
                 fromat_no_pre = ''
                 if len(val) > 0:
                     for l in range(len(val)):
@@ -299,7 +302,7 @@ class PMSLeaseAgreement(models.Model):
                         res['charge_type'] = ctype.applicable_charge_id.id
                         res['amount'] = ctype.total_amount
                         if self.property_id.rentschedule_type == 'prorated':
-                            date = None
+                            # date = None
                             res['start_date'] = None
                             res['billing_date'] = None
                             day = 1
@@ -327,11 +330,11 @@ class PMSLeaseAgreement(models.Model):
                                         _("Please set start date and end date for your lease."
                                           ))
                         if self.property_id.rentschedule_type == 'calendar':
-                            date = None
+                            # date = None
                             res['start_date'] = None
                             res['end_date'] = None
-                            s_day = 0
-                            last_day = 0
+                            # s_day = 0
+                            # last_day = 0
                             day = 1
                             next_month_sdate = None
                             while day >= 1:
@@ -396,7 +399,7 @@ class PMSLeaseAgreement(models.Model):
                                                 yrs = datetime.today(
                                                 ).strftime("%Y")
                                                 val.append(yrs)
-                                    space = []
+                                    # space = []
                                     if len(val) > 0:
                                         for l in range(len(val)):
                                             leasepos_no_pre += str(val[l])
@@ -408,7 +411,7 @@ class PMSLeaseAgreement(models.Model):
                         posinterface_id = self.env[
                             'pms.lease.interface.code'].create(
                                 {'name': leasepos_no_pre + leasepos_no})
-                        leasepos_ids = line.leaseunitpos_line_id.create({
+                        line.leaseunitpos_line_id.create({
                             'posinterfacecode_id':
                             posinterface_id.id,
                             'leaseagreementitem_id':
@@ -830,7 +833,7 @@ class PMSLeaseAgreement(models.Model):
         partner_obj = self.env['res.partner']
         mail_mail = self.env['mail.mail']
         mail_ids = None
-        today = datetime.now()
+        # today = datetime.now()
         # today_month_day = '%-' + today.strftime('%m') + '-' + today.strftime(
         #     '%d')
         notify_date = new_lease_ids = extend_lease_ids = par_id = None
@@ -878,20 +881,21 @@ class PMSLeaseAgreement(models.Model):
         today_month_day = today.strftime('%Y-%m-%d')
         partner_obj = self.env['res.partner']
         mail_mail = self.env['mail.mail']
-        notify_date = new_lease_ids = extend_lease_ids = par_id = None
+        # notify_date= None
+        par_id = None
         par_id = partner_obj.search([('id', '=', self.company_tanent_id.id)])
         noti = None
         if not self.end_date:
             if self.state == 'NEW':
                 noti = 'Activated'
-                notify_date = today_month_day
+                # notify_date = today_month_day
                 # notify_date = self.end_date - relativedelta(
                 #     months=self.property_id.new_lease_term.notify_period
                 # ) + relativedelta(days=1)
                 # new_lease_ids = self.search([('end_date', '=', notify_date)])
             if self.state == 'EXTENDED':
                 noti = 'Extended'
-                notify_date = today_month_day
+                # notify_date = today_month_day
                 # noti = 'Extend'
                 # notify_date = self.extend_to - relativedelta(
                 #     months=self.property_id.extend_lease_term.notify_period)
@@ -899,7 +903,7 @@ class PMSLeaseAgreement(models.Model):
         else:
             self.state == 'PRE-TERMINATED'
             noti = 'Pre-Terminated'
-            notify_date = self.end_date.strftime('%Y-%m-%d')
+            # notify_date = self.end_date.strftime('%Y-%m-%d')
         for val in par_id:
             email_from = val.email
             name = val.name
@@ -1018,22 +1022,22 @@ class PMSLeaseAgreement(models.Model):
                 if exp.booking_expdate < today_date and exp.state == 'BOOKING':
                     exp.write({'state': 'CANCELLED'})
 
-    @api.multi
-    @api.depends('end_date', 'extend_to')
-    def lease_expired(self):
-        lease_ids = self.search([])
-        today = datetime.now().strftime('%Y-%m-%d')
-        today_date = datetime.strptime(today, '%Y-%m-%d').date()
-        for exp in lease_ids:
-            if exp.extend_to:
-                if exp.extend_to < today_date:
-                    exp.write({'state': 'EXPIRED'})
-            if not exp.extend_to and exp.end_date:
-                if exp.end_date < today_date:
-                    exp.write({'state': 'EXPIRED'})
-            if exp.booking_expdate:
-                if exp.booking_expdate < today_date and exp.state == 'BOOKING':
-                    exp.write({'state': 'EXPIRED'})
+    # @api.multi
+    # @api.depends('end_date', 'extend_to')
+    # def lease_expired(self):
+    #     lease_ids = self.search([])
+    #     today = datetime.now().strftime('%Y-%m-%d')
+    #     today_date = datetime.strptime(today, '%Y-%m-%d').date()
+    #     for exp in lease_ids:
+    #         if exp.extend_to:
+    #             if exp.extend_to < today_date:
+    #                 exp.write({'state': 'EXPIRED'})
+    #         if not exp.extend_to and exp.end_date:
+    #             if exp.end_date < today_date:
+    #                 exp.write({'state': 'EXPIRED'})
+    #         if exp.booking_expdate:
+    #             if exp.booking_expdate < today_date and exp.state == 'BOOKING':
+    #                 exp.write({'state': 'EXPIRED'})
 
     @api.multi
     @api.depends('terminate_period')
@@ -1205,8 +1209,8 @@ class PMSLeaseAgreement(models.Model):
             if 'BOOKING' not in vals or 'CANCELLED' not in vals:
                 if self.lease_agreement_line:
                     for lal in self.lease_agreement_line:
-                        imported = lal.unit_no.spaceunittype_id.space_type_id.is_import
-                        if imported:
+                        exported = lal.unit_no.spaceunittype_id.space_type_id.is_export
+                        if exported:
                             property_id = self.env['pms.properties'].browse(
                                 vals['property_id']
                             ) if 'property_id' in vals else self.property_id
@@ -1270,11 +1274,11 @@ class PMSLeaseAgreement(models.Model):
                                                                     True
                                                                 })
                                 if self.lease_rent_config_id:
-                                    if lal.applicable_charge_id:
-                                        for chline in lal.applicable_charge_id:
+                                    if lal.applicable_type_line_id:
+                                        for chline in lal.applicable_type_line_id:
                                             if chline.applicable_charge_id.charge_type_id:
-                                                imported = chline.applicable_charge_id.charge_type_id.is_import
-                                                if imported:
+                                                exported = chline.applicable_charge_id.charge_type_id.is_export
+                                                if exported:
                                                     leasers_api_id = integ_line_obj.search([
                                                         ('name', '=', "RentSchedule")
                                                     ])
@@ -1337,6 +1341,7 @@ class PMSLeaseAgreementLine(models.Model):
     def get_end_date(self):
         if self._context.get('end_date') != False:
             return self._context.get('end_date')
+
 
     name = fields.Char("Name", compute="compute_name", track_visibility=True)
     lease_agreement_id = fields.Many2one("pms.lease_agreement",
@@ -1535,7 +1540,7 @@ class PMSLeaseAgreementLine(models.Model):
                         taxes = product_id.taxes_id.filtered(
                             lambda r: not self.lease_agreement_id.company_id or
                             r.company_id == self.lease_agreement_id.company_id)
-                        unit = self.lease_agreement_id.lease_no
+                        # unit = self.lease_agreement_id.lease_no
                         if l.charge_type.calcuation_method.name == 'area':
                             area = 1
                             rent = l.amount
@@ -1590,7 +1595,7 @@ class PMSLeaseAgreementLine(models.Model):
                         taxes = product_id.taxes_id.filtered(
                             lambda r: not self.lease_agreement_id.company_id or
                             r.company_id == self.lease_agreement_id.company_id)
-                        unit = self.lease_agreement_id.lease_no
+                        # unit = self.lease_agreement_id.lease_no
                         if l.charge_type.calcuation_method.name == 'area':
                             area = 1
                             rent = l.amount
@@ -1641,11 +1646,11 @@ class PMSLeaseAgreementLine(models.Model):
             })
             # self.invoice_count += 1
             inv_ids.action_invoice_open()
-            is_email = self.env.user.company_id.invoice_is_email
-            template_id = self.env.ref('account.email_template_edi_invoice',
-                                       False)
-            composer = self.env['mail.compose.message'].create(
-                {'composition_mode': 'comment'})
+            # is_email = self.env.user.company_id.invoice_is_email
+            # template_id = self.env.ref('account.email_template_edi_invoice',
+            #                            False)
+            # composer = self.env['mail.compose.message'].create(
+            #     {'composition_mode': 'comment'})
             return inv_ids
 
     def lease_agreement_item_scheduler(self):
@@ -1707,7 +1712,7 @@ class PMSChargeTypes(models.Model):
     charge_method_type = fields.Selection([('fix','Fix'),('$-area',"$/sqft")],"Charge Method type")
     calculate_period = fields.Selection([('hourly',"Hourly"),('daily',"Daily"),('weekly',"Weekly"),('monthly',"Monthly"),('quaterly',"Quarterly"),('yearly',"Yearly")],"Calculate Peroid")
     billing_frequency = fields.Selection([('minthly','Monthly'),('quarter',"Quarterly"),('yearly','Yearly')],"Billing Frequency")
-    is_import = fields.Boolean("Import?")
+    is_export = fields.Boolean("Import?")
     remark = fields.Text("Remark")
     
     _sql_constraints = [('name_unique', 'unique(name)',

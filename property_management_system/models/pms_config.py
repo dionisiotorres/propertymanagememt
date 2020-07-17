@@ -132,17 +132,17 @@ class PmsFormatDetail(models.Model):
 class Users(models.Model):
     _inherit = "res.users"
 
-    def _get_property(self):
-        return self.env.user.property_id
+    # def _get_property(self):
+    #     return self.env.user.property_id
 
     property_id = fields.Many2many("pms.properties",
                                    'property_id',
                                    'user_id',
                                    "pms_property_user_rel",
                                    "Property",
-                                   default=_get_property,
                                    store=True,
                                    track_visibility=True)
+
 
 
 class Company(models.Model):
@@ -161,7 +161,7 @@ class Company(models.Model):
             return self.env.ref('base.main_company').lease_agre_format_id
     
     def _default_prospect_format(self):
-        if not self.lease_agre_format_id:
+        if not self.prospect_format_id:
             return self.env.ref('base.main_company').prospect_format_id
 
     def _default_new_lease_term(self):
@@ -304,6 +304,11 @@ class ResConfigSettings(models.TransientModel):
     def onchange_extend_lease_term(self):
         if self.extend_lease_term:
             self.company_id.extend_lease_term = self.extend_lease_term
+
+    @api.onchange('prospect_format_id')
+    def onchange_prospect_format_id(self):
+        if self.prospect_format_id:
+            self.company_id.prospect_format_id = self.prospect_format_id
 
     @api.onchange('lease_agre_format_id')
     def onchange_lease_agre_format_id(self):

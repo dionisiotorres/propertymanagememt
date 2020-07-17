@@ -388,9 +388,9 @@ class APIData:
                                 facility.SpaceUnitID = str(unfacl.unit_id.id)
                                 facility.StartDate = str(unfacl.facility_id.install_date.strftime('%Y-%m-%d') if unfacl.end_date else "")
                                 facility.EndDate = str(unfacl.end_date.strftime('%Y-%m-%d') if unfacl.end_date else "")
-                                facility.LastReadingOn = str(unfacl.lmr_date.strftime('%Y-%m-%d') if unfacl.lmr_date else "")
+                                facility.LastReadingOn = str(unfacl.start_reading_date.strftime('%Y-%m-%d') if unfacl.start_reading_date else "")
                                 facility.UtilityType = str(unfacl.source_type_id.code)
-                                facility.LastReadingValue = str(unfacl.lmr_value)
+                                facility.LastReadingValue = str(unfacl.start_reading_value)
                                 facility.EMeterType = facility.EMeterType or str(unfacl.source_type_id.code)
                                 facility.Remark = facility.Remark or str(unfacl.facility_id.remark if unfacl.facility_id.remark else "" )
                                 facility.Digit = facility.Digit or str(unfacl.digit if unfacl.digit else 0)
@@ -423,17 +423,17 @@ class APIData:
                             if 'end_date' in self.values:
                                 facility.EndDate = str(self.values['end_date'].strftime('%Y-%m-%d') if self.values['end_date'] else "")
                             facility.EndDate = facility.EndDate or str(self.model_id.end_date.strftime('%Y-%m-%d') if self.model_id.end_date else "")
-                            if 'lmr_date' in self.values:
-                                facility.LastReadingOn = self.values['lmr_date'].strftime('%Y-%m-%d')
-                            facility.LastReadingOn = facility.LastReadingOn or str(self.model_id.lmr_date.strftime('%Y-%m-%d'))
+                            if 'start_reading_date' in self.values:
+                                facility.LastReadingOn = self.values['start_reading_date'].strftime('%Y-%m-%d')
+                            facility.LastReadingOn = facility.LastReadingOn or str(self.model_id.start_date.strftime('%Y-%m-%d'))
                             if 'source_type_id' in self.values:
-                                facility.UtilityType = str(self.values['source_type_id'])
+                                facility.UtilityType = str(self.values['utilities_type_id'])
                             facility.UtilityType = facility.UtilityType or str(self.model_id.source_type_id.code)
-                            if 'lmr_value' in self.values:
-                                facility.LastReadingValue = str(self.values['lmr_value'])
-                            facility.LastReadingValue = facility.LastReadingValue or str(self.model_id.lmr_value)
+                            if 'start_reading_value' in self.values:
+                                facility.LastReadingValue = str(self.values['start_reading_value'])
+                            facility.LastReadingValue = facility.LastReadingValue or str(self.model_id.start_reading_value)
                             if 'source_type_id' in self.values:
-                                facility.EMeterType = str(self.values['source_type_id'])
+                                facility.EMeterType = str(self.values['utilities_type_id'])
                             facility.EMeterType = facility.EMeterType or str(self.model_id.source_type_id.code)
                             if 'remark' in self.values:
                                 facility.Remark = str(self.values['remark'])
@@ -441,7 +441,7 @@ class APIData:
                             if 'digit' in self.values:
                                 facility.Digit = str(self.values['digit'])
                             facility.Digit = facility.Digit or str(self.model_id.digit if self.model_id.digit else 0)
-                            if 'digit' in self.values:
+                            if 'id' in self.values:
                                 facility.ExtSpaceUnitFacilityID = str(self.values['id'])
                             facility.ExtSpaceUnitFacilityID = facility.ExtSpaceUnitFacilityID or str(self.model_id.id)
                             facility.LastReadingNOC = 0

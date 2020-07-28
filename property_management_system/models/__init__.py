@@ -23,6 +23,6 @@ from . import unit_reconfig
 from . import unit_resurvey
 from . import pms_space_unit_facility_lines
 from . import pms_meter_template
-from . import pms_http
+# from . import pms_http
 from . import pms_base_import
 from . import pms_space_facilities

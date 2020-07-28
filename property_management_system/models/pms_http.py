@@ -62,11 +62,12 @@ class IrHttp(models.AbstractModel):
                 raise result
         except Exception as e:
             return cls._handle_exception(e)        
-        if result.data:
-            isValid = validateJSON(result.data)
-            if isValid:
-                error_data = json.loads(result.data)
-                if 'error' in error_data:
-                    error_data['error']['message'] = 'ZPMS'
-                    result.data = json.dumps(error_data, sort_keys=False)
+        # cls._ensure_sequence()
+        # if result.data:
+        #     isValid = validateJSON(result.data)
+        #     if isValid:
+        #         error_data = json.loads(result.data)
+        #         if 'error' in error_data:
+        #             error_data['error']['message'] = 'ZPMS'
+        #             result.data = json.dumps(error_data, sort_keys=True)
         return result

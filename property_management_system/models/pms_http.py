@@ -68,5 +68,5 @@ class IrHttp(models.AbstractModel):
                 error_data = json.loads(result.data)
                 if 'error' in error_data:
                     error_data['error']['message'] = 'ZPMS'
-                    result.data = json.dumps(error_data, sort_keys=True)
+                    result.data = json.dumps(error_data, sort_keys=False)
         return result

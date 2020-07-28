@@ -23,7 +23,7 @@
             <field name="code">MM</field>
             <field name="currency_id" ref="base.MMK"/>
             <field name="propertytype_id" ref="propertytype_id"/>
-            <field name="area" ref="square_feet_id"/>
+            <field name="uom_id" ref="square_feet_id"/>
             <field name="timezone">Asia/Yangon</field>
             <field name="property_management_id" eval="[(4, ref('base.main_company'))]"/>
         </record>
@@ -31,8 +31,8 @@
             <field name="partner_id" ref="base.partner_root"/>
             <field name="company_id" ref="base.main_company"/>
             <field name="company_ids" eval="[(4, ref('base.main_company'))]"/>
-            <field name="current_property_id" ref="property_management_system.main_property"/>
-            <field name="property_id" eval="[(4, ref('property_management_system.main_property'))]"/>
+            <field name="current_property_id" ref="main_property"/>
+            <field name="property_id" eval="[(4, ref('main_property'))]"/>
             <field name="signature"><![CDATA[<span>-- <br/>System</span>]]></field>
         </record>
     </data>

@@ -6,4 +6,4 @@ class Users(models.Model):
     _inherits = {'res.partner': 'partner_id'}
     _order = 'name, login'
 
-    current_property_id = fields.Many2one("pms.properties", string="Property", required=True)
+    current_property_id = fields.Many2one("pms.properties", string="Current Property")

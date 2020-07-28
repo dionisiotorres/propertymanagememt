@@ -1414,7 +1414,7 @@ class PMSLeaseAgreementLine(models.Model):
                                      string="Reconfig Flag")
     reconfig_date = fields.Date("Reconfig Date")
     shop_ids = fields.One2many('res.partner', "lease_line_id", string='Shop', related="company_tanent_id.shop_ids", readonly=False, store=True, track_visibility=True, index=True)
-    shop_id = fields.Many2one("res.partner","Shop", store=True, track_visibility=True)
+    shop_id = fields.Many2one("res.partner","Shop Name", store=True, track_visibility=True)
 
     # @api.onchange('shop_ids')
     # def domain_lease_tanent_id(self):

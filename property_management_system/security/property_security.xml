@@ -30,7 +30,7 @@
         <record id="rule_id_properties" model="ir.rule">
             <field name="name">Property User</field>
             <field name="model_id" ref="model_pms_properties"/>
-            <field name="domain_force">[('id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">[('id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
         <record id="id_floor" model="ir.rule">
@@ -42,7 +42,7 @@
         <record id="rule_id_floor" model="ir.rule">
             <field name="name">Floor User</field>
             <field name="model_id" ref="model_pms_floor"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id','child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record> 
          <record id="id_space_unit" model="ir.rule">
@@ -54,7 +54,7 @@
         <record id="rule_id_space_unit" model="ir.rule">
             <field name="name">Space Unit User</field>
             <field name="model_id" ref="model_pms_space_unit"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <record id="id_lease_agreement" model="ir.rule">
@@ -66,7 +66,7 @@
         <record id="rule_id_lease_agreement" model="ir.rule">
             <field name="name">Lease Agreement User</field>
             <field name="model_id" ref="model_pms_lease_agreement"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
         <record id="id_facilities" model="ir.rule">
@@ -78,7 +78,7 @@
         <record id="rule_id_facilities" model="ir.rule">
             <field name="name">Facilities User</field>
             <field name="model_id" ref="model_pms_facilities"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <record id="id_pms_space_facilities" model="ir.rule">
@@ -90,7 +90,7 @@
          <record id="rule_id_pms_space_facilities" model="ir.rule">
             <field name="name">Space Facilities</field>
             <field name="model_id" ref="model_pms_space_facilities"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
         <record id="id_pms_space_unit_facility_lines" model="ir.rule">
@@ -102,7 +102,7 @@
         <record id="rule_id_pms_space_unit_facility_lines" model="ir.rule">
             <field name="name">Space Facilities</field>
             <field name="model_id" ref="model_pms_space_unit_facility_lines"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <!-- <record id="id_utilities_source_type" model="ir.rule">
@@ -150,7 +150,7 @@
         <record id="rule_id_equipment" model="ir.rule">
             <field name="name">Equipment User</field>
             <field name="model_id" ref="model_pms_equipment"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <record id="id_facility_lines" model="ir.rule">
@@ -162,7 +162,7 @@
         <record id="rule_id_facility_lines" model="ir.rule">
             <field name="name">Facility Lines User</field>
             <field name="model_id" ref="model_pms_facility_lines"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <record id="id_pms_rent_schedule" model="ir.rule">
@@ -174,7 +174,7 @@
         <record id="rule_pms_rent_schedule" model="ir.rule">
             <field name="name">Rent Schedule User</field>
             <field name="model_id" ref="model_pms_rent_schedule"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id','child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
              <record id="id_pms_gen_rent_schedule" model="ir.rule">
@@ -186,7 +186,7 @@
         <record id="rule_pms_gen_rent_schedule" model="ir.rule">
             <field name="name">Generated Schedule User</field>
             <field name="model_id" ref="model_pms_gen_rent_schedule"/>
-            <field name="domain_force">[('property_id', 'in', [c.id for c in user.current_property_id])]</field>    
+            <field name="domain_force">['|',('property_id','=',False),('property_id', 'child_of', [user.current_property_id.id])]</field>    
             <field name="groups" eval="[(4,ref('group_property_user'))]"/>
         </record>
          <record id="id_lease_agreement_line" model="ir.rule">

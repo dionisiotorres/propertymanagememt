@@ -24,7 +24,7 @@
        <record id="id_properties" model="ir.rule">
             <field name="model_id" ref="model_pms_properties" />
             <field name="name">Property Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4, ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_properties" model="ir.rule">
@@ -36,7 +36,7 @@
         <record id="id_floor" model="ir.rule">
             <field name="model_id" ref="model_pms_floor" />
             <field name="name">Floor Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_floor" model="ir.rule">
@@ -48,7 +48,7 @@
          <record id="id_space_unit" model="ir.rule">
             <field name="model_id" ref="model_pms_space_unit" />
             <field name="name">Space Unit Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_space_unit" model="ir.rule">
@@ -60,7 +60,7 @@
          <record id="id_lease_agreement" model="ir.rule">
             <field name="model_id" ref="model_pms_lease_agreement" />
             <field name="name">Lease Agreement Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_lease_agreement" model="ir.rule">
@@ -72,7 +72,7 @@
         <record id="id_facilities" model="ir.rule">
             <field name="model_id" ref="model_pms_facilities" />
             <field name="name">Facilities Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_facilities" model="ir.rule">
@@ -84,7 +84,7 @@
          <record id="id_pms_space_facilities" model="ir.rule">
             <field name="model_id" ref="model_pms_space_facilities" />
             <field name="name">Space Facilities Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
          <record id="rule_id_pms_space_facilities" model="ir.rule">
@@ -96,7 +96,7 @@
         <record id="id_pms_space_unit_facility_lines" model="ir.rule">
             <field name="model_id" ref="model_pms_space_unit_facility_lines" />
             <field name="name">Space Facilities Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_pms_space_unit_facility_lines" model="ir.rule">
@@ -108,7 +108,7 @@
          <!-- <record id="id_utilities_source_type" model="ir.rule">
             <field name="model_id" ref="model_pms_utilities_source_type" />
             <field name="name">Utilities Source Type Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('property_management_system.group_property_manager'))]"/>
         </record>
         <record id="rule_id_utilities_source_type" model="ir.rule">
@@ -120,7 +120,7 @@
          <!-- <record id="id_utilities_supply_type" model="ir.rule">
             <field name="model_id" ref="model_pms_utilities_supply_type" />
             <field name="name">Utilities Supply Type Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('property_management_system.group_property_manager'))]"/>
         </record> -->
         <!-- <record id="rule_id_utilities_supply_type" model="ir.rule">
@@ -132,7 +132,7 @@
          <!-- <record id="id_equipment_type" model="ir.rule">
             <field name="model_id" ref="model_pms_equipment_type" />
             <field name="name">Equipment Type Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('property_management_system.group_property_manager'))]"/>
         </record>
         <record id="rule_id_equipment_type" model="ir.rule">
@@ -144,7 +144,7 @@
          <record id="id_equipment" model="ir.rule">
             <field name="model_id" ref="model_pms_equipment" />
             <field name="name">Equipment Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_equipment" model="ir.rule">
@@ -156,7 +156,7 @@
          <record id="id_facility_lines" model="ir.rule">
             <field name="model_id" ref="model_pms_facility_lines" />
             <field name="name">Facility Lines Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_id_facility_lines" model="ir.rule">
@@ -168,7 +168,7 @@
          <record id="id_pms_rent_schedule" model="ir.rule">
             <field name="model_id" ref="model_pms_rent_schedule"/>
             <field name="name">Rent Schedule Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_pms_rent_schedule" model="ir.rule">
@@ -180,7 +180,7 @@
              <record id="id_pms_gen_rent_schedule" model="ir.rule">
             <field name="model_id" ref="model_pms_gen_rent_schedule"/>
             <field name="name">Generated Schedule Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record id="rule_pms_gen_rent_schedule" model="ir.rule">
@@ -192,7 +192,7 @@
          <record id="id_lease_agreement_line" model="ir.rule">
             <field name="model_id" ref="model_pms_lease_agreement_line"/>
             <field name="name">Lease Agreement Line Manager</field>
-            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="domain_force">[(1,'in',1)]</field>
             <field name="groups" eval="[(4,ref('group_property_manager'))]"/>
         </record>
         <record model="res.groups" id="group_multi_property">

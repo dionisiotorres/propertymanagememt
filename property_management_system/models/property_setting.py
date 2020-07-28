@@ -844,14 +844,14 @@ class Partner(models.Model):
                                     for ca in crmaccount_ids:
                                         ca.update({'is_api_post': True})
 
-    @api.model
-    def create(self, values):
-        if 'name' in values:
-            crm_id = self.search([('name', '=', values['name']),
-                                  ('is_company', '=', True)])
-            if crm_id:
-                raise UserError(_("%s is already existed" % values['name']))
-        return super(Partner, self).create(values)
+    # @api.model
+    # def create(self, values):
+    #     if 'name' in values:
+    #         crm_id = self.search([('name', '=', values['name']),
+    #                               ('is_company', '=', True)])
+    #         if crm_id:
+    #             raise UserError(_("%s is already existed" % values['name']))
+    #     return super(Partner, self).create(values)
 
     @api.one
     def write(self, vals):

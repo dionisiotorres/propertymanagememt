@@ -238,7 +238,7 @@ class PMSProperties(models.Model):
     vacant_unit = fields.Integer("Vacant Unit", compute="_get_vacant_unit")
     occupy_unit = fields.Integer('Occupied Unit', compute="_get_occupied_unit")
     booking_lease = fields.Integer('Booking Lease', compute="_get_booking_lease")
-    new_lease = fields.Integer('Booking Lease', compute="_get_new_lease")
+    new_lease = fields.Integer('New Lease', compute="_get_new_lease")
     extend_lease =fields. Integer('Extend Lease', compute="_get_extend_lease")
     expire_lease = fields. Integer('Expire Soon', compute ="_get_expire_lease")
 

@@ -2,6 +2,7 @@ from odoo import models, fields, api, tools
 
 class PMSSpaceFacilities(models.Model):
     _name = 'pms.space.facilities'
+    _description = "Space Facilities"
     _auto = False
 
     name = fields.Char(default="Utilities No",

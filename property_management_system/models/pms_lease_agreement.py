@@ -1402,7 +1402,7 @@ class PMSLeaseAgreementLine(models.Model):
         'pms.lease.unit.charge.type.line', 'lease_line_id', "Charge Types")
     company_tanent_id = fields.Many2one(
         "res.partner",
-        "Shop",
+        "Tanent",
         required=True,
         related="lease_agreement_id.company_tanent_id")
     leaseunitpos_line_id = fields.One2many("pms.lease.unit.pos",

@@ -5,7 +5,6 @@ odoo.define('property_management_system.action_button', function(require) {
     var rpc = require('web.rpc');
     var session = require('web.session');
     var _t = core._t;
-    var Dialog = require('web.Dialog');
     ListController.include({
         renderButtons: function($node) {
             this._super.apply(this, arguments);
@@ -18,14 +17,19 @@ odoo.define('property_management_system.action_button', function(require) {
             var user = session.uid;
             var selection_id = [];
             var active_id = self.initialState.context.active_id;
-            console.log(self.initialState.data[0].data.id);
-            selection_id.push(self.initialState.data[0].data.id);
+            console.log(self.initialState.data);
+            if (self.initialState.data){
+                for (var k=0; k < self.initialState.data.length; k++) {
+                    selection_id.push(self.initialState.data[k].data.id);
+                }
+            }
             rpc.query({
-                model:'pms.facilities',
+                model:'pms.space.facilities',
                 method: 'select_values',
                 args: [[user],{'id':user,'active_id':active_id,'selection_id':selection_id}],
+                }).then(function() {
+                    location.reload();
                 });
-            this.closed = true;
             },
     });
 });

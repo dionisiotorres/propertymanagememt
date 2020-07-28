@@ -13,7 +13,8 @@ class PMSFloor(models.Model):
     _order = "code,name"
 
     def _get_property(self):
-        return self.env.user.current_property_id
+        if self.env.user.current_property_id:
+            return [('id','in', [self.env.user.current_property_id.id])]
 
     name = fields.Char("Floor", required=True, track_visibility=True)
     code = fields.Char("Floor Code", required=True, track_visibility=True)
@@ -23,8 +24,10 @@ class PMSFloor(models.Model):
     property_id = fields.Many2one("pms.properties",
                                   "Property",
                                   index=True,
-                                  default=_get_property,
+                                  default=lambda self: self.env.user.current_property_id,
+                                  domain=_get_property,
                                   required=True,
+                                  store=True,
                                   track_visibility=True)
     is_api_post = fields.Boolean("Posted")
 
@@ -100,7 +103,7 @@ class PMSFloor(models.Model):
             raise UserError(_("%s is already existed.") % (values['code']))
         id = None
         id = super(PMSFloor, self).create(values)
-        if id:
+        if id and 'is_api_post' not in values:
             property_obj = self.env['pms.properties']
             property_id = property_obj.browse(values['property_id'])
             if property_id.api_integration:
@@ -143,7 +146,7 @@ class PMSFloor(models.Model):
             integ_obj = property_id.api_integration_id
             integ_line_obj = integ_obj.api_integration_line
             api_line_ids = integ_line_obj.search([('name', '=', "Floor")])
-            if 'is_api_post' in vals:
+            if 'is_api_post' in vals and len(vals) > 1:
                 if vals['is_api_post']:
                     datas = api_rauth_config.APIData.get_data(
                         self, vals, property_id, integ_obj, api_line_ids)
@@ -155,17 +158,17 @@ class PMSFloor(models.Model):
                                     if 'message' in response:
                                         if response['message'] == 'SUCCESS':
                                             self.write({'is_api_post': True})
-            else:
-                datas = api_rauth_config.APIData.get_data(
-                    self, vals, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        self.write({'is_api_post': True})
+            # else:
+            #     datas = api_rauth_config.APIData.get_data(
+            #         self, vals, property_id, integ_obj, api_line_ids)
+            #     if datas:
+            #         if datas.res:
+            #             response = json.loads(datas.res)
+            #             if 'responseStatus' in response:
+            #                 if response['responseStatus']:
+            #                     if 'message' in response:
+            #                         if response['message'] == 'SUCCESS':
+            #                             self.write({'is_api_post': True})
         return id
 
     @api.multi

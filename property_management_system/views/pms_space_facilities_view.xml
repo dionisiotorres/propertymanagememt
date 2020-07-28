@@ -1,0 +1,64 @@
+<odoo>
+    <data>
+        <template id="button_render_js" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script src="property_management_system/static/src/js/action_call.js" type="text/javascript"/>
+            </xpath>
+        </template>
+        <record id="form_pms_sapce_facilities_view" model="ir.ui.view">
+        <field name="name">Facilities</field>
+        <field name="model">pms.space.facilities</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <field name="utilities_no"/>
+                <field name="utilities_type_id"/>
+                <field name="interface_type"/>
+                <field name="property_id"/>
+                <field name="install_date"/>
+                <field name="meter_type"/>
+                <field name="active"/>
+                <field name="inuse"/>
+            </sheet>
+        </form>
+        </field>
+        </record>
+        <record id="tree_pms_sapce_facilities_view" model="ir.ui.view">
+        <field name="name">Facilities</field>
+        <field name="model">pms.space.facilities</field>
+        <field name="arch" type="xml">
+        <tree create='false'>
+            <field name="utilities_no"/>
+            <field name="utilities_type_id"/>
+            <field name="interface_type"/>
+            <field name="property_id"/>
+            <field name="install_date"/>
+            <field name="meter_type"/>
+            <!-- <field name="active"/> -->
+            <!-- <field name="inuse"/> -->
+        </tree>
+        </field>
+        </record>
+        <record id="search_pms_sapce_facilities_view" model="ir.ui.view">
+        <field name="name">Facilities</field>
+        <field name="model">pms.space.facilities</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="utilities_no"/>
+                <field name="utilities_type_id"/>
+                <field name="property_id"/>
+            </search>
+        </field>
+        </record>
+        <record id="action_pms_sapce_facilities"  model="ir.actions.act_window">
+            <field name="name">Facilities</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">pms.space.facilities</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="tree_pms_sapce_facilities_view"/>
+            <field name="search_view_id" ref="search_pms_sapce_facilities_view"/>
+            <field name="target">new</field>
+        </record>
+  </data>
+</odoo>

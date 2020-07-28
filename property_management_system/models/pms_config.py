@@ -143,6 +143,48 @@ class Users(models.Model):
                                    store=True,
                                    track_visibility=True)
 
+   
+class UsersView(models.Model):
+    _inherit = 'res.users'
+
+    @api.model
+    def create(self, values):
+        values = self._remove_reified_groups(values)
+        user = super(UsersView, self).create(values)
+        group_multi_company = self.env.ref('base.group_multi_company', False)
+        if group_multi_company and 'company_ids' in values:
+            if len(user.company_ids) <= 1 and user.id in group_multi_company.users.ids:
+                user.write({'groups_id': [(3, group_multi_company.id)]})
+            elif len(user.company_ids) > 1 and user.id not in group_multi_company.users.ids:
+                user.write({'groups_id': [(4, group_multi_company.id)]})
+        group_multi_property = self.env.ref('property_management_system.group_multi_property', False)
+        if group_multi_property and 'property_id' in values:
+            if len(user.property_id) <= 1 and user.id in group_multi_property.users.ids:
+                user.write({'groups_id': [(3, group_multi_property.id)]})
+            elif len(user.property_id) > 1 and user.id not in group_multi_property.users.ids:
+                user.write({'groups_id': [(4, group_multi_property.id)]})
+        return user
+
+    @api.multi
+    def write(self, values):
+        values = self._remove_reified_groups(values)
+        res = super(UsersView, self).write(values)
+        group_multi_company = self.env.ref('base.group_multi_company', False)
+        if group_multi_company and 'company_ids' in values:
+            for user in self:
+                if len(user.company_ids) <= 1 and user.id in group_multi_company.users.ids:
+                    user.write({'groups_id': [(3, group_multi_company.id)]})
+                elif len(user.company_ids) > 1 and user.id not in group_multi_company.users.ids:
+                    user.write({'groups_id': [(4, group_multi_company.id)]})
+        group_multi_property = self.env.ref('property_management_system.group_multi_property', False)
+        if group_multi_property and 'property_id' in values:
+            for user in self:
+                if len(user.property_id) <= 1 and user.id in group_multi_property.users.ids:
+                    user.write({'groups_id': [(3, group_multi_property.id)]})
+                elif len(user.property_id) > 1 and user.id not in group_multi_property.users.ids:
+                    user.write({'groups_id': [(4, group_multi_property.id)]})
+        return res
+
 
 
 class Company(models.Model):
@@ -222,11 +264,11 @@ class Company(models.Model):
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    def get_company_id(self):
-        if not self.company_id:
-            return self.env.user.company_id
-
-    company_id = fields.Many2one('res.company', default=get_company_id)
+    group_multi_property = fields.Boolean("Manage multiple properties", implied_group='property_management_system.group_multi_property')
+    current_property_id = fields.Many2one('pms.properties', string='Properties', required=True,
+        default=lambda self: self.env.user.current_property_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
     property_code_len = fields.Integer("Property Code Length",
                                        related="company_id.property_code_len",
                                        readonly=False)

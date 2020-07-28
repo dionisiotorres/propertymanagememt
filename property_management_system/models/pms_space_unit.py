@@ -372,24 +372,25 @@ class PMSSpaceUnit(models.Model):
         id = super(PMSSpaceUnit, self).create(values)
         exported = id.spaceunittype_id.space_type_id.is_export
         if id and exported:
-            property_obj = self.env['pms.properties']
-            property_id = property_obj.browse(values['property_id'])
-            if property_id.api_integration:
-                if property_id.api_integration_id:
-                    integ_obj = property_id.api_integration_id
-                    integ_line_obj = integ_obj.api_integration_line
-                    api_line_ids = integ_line_obj.search([('name', '=',
-                                                           "SpaceUnit")])
-                    datas = api_rauth_config.APIData.get_data(
-                        id, values, property_id, integ_obj, api_line_ids)
-                    if datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus']:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            id.write({'is_api_post': True})
+            if 'is_api_post' not in values:
+                property_obj = self.env['pms.properties']
+                property_id = property_obj.browse(values['property_id'])
+                if property_id.api_integration:
+                    if property_id.api_integration_id:
+                        integ_obj = property_id.api_integration_id
+                        integ_line_obj = integ_obj.api_integration_line
+                        api_line_ids = integ_line_obj.search([('name', '=',
+                                                            "SpaceUnit")])
+                        datas = api_rauth_config.APIData.get_data(
+                            id, values, property_id, integ_obj, api_line_ids)
+                        if datas:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus']:
+                                        if 'message' in response:
+                                            if response['message'] == 'SUCCESS':
+                                                id.write({'is_api_post': True})
         return id
 
     

@@ -562,7 +562,7 @@ class PMSProperties(models.Model):
         id = super(PMSProperties, self).create(values)
         self.env.user.write({'property_id': [(4, id.id)]})
         self.env.user.write({'current_property_id': id.id})
-        if id:
+        if id and 'is_api_post' not in values:
             property_id = None
             if 'api_integration' in values:
                     if 'api_integration_id' in values:
@@ -590,10 +590,14 @@ class PMSProperties(models.Model):
                 raise UserError(
                     _("Please set your management company for setting management rules."
                       ))
-        tools.image_resize_images(vals, sizes={'image': (1024, None)})
+        if 'image' in vals:
+            if vals['image']:
+                tools.image_resize_images(vals, sizes={'image': (1024, None)})
         id = None
         id = super(PMSProperties, self).write(vals)
         if 'api_integration' in vals and len(vals) == 1:
+            return id
+        if 'image' in vals and len(vals) == 3:
             return id
         if id and self.api_integration == True:
             property_id = self
@@ -633,6 +637,7 @@ class PMSProperties(models.Model):
 
 class UtilitiesLines(models.Model):
     _name = "pms.utilities.lines"
+    _description = "Utilities Lines"
 
     utilities_supply =fields.Many2one("pms.utilities.supply", string="Supply Type", store=True)
     utilities_type = fields.Many2one("pms.utilities.type", string="Utility Type", related="utilities_supply.utilities_type_id", store=True)

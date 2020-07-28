@@ -13,15 +13,12 @@
     'category':
     'base',
     'version':
-    '1.0.5',
+    '1.0.6',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
         'security/ir.model.access.csv',
         'data/pms_config_data.xml',
-        # 'data/pms.api.integration.csv',
-        # 'data/pms.api.integration.line.csv',
-        'data/pms_space_type_data.xml',
         'data/pms_api_integration_data.xml',
         'data/pms_generate_rs_data.xml',
         'data/pms.company.category.csv',
@@ -42,6 +39,7 @@
         'data/pms.township.csv',
         'data/pms.calculation.method.csv',
         'data/pms.charge_types.csv',
+        'data/pms_space_type_data.xml',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',
@@ -50,6 +48,7 @@
         'views/pms_leaseterms_view.xml',
         'views/pms_terms_view.xml',
         'views/pms_space_unit_management.xml',
+        'views/pms_space_facilities_view.xml',
         'views/pms_space_unit_view.xml',
         'views/pms_facilities_view.xml',
         'views/pms_uom_view.xml',
@@ -84,7 +83,7 @@
         'reports/pms_lease_template.xml',
     ],
     'qweb': [
-        'static/src/xml/facilities.xml',
+        'static/src/xml/pms_space_facilities.xml',
         'static/src/xml/datepicker.xml',
         'static/src/xml/property_menu_template.xml',
         ],

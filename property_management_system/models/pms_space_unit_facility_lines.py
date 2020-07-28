@@ -73,13 +73,13 @@ class PMSSpaceUnitFacilityLines(models.Model):
     @api.model
     def create(self,values):
         res = super(PMSSpaceUnitFacilityLines,self).create(values)
-        if 'unit_id' in values:
+        if 'unit_id' in values and 'is_api_post' not in values:
             unit_id = self.env['pms.space.unit'].browse(values['unit_id'])
             if unit_id.spaceunittype_id.space_type_id.is_export:    
                 if 'facility_id' in values:
                     facility_id = self.env['pms.facilities'].browse(values['facility_id'])
                     values['utilities_type_id'] = facility_id.utilities_type_id.export_utilities_type
-                    values['start_reading_date'] = facility_id.install_date
+                    values['start_date'] = facility_id.install_date
                     values['remark'] = facility_id.remark
                 if 'facility_line_id' in values:
                     facility_line_id = self.env['pms.facility.lines'].browse(values['facility_line_id'])
@@ -103,22 +103,23 @@ class PMSSpaceUnitFacilityLines(models.Model):
     def write(self, values):
         result = super(PMSSpaceUnitFacilityLines, self).write(values)
         if len(values) > 0 and self.inuse:
-            property_id = self.property_id
-            integ_objs = property_id.api_integration_id
-            integ_line_obj = integ_objs.api_integration_line
-            api_line_ids = integ_line_obj.search([('name', '=', "SpaceUnitFacilities")])
-            datas = api_rauth_config.APIData.get_data(self, values, property_id, integ_objs, api_line_ids)
-            if datas:
-                if datas.res:
-                    response = json.loads(datas.res)
-                    if 'responseStatus' in response:
-                        if response['responseStatus']:
-                            if 'message' in response:
-                                if response['message'] == 'SUCCESS':
-                                    self.write({'is_api_post': True})
+            if 'is_api_post' not in values:
+                property_id = self.property_id
+                integ_objs = property_id.api_integration_id
+                integ_line_obj = integ_objs.api_integration_line
+                api_line_ids = integ_line_obj.search([('name', '=', "SpaceUnitFacilities")])
+                datas = api_rauth_config.APIData.get_data(self, values, property_id, integ_objs, api_line_ids)
+                if datas:
+                    if datas.res:
+                        response = json.loads(datas.res)
+                        if 'responseStatus' in response:
+                            if response['responseStatus']:
+                                if 'message' in response:
+                                    if response['message'] == 'SUCCESS':
+                                        self.write({'is_api_post': True})
         return result
 
-    @api.multi
+    
     @api.onchange('end_date')
     def onchange_end_date(self):
         if self.end_date:

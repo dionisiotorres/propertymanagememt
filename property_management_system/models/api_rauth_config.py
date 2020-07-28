@@ -2,9 +2,9 @@ import requests
 import pytz
 import json
 import datetime
-from odoo.addons.property_management_system.rauth import OAuth2Service
 from odoo import tools, _
 from odoo import models, api
+from odoo.addons.property_management_system.rauth import OAuth2Service
 
 
 class APIData:
@@ -419,13 +419,12 @@ class APIData:
                             if 'start_date' in self.values:
                                 facility.StartDate = str(self.values['start_date'].strftime('%Y-%m-%d'))
                             facility.StartDate = facility.StartDate or str(self.model_id.facility_id.install_date.strftime('%Y-%m-%d'))
-
                             if 'end_date' in self.values:
-                                facility.EndDate = str(self.values['end_date'].strftime('%Y-%m-%d') if self.values['end_date'] else "")
+                                facility.EndDate = str(self.values['end_date'] if self.values['end_date'] else "")
                             facility.EndDate = facility.EndDate or str(self.model_id.end_date.strftime('%Y-%m-%d') if self.model_id.end_date else "")
                             if 'start_reading_date' in self.values:
                                 facility.LastReadingOn = self.values['start_reading_date'].strftime('%Y-%m-%d')
-                            facility.LastReadingOn = facility.LastReadingOn or str(self.model_id.start_date.strftime('%Y-%m-%d'))
+                            facility.LastReadingOn = facility.LastReadingOn or str(self.model_id.start_reading_date.strftime('%Y-%m-%d'))
                             if 'source_type_id' in self.values:
                                 facility.UtilityType = str(self.values['utilities_type_id'])
                             facility.UtilityType = facility.UtilityType or str(self.model_id.source_type_id.code)

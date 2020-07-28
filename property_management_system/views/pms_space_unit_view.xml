@@ -61,7 +61,7 @@
                   </field>
                 </page> -->
                 <page string="Facilities" >
-                  <button type="object" name="generate_facilities" string="Add"/>
+                  <button type="action" name="%(action_pms_sapce_facilities)d" string="Add"/>
                   <field name="space_facility_line" options="{'no_create':True}">
                     <tree editable="buttom" create="false">
                       <field name="facility_id"/>
@@ -72,7 +72,7 @@
                     </tree>
                   </field>
                 </page>
-                <page string="Job" >
+                <page string="Job" invisible="1">
                   <field name="job_ids">
                     <tree editable="buttom">
                       <field name="name"/>

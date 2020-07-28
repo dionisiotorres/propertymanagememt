@@ -33,8 +33,8 @@ access_pms_space_facility_lines,pms.space.unit.facility.lines,model_pms_space_un
 access_pms_space_facility_lines_manager,pms.space.unit.facility.lines,model_pms_space_unit_facility_lines,group_property_manager,1,1,1,1
 access_pms_company_category,pms.company.category,model_pms_company_category,group_property_user,1,1,1,1
 access_pms_company_category_manager,pms.company.category,model_pms_company_category,group_property_manager,1,1,1,1
-access_pms_lease_agreement,pms.lease.agreement,model_pms_lease_agreement,group_property_user,1,1,1,0
-access_pms_lease_agreement_manager,pms.lease.agreement,model_pms_lease_agreement,group_property_manager,1,1,1,0
+access_pms_lease_agreement,pms.lease_agreement,model_pms_lease_agreement,group_property_user,1,1,1,0
+access_pms_lease_agreement_manager,pms.lease_agreement,model_pms_lease_agreement,group_property_manager,1,1,1,0
 access_pms_charge_type,pms.charge.types,model_pms_charge_types,group_property_user,1,1,1,1
 access_pms_charge_type_manager,pms.charge.types,model_pms_charge_types,group_property_manager,1,1,1,1
 access_pms_ap_charge_type,pms.applicable.charge.type,model_pms_applicable_charge_type,group_property_user,1,1,1,0
@@ -107,3 +107,5 @@ access_pms_base_charge_user,pms.base.charge,model_pms_base_charge,group_property
 access_pms_base_charge_manager,pms.base.charge,model_pms_base_charge,group_property_manager,1,1,1,1
 access_pms_utilities_lines_user,pms.utilities.lines,model_pms_utilities_lines,group_property_user,1,1,1,1
 access_pms_utilities_lines_manager,pms.utilities.lines,model_pms_utilities_lines,group_property_manager,1,1,1,1
+access_pms_space_facilities_user,pms.space.facilities,model_pms_space_facilities,group_property_user,1,1,1,1
+access_pms_space_facilities_manager,pms.space.facilities,model_pms_space_facilities,group_property_manager,1,1,1,1

@@ -1,5 +1,31 @@
 <odoo>
   <data>  
+        <record id="res_config_settings_view_form_extension" model="ir.ui.view">
+          <field name="name">res.config.settings.view.form</field>
+          <field name="model">res.config.settings</field>
+          <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+          <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('app_settings_block')]" position="inside">
+              <div id="multi_property">
+                  <field name="current_property_id" invisible="1"/>
+                  <h2>Multi-Properties</h2>
+                  <div class="row mt16 o_settings_container" name="multi_property">
+                      <div class="col-12 col-lg-6 o_setting_box">
+                          <div class="o_setting_left_pane">
+                              <field name="group_multi_property"/>
+                          </div>
+                          <div class="o_setting_right_pane">
+                              <label string="Multi-Properties" for="group_multi_property"/>
+                              <div class="text-muted">
+                                  Manage multiple legal entities with separate properties
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            </xpath>
+          </field>
+        </record>
           <record id="res_rule_view_form" model="ir.ui.view">
           <field name="name">res.config.settings.view.form</field>
           <field name="model">res.config.settings</field>

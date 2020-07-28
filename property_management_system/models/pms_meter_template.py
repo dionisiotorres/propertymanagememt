@@ -3,6 +3,7 @@ from odoo import models, fields, api
 
 class PMSMeterTemplate(models.Model):
     _name = 'pms.meter.template'
+    _description = "Meter Template"
     _order = 'sequence,name'
 
     name = fields.Char("Name")
@@ -27,6 +28,7 @@ class PMSMeterTemplate(models.Model):
 
 class PMSMeterTemplateLine(models.Model):
     _name = 'pms.meter.template.line'
+    _description = "Meter Template Line"
 
     utilities_supply_id = fields.Many2one("pms.utilities.supply","Utilities Supply")
     template_id = fields.Many2one("pms.meter.template", "Meter Template")

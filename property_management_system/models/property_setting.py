@@ -431,6 +431,16 @@ class PMSFacilitiesline(models.Model):
                 uti_ids.append(uti.id)
             domain = {'source_type_id': [('id', 'in', uti_ids)]}
         return {'domain': domain}
+    
+
+    @api.multi
+    @api.onchange('end_date','facility_id')
+    def onchange_end_date(self):
+        facility_line_id = self._origin.id
+        if self.end_date:
+            space_fline_id = self.env['pms.space.unit.facility.lines'].search([('facility_line_id','=',facility_line_id),('inuse','=',True)])
+            space_fline_id.write({'end_date': self.end_date, 'inuse':False})
+            self.active = False
 
 
 class PMSSpaceUntiManagement(models.Model):
@@ -764,8 +774,8 @@ class Partner(models.Model):
     is_company = fields.Boolean(string='Is a Company', default=True, help="Check if the contact is a company, otherwise it is a person")
     is_shop = fields.Boolean(string='Is a shop', help="Check if the contact is a company or branch, otherwise it is a person")
     shop_ids = fields.One2many('res.partner', "parent_id", string='Shop', domain=[('is_shop', '=', True)], track_visibility=True, index=True)
-    lease_id = fields.Many2one("pms.lease.agreement", "Lease")
-    lease_line_id = fields.Many2one("pms.lease.agreement", "Lease")
+    lease_id = fields.Many2one("pms.lease_agreement", "Lease")
+    lease_line_id = fields.Many2one("pms.lease_agreement.line", "Lease Line")
     current_property_id = fields.Many2one("pms.properties", string="Properties")
 
     
@@ -857,21 +867,22 @@ class Partner(models.Model):
         id = None
         id = super(Partner, self).write(vals)
         if self.is_company and self.company_channel_type:
-            property_id = None
-            integ_obj = self.env['pms.api.integration'].search([])
-            api_line_ids = self.env['pms.api.integration.line'].search([
-                ('name', '=', "CRMAccount")
-            ])
-            datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
-            if datas:
-                if 'res' in datas:
-                    if datas.res:
-                        response = json.loads(datas.res)
-                        if 'responseStatus' in response:
-                            if response['responseStatus']:
-                                if 'message' in response:
-                                    if response['message'] == 'SUCCESS':
-                                        self.write({'is_api_post': True})
+            if 'is_api_post' not in vals:
+                property_id = None
+                integ_obj = self.env['pms.api.integration'].search([])
+                api_line_ids = self.env['pms.api.integration.line'].search([
+                    ('name', '=', "CRMAccount")
+                ])
+                datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
+                if datas:
+                    if 'res' in datas:
+                        if datas.res:
+                            response = json.loads(datas.res)
+                            if 'responseStatus' in response:
+                                if response['responseStatus']:
+                                    if 'message' in response:
+                                        if response['message'] == 'SUCCESS':
+                                            self.write({'is_api_post': True})
         return id
 
     @api.multi

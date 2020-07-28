@@ -6,7 +6,6 @@ odoo.define('property_management_system.PropertyMenu', function(require) {
         var session = require('web.session');
         var SystrayMenu = require('web.SystrayMenu');
         var _t = core._t;
-        console.log('hello');
         var PropertyMenu = Widget.extend({
             template: 'PropertyMenu',
             events: {
@@ -16,13 +15,11 @@ odoo.define('property_management_system.PropertyMenu', function(require) {
                 this._super.apply(this, arguments);
                 this.isMobile = config.device.isMobile;
                 this._onClick = _.debounce(this._onClick, 1500, true);
-                console.log("HI");
             },
             /**
             * @override
             */
             willStart: function () {
-                console.log(session);
                 return session.user_properties ? this._super() : $.Deferred().reject();
             },
             /**
@@ -30,7 +27,6 @@ odoo.define('property_management_system.PropertyMenu', function(require) {
              */
             start: function () {
                 var propertiesList = '';
-                console.log('hello1');
                 if (this.isMobile) {
                     propertiesList = '<li class="bg-info">' +
                         _t('Tap on the list to change property') + '</li>';
@@ -64,7 +60,6 @@ odoo.define('property_management_system.PropertyMenu', function(require) {
             _onClickMenu: function (ev) {
                 ev.preventDefault();
                 var propertyID = $(ev.currentTarget).data('property-id');
-                console.log('hello2');
                 this._rpc({
                     model: 'res.users',
                     method: 'write',

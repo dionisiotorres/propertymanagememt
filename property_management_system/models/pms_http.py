@@ -62,7 +62,6 @@ class IrHttp(models.AbstractModel):
                 raise result
         except Exception as e:
             return cls._handle_exception(e)        
-        # cls._ensure_sequence()
         # if result.data:
         #     isValid = validateJSON(result.data)
         #     if isValid:

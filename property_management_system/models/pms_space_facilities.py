@@ -63,5 +63,4 @@ class PMSSpaceFacilities(models.Model):
             }
             self.env['pms.space.unit.facility.lines'].create(vals)
             fcl.facility_id.write({'inuse':True})
-        # return {'type': 'ir.actions.act_window_close'}
-        
+        return {'type': 'ir.actions.act_window_close'}

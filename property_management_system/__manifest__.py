@@ -14,7 +14,7 @@
     'base',
     'version':
     '1.0.8',
-    'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
+    'depends': ['base', 'contacts', 'uom', 'account','account_accountant', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
         'security/ir.model.access.csv',
@@ -91,5 +91,5 @@
     True,
     'application':
     True,
-    'auto_install':True
+    'auto_install':False
 }

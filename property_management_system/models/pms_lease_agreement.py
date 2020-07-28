@@ -26,7 +26,7 @@ class IrSequence(models.Model):
             for pro in self.env.user.property_id:
                 if not force_property:
                     force_property = pro.id
-                seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False]),('property_id','=',[force_property,False])], order='company_id')
+                seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False]),('property_id','in',[force_property,False])], order='company_id')
                 if not seq_ids:
                     _logger.debug("No ir.sequence has been found for code '%s'. Please make sure a sequence is set for current company." % sequence_code)
                     return False

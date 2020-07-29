@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.9',
+    '1.0.8',
     'depends':
     ['base', 'contacts', 'uom', 'account_accountant', 'mail', 'web'],
     'data': [

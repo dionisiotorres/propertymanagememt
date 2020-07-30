@@ -14,7 +14,8 @@
     'base',
     'version':
     '1.0.8',
-    'depends': ['base', 'contacts', 'uom', 'account', 'account_accountant', 'mail', 'web'],
+    'depends':
+    ['base', 'contacts', 'uom', 'account_accountant', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
         'security/ir.model.access.csv',
@@ -86,10 +87,11 @@
         'static/src/xml/pms_space_facilities.xml',
         'static/src/xml/datepicker.xml',
         'static/src/xml/property_menu_template.xml',
-        ],
+    ],
     'installable':
     True,
     'application':
     True,
-    'auto_install': False
+    'auto_install':
+    False
 }

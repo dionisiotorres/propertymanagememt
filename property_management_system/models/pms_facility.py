@@ -17,6 +17,7 @@ class PMSFacilities(models.Model):
     def _get_utilities_no(self):
         facilities_ids = self.env['pms.facilities'].search([])
         utilities = []
+        # domain = {}
         if not self.utilities_no:
             if facilities_ids:
                 for uti in facilities_ids:

@@ -265,7 +265,8 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     group_multi_property = fields.Boolean("Manage multiple properties", implied_group='property_management_system.group_multi_property')
-    current_property_id = fields.Many2one('pms.properties', string='Current Properties', default=lambda self: self.env.user.current_property_id)
+    current_property_id = fields.Many2one('pms.properties', string='Current Properties', required=True,
+        default=lambda self: self.env.user.current_property_id)
     company_id = fields.Many2one('res.company', string='Company', required=True,
         default=lambda self: self.env.user.company_id)
     property_code_len = fields.Integer("Property Code Length",

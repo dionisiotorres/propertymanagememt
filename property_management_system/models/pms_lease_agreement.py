@@ -26,7 +26,7 @@ class IrSequence(models.Model):
             for pro in self.env.user.property_id:
                 if not force_property:
                     force_property = pro.id
-                seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False]),('property_id','in',[force_property,False])], order='company_id')
+                seq_ids = self.search([('code', '=', sequence_code), ('company_id', 'in', [force_company, False]),('property_id','=',[force_property,False])], order='company_id')
                 if not seq_ids:
                     _logger.debug("No ir.sequence has been found for code '%s'. Please make sure a sequence is set for current company." % sequence_code)
                     return False
@@ -1551,9 +1551,9 @@ class PMSLeaseAgreementLine(models.Model):
                             area = 1
                             rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'unit_no':
+                            'name':
                             _(l.unit_no.name),
-                            'charge_type_id':l.charge_type.name,
+                            'description':l.charge_type.name,
                             'account_id':
                             account_id,
                             'price_unit':

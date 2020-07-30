@@ -176,6 +176,10 @@ class PMSProperties(models.Model):
         "Property Code Length",
         track_visibility=True,
         default=lambda self: self.env.user.company_id.property_code_len)
+    # unit_code_len = fields.Integer(
+    #     "Unit Code Length",
+    #     track_visibility=True,
+    #     default=lambda self: self.env.user.company_id.space_unit_code_len)
     floor_code_len = fields.Integer(
         "Floor Code Length",
         track_visibility=True,

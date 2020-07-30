@@ -474,10 +474,6 @@ class PMSSpaceUnit(models.Model):
                                 self.write({'is_api_post': True})
         return id
 
-    @api.one
-    def do_action(self):
-        return True
-
 class PMSSpaceUnitJobLine(models.Model):
     _name ="pms.space.unit.job.line"
     _description = "Unit Jobs"

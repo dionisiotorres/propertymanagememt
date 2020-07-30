@@ -15,9 +15,9 @@
           <group>
             <group>
               <field name='utilities_type'/>
-              <field name='power_system' widget="radio" options="{'horizontal': true}"/>
-              <field name='meter_type' widget="radio" options="{'horizontal': true}"/>
-              <field name="current_unit_type" widget="radio" options="{'horizontal': true}"/>
+              <field name='power_system' widget="radio"/>
+              <field name='meter_type' widget="radio"/>
+              <field name="current_unit_type" widget="radio"/>
               <field name='digit'/>
             </group>
           </group>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="lease_agreement_reports">
+        <div class="page" style="width:100%;">
+            <table class="table" style="width:100%;">
+                <thead>
+                    <tr  style="text-align:center;">
+                        <th style="width:70%;"><h1>Lease Agreements</h1></th>
+                        <th style="width:30%;"><img t-if="logo" t-att-src="image_data_uri(logo)" style="max-height: 100px;min-height:80px;padding-left:20px;" alt="Logo"/></th>
+                    </tr>
+                </thead>
+            </table>  
+            <table style="width:100%;font-size:20px;background:#f5f5f0;">
+                <thead>
+                    <tr style="padding:10px;">
+                        <th style="width:10%;text-align:center;height:50px;border:1px solid lightgray;">Property</th>
+                        <th style="width:20%;text-align:center;height:50px;border:1px solid lightgray;">Shop</th>
+                        <th style="width:20%;text-align:center;height:50px;border:1px solid lightgray;">Lease No</th>
+                        <th style="width:10%;text-align:center;height:50px;border:1px solid lightgray;">Unit No</th>
+                        <th style="width:15%;text-align:center;height:50px;border:1px solid lightgray;">Start Date</th>
+                        <th style="width:15%;text-align:center;height:50px;border:1px solid lightgray;">End Date</th>
+                        <th style="width:10%;text-align:center;height:50px;border:1px solid lightgray;">Status</th>
+                    </tr>
+                </thead>
+                <tbody style="background:white;">
+                <t t-foreach="docs" t-as="o">
+                    <tr>
+                        <td style="text-align:center;height:35px;">
+                            <t t-esc="o['property']"/>
+                        </td>
+                        <td style="text-align:left;height:35px;padding-left:10px;">
+                            <t t-esc="o['shop']"/>
+                        </td>
+                        <td style="text-align:letf;height:35px;padding-left:10px;">
+                             <t t-esc="o['lease_no']"/>
+                        </td>
+                        <td style="text-align:left;height:35px;padding-left:10px;">
+                            <t t-esc="o['unit_no']" />                            
+                        </td>
+                        <td style="text-align:center;height:35px;">
+                            <t t-esc="o['start_date']"/>
+                        </td>
+                        <td style="text-align:center;height:35px;">
+                            <t t-esc="o['end_date']"/>
+                        </td>
+                        <td style="text-align:center;height:35px;">
+                            <t t-esc="o['state']"/>
+                        </td>
+                    </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </template>
+    <template id="lease_report">
+        <t t-call="web.html_container">
+            <t t-set="lang" t-value="lang"/>
+            <t t-call="property_management_system.lease_agreement_reports" t-lang="lang"/>
+        </t>
+    </template>
+</odoo>

@@ -23,6 +23,7 @@ class PMSApplicableChargeType(models.Model):
                                             required=True,
                                             store=True)
     is_apply_tax = fields.Boolean('Apply Tax', default=True,track_visibility=True)
+    # tax = fields.Float("Tax", track_visibility=True)
     tax_id = fields.Many2one("account.tax","Tax")
     billing_type = fields.Selection([('monthly', 'Monthly'),
                                      ('quarterly', 'Quarterly'),

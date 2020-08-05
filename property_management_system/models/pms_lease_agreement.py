@@ -1551,8 +1551,9 @@ class PMSLeaseAgreementLine(models.Model):
                             area = 1
                             rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'unit_no':_(l.unit_no.name),
-                            'charge_type_id':l.charge_type.name,
+                            'name':_(l.charge_type.name),
+                            'unit_no':l.unit_no.id,
+                            'charge_type_id':l.charge_type.charge_type_id.id,
                             'account_id':
                             account_id,
                             'price_unit':
@@ -1605,8 +1606,9 @@ class PMSLeaseAgreementLine(models.Model):
                             area = 1
                             rent = l.amount
                         inv_line_id = self.env['account.invoice.line'].create({
-                            'unit_no':_(l.unit_no.name),
-                            'charge_type_id':l.charge_type.name,
+                            'name': _(l.charge_type_id.name),
+                            'unit_no': l.unit_no.id,
+                            'charge_type_id': l.charge_type.charge_type_id.id,
                             'account_id':
                             account_id,
                             'price_unit':

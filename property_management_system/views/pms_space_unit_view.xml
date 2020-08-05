@@ -47,6 +47,7 @@
                   <field name="resurvey_date" attrs="{'invisible':[('config_flag','not in',['survey'])]}"/>
                   <field name="active"/>
                   <field name="remark"/>
+                  <field name="is_add_facilities" invisible='1'/>
                 </group>
               </group>
               <notebook>
@@ -61,7 +62,7 @@
                   </field>
                 </page> -->
                 <page string="Facilities" >
-                  <button type="action" name="%(action_pms_sapce_facilities)d" string="Add"/>
+                  <button type="action" name="%(action_pms_sapce_facilities)d" string="Add" attrs="{'invisible':[('is_add_facilities','!=',True)]}"/>
                   <field name="space_facility_line" options="{'no_create':True}">
                     <tree editable="buttom" create="false">
                       <field name="facility_id"/>

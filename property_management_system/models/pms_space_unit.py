@@ -107,6 +107,7 @@ class PMSSpaceUnit(models.Model):
     active_lease = fields.Integer('Active Lease', compute="_get_active_lease")
     history_lease = fields.Integer('History Lease', compute="_get_history_lease")
     color = fields.Integer(string='Color Index', compute="set_kanban_color")
+    is_add_facilities = fields.Boolean("Facilities")
 
     def set_kanban_color(self):
         for record in self:
@@ -369,6 +370,7 @@ class PMSSpaceUnit(models.Model):
                     fac_id = self.env['pms.facilities'].browse(fl[2])
                     fac_id.write({'status': True})
         id = None
+        values['is_add_facilities'] = True
         id = super(PMSSpaceUnit, self).create(values)
         exported = id.spaceunittype_id.space_type_id.is_export
         if id and exported:

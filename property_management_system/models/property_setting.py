@@ -1017,10 +1017,12 @@ class PMSGenerateRentSchedule(models.Model):
                         taxes = product_id.taxes_id.filtered(
                             lambda r: not line.lease_agreement_id.company_id or
                             r.company_id == line.lease_agreement_id.company_id)
-                        unit = line.lease_agreement_id.unit_no
+                        unit = line.unit_no
                         inv_line_id = self.env['account.invoice.line'].create({
                             'name':
                             _(product_name),
+                            'unit_no':unit.id,
+                            'charge_type_id': line.charge_type.charge_type_id.id,
                             'account_id':
                             account_id,
                             'price_unit':
@@ -1040,8 +1042,6 @@ class PMSGenerateRentSchedule(models.Model):
                     ls.name,
                     'lease_no':
                     ls.lease_agreement_id.lease_no,
-                    'unit_no':
-                    unit,
                     'inv_month':
                     invoice_month,
                     'partner_id':

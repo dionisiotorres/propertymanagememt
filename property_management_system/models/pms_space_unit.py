@@ -107,7 +107,7 @@ class PMSSpaceUnit(models.Model):
     active_lease = fields.Integer('Active Lease', compute="_get_active_lease")
     history_lease = fields.Integer('History Lease', compute="_get_history_lease")
     color = fields.Integer(string='Color Index', compute="set_kanban_color")
-    is_add_facilities = fields.Boolean("Facilities")
+    is_add_facilities = fields.Boolean("Add Facilities")
 
     def set_kanban_color(self):
         for record in self:

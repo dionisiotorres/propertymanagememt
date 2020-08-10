@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+         <record id="id_pms_lease_agreement" model="ir.actions.server">
+            <field name="name">Activate</field>
+            <field name="model_id" ref="model_pms_lease_agreement"/>
+            <field name="state">code</field>
+            <field name="code">records.action_multi_activation()</field>
+            <field name="binding_model_id" ref="model_pms_lease_agreement"/>
+            <field name='binding_type'>action</field>
+        </record>
+    </data>
+</odoo>

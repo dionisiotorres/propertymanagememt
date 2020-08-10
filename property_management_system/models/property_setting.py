@@ -212,7 +212,7 @@ class PMSRentSchedule(models.Model):
             for lease in lease_ids.lease_agrrement_line:
                 for chline in lease.applicable_type_line_id:
                     if chline.applicable_charge_id.charge_type_id:
-                        exported = chline.applicable_charge_id.charge_type_id.is_export
+                        exported = chline.applicable_charge_id.charge_type_id.is_import
                         if exported:
                             integ_obj = property_id.api_integration_id
                             integ_line_obj = integ_obj.api_integration_line
@@ -355,10 +355,10 @@ class PMSUtilitiesType(models.Model):
     _order = 'sequence,name'
 
     name = fields.Char("Utilities Type",
-                       required=True,
+                       required=True, store=True,
                        track_visibility=True)
     code = fields.Char("Utilities Type Code",
-                       required=True,
+                       required=True, store=True,
                        track_visibility=True)
     export_utilities_type = fields.Char("Export Utilities Type")
     description = fields.Text("Description", track_visibility=True)

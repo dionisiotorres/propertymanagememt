@@ -161,8 +161,8 @@
                                 <tree editable="buttom">
                                     <field name="name"/>
                                     <field name="email"/>
-                                    <field name="parent_id"/>
-                                    <field name="is_shop"/>
+                                    <field name="parent_id" invisible="1"/>
+                                    <field name="is_shop" invisible="1"/>
                                     <field name="phone"/>
                                     <field name="mobile"/>
                                 </tree>                  

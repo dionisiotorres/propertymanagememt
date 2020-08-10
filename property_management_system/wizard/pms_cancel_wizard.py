@@ -10,5 +10,5 @@ class PMSLeaseCancelWizard(models.TransientModel):
     def action_cancel_wiz(self):
         lease_ids = self.env['pms.lease_agreement'].browse(
             self._context.get('active_id', []))
-        lease_ids.write({'state': 'CANCELLED'})
+        lease_ids.action_cancel()
         return True

@@ -50,6 +50,7 @@ class PMSLeaseAgreement(models.Model):
 
     def _get_property(self):
         return self.env.user.current_property_id
+            
 
     name = fields.Char("Name",
                        default="New",
@@ -153,7 +154,36 @@ class PMSLeaseAgreement(models.Model):
                                      string="Reconfig Flag")
     booking_ref_code = fields.Char("Booking Ref Code", store=True, track_visibility=True)
     shop_ids = fields.One2many('res.partner', "lease_id",  string='Shop', readonly=False, store=True, track_visibility=True, index=True)
-    # shop_id = fields.Many2one("res.partner","Shop", store=True, track_visibility=True)
+    total_amount = fields.Float("Total Amount", compute="get_total_amount")
+    area = fields.Char("Area", compute="get_area")
+    activation_date = fields.Date("Activation Date", compute='_get_activation_date', required=True, store=True)
+
+    
+    @api.depends('start_date','property_id')
+    def _get_activation_date(self):
+        if self.property_id and self.start_date:
+            self.activation_date = self.start_date - relativedelta(days= self.property_id.terminate_days)
+
+    @api.depends('lease_agreement_line')
+    def get_area(self):
+        for lage in self:
+            if lage.lease_agreement_line:
+                l = 1
+                lage.area = ''
+                for lagel in lage.lease_agreement_line:
+                    if len(lage.lease_agreement_line) > 1 and l < len(lage.lease_agreement_line):
+                        lage.area += str(lagel.area) + ' | '
+                        l +=1
+                    else:
+                        lage.area += str(lagel.area)
+
+
+    @api.depends('lease_agreement_line')
+    def get_total_amount(self):
+        for lage in self:
+            if lage.lease_agreement_line:
+                for leal in lage.lease_agreement_line:
+                    lage.total_amount += leal.total_amount
 
     @api.one
     @api.depends('company_tanent_id', 'lease_agreement_line')
@@ -266,6 +296,12 @@ class PMSLeaseAgreement(models.Model):
             force_company=self.env.user.company_id.id,force_property = property.id).next_by_code(formats))
         return fromat_no_pre + format_no
 
+    
+    @api.multi
+    def action_multi_activation(self):
+        for lage in self:
+            lage.action_activate()
+
     @api.multi
     def action_activate(self):        
         if self.property_id and self.lease_no == 'New':
@@ -279,6 +315,11 @@ class PMSLeaseAgreement(models.Model):
             res['name'] = self.name
             res['lease_no'] = self.lease_no
             for line in self.lease_agreement_line:
+                lease_line_ids = self.env['pms.lease_agreement.line'].search([('unit_no','=', line.unit_no.id),('state','=','BOOKING')])
+                if lease_line_ids:
+                    for lid in lease_line_ids:
+                        if line != lid.lease_agreement_id:
+                            lid.lease_agreement_id.write({'state':'CANCELLED'})
                 if line.reconfig_flag not in ('config', 'survey'):
                     res['lease_agreement_line_id'] = res[
                         'lease_agreement_id'] = res['unit_no'] = res[
@@ -802,7 +843,15 @@ class PMSLeaseAgreement(models.Model):
 
     @api.multi
     def action_cancel(self):
-        return self.write({'state': 'CANCELLED'})
+        for lage in self:
+            today = datetime.today().date()
+            if lage.state == "NEW":
+                if lage.activation_date < today:
+                    raise UserError(_("This lease cannot be cancelled."))
+                else:
+                    self.write({'state': 'CANCELLED'})
+            else:
+                self.write({'state': 'CANCELLED'})
 
     @api.multi
     def action_reset_confirm(self):
@@ -1209,7 +1258,7 @@ class PMSLeaseAgreement(models.Model):
             if 'BOOKING' not in vals or 'CANCELLED' not in vals:
                 if self.lease_agreement_line:
                     for lal in self.lease_agreement_line:
-                        exported = lal.unit_no.spaceunittype_id.space_type_id.is_export
+                        exported = lal.unit_no.spaceunittype_id.space_type_id.is_import
                         if exported:
                             property_id = self.env['pms.properties'].browse(
                                 vals['property_id']
@@ -1277,7 +1326,7 @@ class PMSLeaseAgreement(models.Model):
                                     if lal.applicable_type_line_id:
                                         for chline in lal.applicable_type_line_id:
                                             if chline.applicable_charge_id.charge_type_id:
-                                                exported = chline.applicable_charge_id.charge_type_id.is_export
+                                                exported = chline.applicable_charge_id.charge_type_id.is_import
                                                 if exported:
                                                     leasers_api_id = integ_line_obj.search([
                                                         ('name', '=', "RentSchedule")
@@ -1415,19 +1464,9 @@ class PMSLeaseAgreementLine(models.Model):
     reconfig_date = fields.Date("Reconfig Date")
     shop_ids = fields.One2many('res.partner', "lease_line_id", string='Shop', related="company_tanent_id.shop_ids", readonly=False, store=True, track_visibility=True, index=True)
     shop_id = fields.Many2one("res.partner","Shop Name", store=True, track_visibility=True)
+    area = fields.Float("Area", related="unit_no.area")
+    total_amount = fields.Float("Total Amount", compute="get_total_amount")
 
-    # @api.onchange('shop_ids')
-    # def domain_lease_tanent_id(self):
-    #     if self.shop_ids: 
-    #         shop = []
-    #         if len(self.shop_ids) >1:
-    #             for ts in self.shop_ids:
-    #                 shop.append(ts.id)
-    #             return {'domain':{'shop_id':[('id','in',shop)]}}
-    #         if len(self.shop_ids) == 1:
-    #             self.shop_id = self.lease_agreement_id.company_tanent_id
-    #     else:
-    #         self.shop_id = self.lease_agreement_id.company_tanent_id
 
     @api.one
     @api.depends('unit_no', 'lease_no')
@@ -1684,6 +1723,13 @@ class PMSLeaseAgreementLine(models.Model):
                                         for lid in lease_line_ids:
                                             lid.write({'is_api_post': True})
 
+    @api.depends("applicable_type_line_id")
+    def get_total_amount(self):
+        for leal in self:
+            if leal.applicable_type_line_id:
+                for appl in leal.applicable_type_line_id:
+                    leal.total_amount += appl.total_amount
+                        
     @api.multi
     def unlink(self):
         for agl in self:
@@ -1713,7 +1759,7 @@ class PMSChargeTypes(models.Model):
     charge_method_type = fields.Selection([('fix','Fix'),('$-area',"$/sqft")],"Charge Method type")
     calculate_period = fields.Selection([('hourly',"Hourly"),('daily',"Daily"),('weekly',"Weekly"),('monthly',"Monthly"),('quaterly',"Quarterly"),('yearly',"Yearly")],"Calculate Peroid")
     billing_frequency = fields.Selection([('minthly','Monthly'),('quarter',"Quarterly"),('yearly','Yearly')],"Billing Frequency")
-    is_export = fields.Boolean("Import?")
+    is_import = fields.Boolean("Import?")
     remark = fields.Text("Remark")
     
     _sql_constraints = [('name_unique', 'unique(name)',

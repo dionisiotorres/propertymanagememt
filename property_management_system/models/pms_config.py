@@ -1,5 +1,6 @@
+import re
 from odoo import models, fields, api, tools, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class PmsFormat(models.Model):
@@ -78,6 +79,19 @@ class PmsFormatDetail(models.Model):
     _order = "sequence"
 
     @api.one
+    @api.constrains('fix_value')
+    def _check_fix_value(self):
+        if self.fix_value:
+            p = re.compile("[A-Za-z0-9/#|-]")
+            res = p.match(self.fix_value)
+            if res:
+                return True
+            else:
+                raise ValidationError(_('fix characters allowed for [A-Za-z0-9/#|-].'))
+        else:
+            raise ValidationError(_('fix value is not existed.'))
+
+    @api.one
     @api.depends(
         'fix_value',
         'digit_value',
@@ -123,6 +137,7 @@ class PmsFormatDetail(models.Model):
     sequence = fields.Integer()
     index = fields.Integer(compute='_compute_index')
 
+    
     @api.one
     def _compute_index(self):
         cr, uid, ctx = self.env.args

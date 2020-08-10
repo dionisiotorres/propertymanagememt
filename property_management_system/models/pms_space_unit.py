@@ -11,7 +11,7 @@ class PMSSpaceUnit(models.Model):
     _name = 'pms.space.unit'
     _inherit = ['mail.thread']
     _description = "Space Units"
-    _order = "parent_id"
+    _order = "name,parent_id"
 
     def _get_property(self):
         return self.env.user.current_property_id
@@ -294,7 +294,7 @@ class PMSSpaceUnit(models.Model):
         for pro in property_id:
             property_ids = pro
             spacetype = spappid = []
-            space_type_ids = self.env['pms.space.type'].search([('is_export','=',True)])
+            space_type_ids = self.env['pms.space.type'].search([('is_import','=',True)])
             for sp in space_type_ids:
                 spacetype.append(sp.id)
             applicable_space_ids = self.env['pms.applicable.space.type'].search([('space_type_id','in',spacetype)])
@@ -372,7 +372,7 @@ class PMSSpaceUnit(models.Model):
         id = None
         values['is_add_facilities'] = True
         id = super(PMSSpaceUnit, self).create(values)
-        exported = id.spaceunittype_id.space_type_id.is_export
+        exported = id.spaceunittype_id.space_type_id.is_import
         if id and exported:
             if 'is_api_post' not in values:
                 property_obj = self.env['pms.properties']
@@ -444,7 +444,7 @@ class PMSSpaceUnit(models.Model):
                     fac_id.write({'status': True})
         id = None
         id = super(PMSSpaceUnit, self).write(val)
-        exported = self.spaceunittype_id.space_type_id.is_export
+        exported = self.spaceunittype_id.space_type_id.is_import
         if id and exported:
             property_id = None
             if 'property_id' in val:

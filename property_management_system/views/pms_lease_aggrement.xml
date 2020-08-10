@@ -8,11 +8,11 @@
         <form>
           <header>
             <button name="%(action_activate_wiz)d" string="Activate" class="oe_highlight" type="action" states="BOOKING"/>
-            <button name="%(action_cancel_wiz)d" states="BOOKING" type="action" string="Cancel"/>
             <button name="action_reset_confirm" states="CANCELLED" type="object" string="Reset Confirm"/>
             <button name="%(action_extend_wiz)d" states="NEW,EXTENDED" type="action" string="Extend" class="btn-primary" context="{'active_id':active_id}" attrs="{'invisible': [('state', 'not in', ['NEW','EXTENDED'])]}"/>
             <button name="action_renew" states="NEW,EXTENDED" type="object" string="Renew"/>
             <button name="%(action_terminate_wiz)d" states="NEW,EXTENDED" type="action" string="TERMINATE"/>
+            <button name="%(action_cancel_wiz)d" states="BOOKING,NEW" type="action" string="Cancel"/>
             <field name="state" widget="statusbar" statusbar_visible="BOOKING,NEW,EXTENDED,RENEWED,CANCELLED,PRE-TERMINATED,EXPIRED"/>
           </header>
           <sheet>
@@ -46,6 +46,7 @@
                   <field name="end_date"  attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
                   <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','not in', ['EXTENDED','PRE-TERMINATED'])],'readonly':[('state','in',['EXTENDED','PRE-TERMINATED'])]}" />
                   <field name="company_id" invisible="1"/>
+                  <field name="activation_date" attrs="{'invisible': [('state','not in',['NEW','BOOKING'])]}"/>
                   <field name="terminate_period" attrs="{'invisible': [('state','not in',['NEW','PRE-TERMINATED'])], 'readonly':[('state','in',['PRE-TERMINATED'])]}"/>
                   <field name="reconfig_flag" attrs="{'invisible':[('reconfig_flag','not in',['survey'])]}"/>
               </group>
@@ -70,6 +71,7 @@
                             <field name="end_date" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
                             <field name="extend_to" string="Extend To" attrs="{'invisible': [('state','in', ['BOOKING'])]}"/>
                             <field name="remark" attrs="{'readonly': [('state','not in', ['BOOKING'])]}"/>
+                            <field name="total_amount"/>
                           </group>
                         </group>
                       <notebook>
@@ -115,6 +117,7 @@
                     </form>
                       <tree attrs="{'readonly': [('parent.state','not in', ['BOOKING'])]}">
                         <field name="unit_no"/>
+                        <field name="area"/>
                         <field name="shop_id"/>
                         <field name="start_date" />
                         <field name="end_date" />
@@ -122,10 +125,11 @@
                         <field name="remark" />
                         <field name="reconfig_date"/>
                         <field name="reconfig_flag" attrs="{'invisible': [('reconfig_flag','!=', 'config')]}"/>
+                        <field name="total_amount"/>
                       </tree>
                     </field>
                 </page>
-                <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['BOOKING'])]}">
+                <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['NEW'])], 'invisible': [('state','in', ['BOOKING'])]}">
                   <group>
                     <group colspan="2">
                       <field name="pos_submission" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
@@ -140,7 +144,7 @@
                     </group>
                   </group>
                 </page>
-                <page string="Charge Configuration" attrs="{'invisible': [('state','in', ['BOOKING'])]}">
+                <page string="Charge Configuration">
                   <field name="applicable_type_line_id"  readonly="1">
                     <form>
                       <group>
@@ -194,16 +198,17 @@
       <field name="model">pms.lease_agreement</field>
       <field name="arch" type="xml">
         <tree>
-          <field name="property_id"/>
           <field name="company_tanent_id"/>
+          <field name="property_id"/>
           <field name="unit_no"/>
           <field name="lease_no"/>
           <field name="old_lease_no"/>
           <field name="booking_ref_code"/>
-          <!-- <field name="booking_date" attrs="{'invisible':[('state','not in',['BOOKING'])]}"/>
-          <field name="booking_expdate" attrs="{'invisible':[('state','not in',['BOOKING'])]}"/> -->
+          <field name="area"/>
+          <field name="total_amount"/>
           <field name="start_date" />
           <field name="end_date" />
+          <field name="activation_date"/>
           <field name="state"/>
         </tree>
       </field>
@@ -438,7 +443,7 @@
                 <group>
                   <field name="calculate_method_ids" widget="many2many_tags"/>
                   <field name="description" placeholder="Descripton"/>
-                  <field name="is_export" />
+                  <field name="is_import" />
                   <field name="remark" placeholder="Remark"/>
                 </group>
                 <group>
@@ -463,7 +468,7 @@
           <field name="description"/>
           <field name="calculate_method_ids" widget="many2many_tags"/>
           <field name="space_type_ids"/>
-          <field name="is_export" />    
+          <field name="is_import" />    
         </tree>
       </field>
     </record>

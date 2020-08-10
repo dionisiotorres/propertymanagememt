@@ -33,7 +33,7 @@
           <field name="inherit_id" ref="base.res_config_settings_view_form" />
           <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="ZPMS" string="ZPMS" data-key="zpms" groups="base.group_erp_manager">
+                <div class="app_settings_block" data-string="property_management_system" string="ZPMS" data-key="property_management_system" groups="base.group_erp_manager">
                   <h4 style="background-color:#e6e6e6;padding: 5px 5px 5px 15px;">Fixed Code Integration</h4>
                   <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-4 o_setting_box">

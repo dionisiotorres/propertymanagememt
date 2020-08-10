@@ -12,7 +12,7 @@ class PMSSpaceType(models.Model):
     active = fields.Boolean(default=True)
     sequence = fields.Integer(track_visibility=True)
     index = fields.Integer(compute='_compute_index')
-    is_export = fields.Boolean("Is Export?")
+    is_import = fields.Boolean("Import?")
 
     @api.one
     def _compute_index(self):

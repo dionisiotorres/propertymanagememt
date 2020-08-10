@@ -75,7 +75,7 @@ class PMSSpaceUnitFacilityLines(models.Model):
         res = super(PMSSpaceUnitFacilityLines,self).create(values)
         if 'unit_id' in values and 'is_api_post' not in values:
             unit_id = self.env['pms.space.unit'].browse(values['unit_id'])
-            if unit_id.spaceunittype_id.space_type_id.is_export:    
+            if unit_id.spaceunittype_id.space_type_id.is_import:    
                 if 'facility_id' in values:
                     facility_id = self.env['pms.facilities'].browse(values['facility_id'])
                     values['utilities_type_id'] = facility_id.utilities_type_id.export_utilities_type

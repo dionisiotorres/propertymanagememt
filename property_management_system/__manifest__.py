@@ -5,7 +5,7 @@
     'description':
     """Property Management System for Payment Bill Transporting Analysis""",
     'author':
-    "Aung Myo Swe",
+    "Zando Technology",
     'summary':
     """Property Management System""",
     'website':
@@ -13,7 +13,7 @@
     'category':
     'base',
     'version':
-    '1.0.7',
+    '1.0.8',
     'depends': ['base', 'contacts', 'uom', 'account', 'mail', 'web'],
     'data': [
         'security/property_security.xml',
@@ -40,6 +40,7 @@
         'data/pms.calculation.method.csv',
         'data/pms.charge_types.csv',
         'data/pms_space_type_data.xml',
+        'data/pms_lease_agreement_data.xml',
         'views/pms_property_type_view.xml',
         'views/pms_properties_view.xml',
         'views/pms_floor_views.xml',

@@ -1,5 +1,5 @@
 id,name,code,export_utilities_type
 utilities_supply_type_1,Electrical Power,EP,PM
-utilities_supply_type_2,TCA TYPE,TCA
-utilities_supply_type_3,WATER,WT,WM
-utilities_supply_type_4,GAS,GS,GM
+utilities_supply_type_2,TCA Type,TCA
+utilities_supply_type_3,Water,WT,WM
+utilities_supply_type_4,Gas,GS,GM

@@ -51,8 +51,8 @@ access_pms_township_all,pms.township,model_pms_township,group_property_user,1,1,
 access_pms_township_mamager,pms.township,model_pms_township,group_property_manager,1,1,1,1
 access_pms_uitility_supply,pms.utilities.supply,model_pms_utilities_supply,group_property_user,1,1,1,1
 access_pms_uitility_supply_manager,pms.utilities.supply,model_pms_utilities_supply,group_property_manager,1,1,1,1
-access_pms_utilities_type,pms.utilities.type,model_pms_utilities_type,group_property_user,1,0,0,0
-access_pms_utilities_type_manager,pms.utilities.type,model_pms_utilities_type,group_property_manager,1,0,0,0
+access_pms_utilities_type,pms.utilities.type,model_pms_utilities_type,group_property_user,1,1,0,0
+access_pms_utilities_type_manager,pms.utilities.type,model_pms_utilities_type,group_property_manager,1,1,0,0
 access_pms_equipment_type,pms.equipment.type,model_pms_equipment_type,group_property_user,1,1,1,1
 access_pms_equipment_type_manager,pms.equipment.type,model_pms_equipment_type,group_property_manager,1,1,1,1
 access_pms_equipment,pms.equipment,model_pms_equipment,group_property_user,1,1,1,1

@@ -79,17 +79,18 @@ class PmsFormatDetail(models.Model):
     _order = "sequence"
 
     @api.one
-    @api.constrains('fix_value')
+    @api.constrains('fix_value','value_type')
     def _check_fix_value(self):
-        if self.fix_value:
-            p = re.compile("[A-Za-z0-9/#|-]")
-            res = p.match(self.fix_value)
-            if res:
-                return True
+        if self.value_type == 'fix':
+            if self.fix_value:
+                p = re.compile("[A-Za-z0-9/#|-]")
+                res = p.match(self.fix_value)
+                if res:
+                    return True
+                else:
+                    raise ValidationError(_('fix characters allowed for [A-Za-z0-9/#|-].'))
             else:
-                raise ValidationError(_('fix characters allowed for [A-Za-z0-9/#|-].'))
-        else:
-            raise ValidationError(_('fix value is not existed.'))
+                raise ValidationError(_('fix value is not existed.'))
 
     @api.one
     @api.depends(

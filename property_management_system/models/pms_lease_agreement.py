@@ -144,7 +144,7 @@ class PMSLeaseAgreement(models.Model):
                                            "Rental Details",
                                            track_visibility=True)
     applicable_type_line_id = fields.One2many(
-        'pms.lease.unit.charge.type.line', 'lease_id', "Charge Types")
+        'pms.lease.unit.charge.type.line', 'lease_id', string="Charge Types")
     booking_date = fields.Date("Booking Date", required=True)
     booking_expdate = fields.Date("Booking ExpDate")
     is_api_post = fields.Boolean("Posted")

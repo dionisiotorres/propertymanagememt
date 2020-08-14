@@ -2,12 +2,13 @@ import json
 import datetime
 import calendar
 import logging
+from odoo import models, fields, api, _
+from odoo.addons.property_management_system.models import api_rauth_config
 from calendar import monthrange
-from odoo import models, fields, api, tools, _
-from odoo.exceptions import UserError
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from odoo.addons.property_management_system.models import api_rauth_config
+
+
 _logger = logging.getLogger(__name__)
 
 class IrSequence(models.Model):
@@ -156,13 +157,17 @@ class PMSLeaseAgreement(models.Model):
     shop_ids = fields.One2many('res.partner', "lease_id",  string='Shop', readonly=False, store=True, track_visibility=True, index=True)
     total_amount = fields.Float("Total Amount", compute="get_total_amount")
     area = fields.Char("Area", compute="get_area")
-    activation_date = fields.Date("Activation Date", compute='_get_activation_date', required=True, store=True)
+    activation_date = fields.Date("Activation Date", compute='_get_activation_date', store=True)
+    leaseunitpos_line_id = fields.One2many("pms.lease.unit.pos",
+                                           'leaseagreement_id',
+                                           "Lease Unit POS")
 
     
     @api.depends('start_date','property_id')
-    def _get_activation_date(self):
-        if self.property_id and self.start_date:
-            self.activation_date = self.start_date - relativedelta(days= self.property_id.terminate_days)
+    def _get_activation_date(self): 
+        if self.state =='NEW':
+            if self.property_id and self.start_date:
+                self.activation_date = self.start_date - relativedelta(days= self.property_id.terminate_days)
 
     @api.depends('lease_agreement_line')
     def get_area(self):
@@ -245,7 +250,7 @@ class PMSLeaseAgreement(models.Model):
 
    
 
-    def format_generate(self,property,format):
+    def format_generate(self, property, format):
         formats = None
         for prop in property:
             if not format:
@@ -255,33 +260,35 @@ class PMSLeaseAgreement(models.Model):
             if format and format.format_line_id:
                 val = []
                 formats = format.sample
+                model = 'Lease Agreement'
                 for ft in format.format_line_id:
-                    if ft.value_type == 'dynamic':
-                        if prop.code and ft.dynamic_value == 'property code':
-                            val.append(prop.code)
-                    if ft.value_type == 'fix':
-                        val.append(ft.fix_value)
-                    if ft.value_type == 'digit':
-                        sequent_ids = self.env['ir.sequence'].search([
-                            ('name', '=', 'Lease Agreement'),('property_id','=',prop.id), ('code','=',formats)
-                        ])
-                        if not sequent_ids:
-                            sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':prop.id,'code': formats})
-                        sequent_ids.write({'padding': ft.digit_value})
-                    if ft.value_type == 'datetime':
-                        mon = yrs = ''
-                        if ft.datetime_value == 'MM':
-                            mon = datetime.today().month
-                            val.append(mon)
-                        if ft.datetime_value == 'MMM':
-                            mon = datetime.today().strftime('%b')
-                            val.append(mon)
-                        if ft.datetime_value == 'YY':
-                            yrs = datetime.today().strftime("%y")
-                            val.append(yrs)
-                        if ft.datetime_value == 'YYYY':
-                            yrs = datetime.today().strftime("%Y")
-                            val.append(yrs)
+                    val = ft.get_type_value(model,prop,val)
+                    # if ft.value_type == 'dynamic':
+                    #     if prop.code and ft.dynamic_value == 'property code':
+                    #         val.append(prop.code)
+                    # if ft.value_type == 'fix':
+                    #     val.append(ft.fix_value)
+                    # if ft.value_type == 'digit':
+                    #     sequent_ids = self.env['ir.sequence'].search([
+                    #         ('name', '=', 'Lease Agreement'),('property_id','=',prop.id), ('code','=',formats)
+                    #     ])
+                    #     if not sequent_ids:
+                    #         sequent_ids = self.env['ir.sequence'].create({'name':'Lease Agreement','property_id':prop.id,'code': formats})
+                    #     sequent_ids.write({'padding': ft.digit_value})
+                    # if ft.value_type == 'datetime':
+                    #     mon = yrs = ''
+                    #     if ft.datetime_value == 'MM':
+                    #         mon = datetime.today().month
+                    #         val.append(mon)
+                    #     if ft.datetime_value == 'MMM':
+                    #         mon = datetime.today().strftime('%b')
+                    #         val.append(mon)
+                    #     if ft.datetime_value == 'YY':
+                    #         yrs = datetime.today().strftime("%y")
+                    #         val.append(yrs)
+                    #     if ft.datetime_value == 'YYYY':
+                    #         yrs = datetime.today().strftime("%Y")
+                    #         val.append(yrs)
                 # space = []
                 fromat_no_pre = ''
                 if len(val) > 0:
@@ -401,54 +408,18 @@ class PMSLeaseAgreement(models.Model):
                     if line.property_id:
                         property_id = line.property_id
                         leasepos_no_pre = ''
+                        formats = ''
+                        model = 'Lease POS ID'
                         if property_id.is_autogenerate_posid:
                             for prop in property_id:
-                                if not prop.pos_id_format:
-                                    raise UserError(
-                                        _("Please set POSID Format in this property setting."
-                                          ))
-                                if prop.pos_id_format and prop.pos_id_format.format_line_id:
-                                    val = []
-                                    for ft in prop.pos_id_format.format_line_id:
-                                        if ft.value_type == 'dynamic':
-                                            if property_id.code and ft.dynamic_value == 'property code':
-                                                val.append(property_id.code)
-                                        if ft.value_type == 'fix':
-                                            val.append(ft.fix_value)
-                                        if ft.value_type == 'digit':
-                                            sequent_ids = self.env[
-                                                'ir.sequence'].search([
-                                                    ('name', '=',
-                                                     'Lease Interface Code')
-                                                ])
-                                            sequent_ids.write(
-                                                {'padding': ft.digit_value})
-                                        if ft.value_type == 'datetime':
-                                            mon = yrs = ''
-                                            if ft.datetime_value == 'MM':
-                                                mon = datetime.today().month
-                                                val.append(mon)
-                                            if ft.datetime_value == 'MMM':
-                                                mon = datetime.today(
-                                                ).strftime('%b')
-                                                val.append(mon)
-                                            if ft.datetime_value == 'YY':
-                                                yrs = datetime.today(
-                                                ).strftime("%y")
-                                                val.append(yrs)
-                                            if ft.datetime_value == 'YYYY':
-                                                yrs = datetime.today(
-                                                ).strftime("%Y")
-                                                val.append(yrs)
-                                    # space = []
-                                    if len(val) > 0:
-                                        for l in range(len(val)):
-                                            leasepos_no_pre += str(val[l])
+                                leasepos_no_pre, formats = self.get_pos_pre_format(model, prop, leasepos_no_pre)
                         leasepos_no = ''
-                        company_id = self.env.user.company_id.id
-                        leasepos_no += self.env['ir.sequence'].with_context(
-                            force_company=company_id).next_by_code(
-                                'pms.lease.interface.code')
+                        sequent_ids = self.env['ir.sequence'].search([('name', '=',model),('property_id','=',property_id.id),('code','=',formats)])
+                        if not sequent_ids:
+                            sequent_ids = self.env['ir.sequence'].create({'name':model,'property_id':property_id.id,'code': formats})
+
+                        leasepos_no += str(self.env['ir.sequence'].with_context(
+                            force_company=self.env.user.company_id.id,force_property = property_id.id).next_by_code(formats))
                         posinterface_id = self.env[
                             'pms.lease.interface.code'].create(
                                 {'name': leasepos_no_pre + leasepos_no})
@@ -456,7 +427,8 @@ class PMSLeaseAgreement(models.Model):
                             'posinterfacecode_id':
                             posinterface_id.id,
                             'leaseagreementitem_id':
-                            line.id
+                            line.id,
+                            'leaseagreement_id':line.lease_agreement_id.id,
                         })
         if self.state == 'NEW' and self.extend_to:
             self.write({'state': 'EXTENDED'})
@@ -471,6 +443,22 @@ class PMSLeaseAgreement(models.Model):
                             val.append(sche.id)
                     # lease.action_invoice(inv_type='INITIAL_PAYMENT', vals=val)
             return self.write({'state': 'NEW'})
+    
+    def get_pos_pre_format(self, model, prop, leasepos_no_pre):
+        formats = ''
+        if not prop.pos_id_format:
+            raise UserError(
+                _("Please set POSID Format in this property setting."
+                    ))
+        if prop.pos_id_format and prop.pos_id_format.format_line_id:
+            val = []
+            formats = prop.pos_id_format.sample
+            for ft in prop.pos_id_format.format_line_id:
+                val = ft.get_type_value(model,prop,val)
+            if len(val) > 0:
+                for l in range(len(val)):
+                    leasepos_no_pre += str(val[l])
+        return leasepos_no_pre, formats
 
     def rent_schedule_prorated(self, bill_type, line, res, next_month_sdate):
         day = 0

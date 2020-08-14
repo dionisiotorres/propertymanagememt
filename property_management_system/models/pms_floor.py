@@ -68,12 +68,12 @@ class PMSFloor(models.Model):
 
     @api.multi
     def _get_count_unit(self):
-        count = 0
         unit_ids = self.env['pms.space.unit'].search([('floor_id', '=',
                                                        self.id),
                                                       ('active', '=', True)])
         for unit in unit_ids:
-            self.count_unit += 1
+            if unit:
+                self.count_unit += 1
 
     @api.multi
     def action_units(self):

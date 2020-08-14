@@ -129,21 +129,6 @@
                       </tree>
                     </field>
                 </page>
-                <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['NEW'])], 'invisible': [('state','in', ['BOOKING'])]}">
-                  <group>
-                    <group colspan="2">
-                      <field name="pos_submission" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
-                      <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>                
-                      <field name="sale_data_type" widget="radio"   options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
-                      <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/> 
-                    </group>
-                    <group>   
-                      <field name="reset_gp_flat" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
-                      <field name="reset_date" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
-                      <field name="remark" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
-                    </group>
-                  </group>
-                </page>
                 <page string="Charge Configuration">
                   <field name="applicable_type_line_id"  readonly="1">
                     <form>
@@ -173,9 +158,36 @@
                     </tree>
                   </field>
                 </page>
+                <page name="POS Configuration" string="POS Configuration" attrs="{'readonly': [('state','not in', ['NEW'])], 'invisible': [('state','in', ['BOOKING'])]}">
+                  <group>
+                    <group colspan="2">
+                      <field name="pos_submission" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="pos_submission_type" widget="radio"  options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>                
+                      <field name="sale_data_type" widget="radio"   options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="pos_submission_frequency" widget="radio" options="{'horizontal':True}" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/> 
+                    </group>
+                    <group>   
+                      <field name="reset_gp_flat" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="reset_date" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                      <field name="remark" attrs="{'readonly': [('state','in', ['PRE-TERMINATED'])]}"/>
+                    </group>
+                  </group>
+                </page>
+                <page name="POSID Configuration" string="POSID Configuration" attrs="{'invisible': [('state','in', ['BOOKING'])]}">
+                   <field name = "leaseunitpos_line_id">
+                    <tree editable="buttom">
+                        <field name="leaseagreement_id" invisible='1'/>
+                        <field name="leaseagreementitem_id" options="{'no_create': True, 'no_create_edit':True, 'no_open':True}"/>
+                        <field name="posinterfacecode_id"/>
+                        <field name="useposid"/>
+                        <field name="inactivedate"/>
+                      </tree>
+                  </field>
+                </page>
                 <page string="Rent Schedule" attrs="{'invisible': [('state','in', ['BOOKING'])]}">
                   <field name = "lease_rent_config_id" readonly="1">
                     <tree editable="buttom">
+                    
                       <field name="lease_agreement_line_id"/>
                       <field name="charge_type"/>
                       <field name="start_date"/>

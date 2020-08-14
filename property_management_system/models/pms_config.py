@@ -1,6 +1,8 @@
 import re
+import datetime
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError, ValidationError
+from datetime import datetime
 
 
 class PmsFormat(models.Model):
@@ -32,22 +34,23 @@ class PmsFormat(models.Model):
     @api.multi
     @api.depends('format_line_id')
     def get_sample_format(self):
-        f_val = []
-        self.sample = ''
-        if self.format_line_id:
-            for fl in self.mapped('format_line_id'):
-                if fl.value_type == 'fix' and fl.fix_value:
-                    f_val.append(fl.fix_value)
-                if fl.value_type == 'digit' and fl.digit_value:
-                    for d in range(fl.digit_value):
-                        f_val.append(str(d+1))
-                if fl.value_type == 'dynamic' and fl.dynamic_value:
-                    f_val.append(fl.dynamic_value)
-                if fl.value_type == 'datetime' and fl.datetime_value:
-                    f_val.append(fl.datetime_value)
-            if f_val:
-                for sm in range(len(f_val)):
-                    self.sample += f_val[sm]
+        for line in self:
+            f_val = []
+            line.sample = ''
+            if line.format_line_id:
+                for fl in line.mapped('format_line_id'):
+                    if fl.value_type == 'fix' and fl.fix_value:
+                        f_val.append(fl.fix_value)
+                    if fl.value_type == 'digit' and fl.digit_value:
+                        for d in range(fl.digit_value):
+                            f_val.append(str(d+1))
+                    if fl.value_type == 'dynamic' and fl.dynamic_value:
+                        f_val.append(fl.dynamic_value)
+                    if fl.value_type == 'datetime' and fl.datetime_value:
+                        f_val.append(fl.datetime_value)
+                if f_val:
+                    for sm in range(len(f_val)):
+                        line.sample += f_val[sm]
 
     @api.multi
     def toggle_active(self):
@@ -143,6 +146,37 @@ class PmsFormatDetail(models.Model):
     def _compute_index(self):
         cr, uid, ctx = self.env.args
         self.index = self._model.search_count(cr,uid,[('sequence','<',self.sequence)],context=ctx) + 1
+
+    def get_type_value(self, model, property, val):
+        for line in self:
+            if line.value_type == 'dynamic':
+                if property.code and line.dynamic_value == 'property code':
+                    val.append(property.code)
+            if line.value_type == 'fix':
+                val.append(line.fix_value)
+            if line.value_type == 'digit':
+                sequent_ids = line.env[
+                    'ir.sequence'].search([
+                        ('name', '=',
+                            model)
+                    ])
+                sequent_ids.write(
+                    {'padding': line.digit_value})
+            if line.value_type == 'datetime':
+                mon = yrs = ''
+                if line.datetime_value == 'MM':
+                    mon = datetime.today().month
+                    val.append(mon)
+                if line.datetime_value == 'MMM':
+                    mon = datetime.today().strftime('%b')
+                    val.append(mon)
+                if line.datetime_value == 'YY':
+                    yrs = datetime.today().strftime("%y")
+                    val.append(yrs)
+                if line.datetime_value == 'YYYY':
+                    yrs = datetime.today().strftime("%Y")
+                    val.append(yrs)
+        return val
 
 
 class Users(models.Model):

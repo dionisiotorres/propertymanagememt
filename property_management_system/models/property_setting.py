@@ -866,23 +866,24 @@ class Partner(models.Model):
                             _("%s is already existed" % vals['name']))
         id = None
         id = super(Partner, self).write(vals)
-        if self.is_company and self.company_channel_type:
-            if 'is_api_post' not in vals:
-                property_id = None
-                integ_obj = self.env['pms.api.integration'].search([])
-                api_line_ids = self.env['pms.api.integration.line'].search([
-                    ('name', '=', "CRMAccount")
-                ])
-                datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
-                if datas:
-                    if 'res' in datas:
-                        if datas.res:
-                            response = json.loads(datas.res)
-                            if 'responseStatus' in response:
-                                if response['responseStatus']:
-                                    if 'message' in response:
-                                        if response['message'] == 'SUCCESS':
-                                            self.write({'is_api_post': True})
+        if self.env.user.current_property_id.api_integration:
+            if self.is_company and self.company_channel_type:
+                if 'is_api_post' not in vals:
+                    property_id = None
+                    integ_obj = self.env['pms.api.integration'].search([])
+                    api_line_ids = self.env['pms.api.integration.line'].search([
+                        ('name', '=', "CRMAccount")
+                    ])
+                    datas = api_rauth_config.APIData.get_data(self, vals, property_id, integ_obj, api_line_ids)
+                    if datas:
+                        if 'res' in datas:
+                            if datas.res:
+                                response = json.loads(datas.res)
+                                if 'responseStatus' in response:
+                                    if response['responseStatus']:
+                                        if 'message' in response:
+                                            if response['message'] == 'SUCCESS':
+                                                self.write({'is_api_post': True})
         return id
 
     @api.multi
